@@ -1,0 +1,22 @@
+{
+  "name": "anomapay-explorer",
+  "version": "1.0.0",
+  "description": "AnomaPay Multichain Explorer - Analytics dashboard for Anoma Protocol Adapter",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:create": "wrangler d1 create anomapay-db",
+    "db:migrate": "wrangler d1 execute anomapay-db --file=schema.sql",
+    "db:migrate:local": "wrangler d1 execute anomapay-db --local --file=schema.sql",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240614.0",
+    "typescript": "^5.4.5",
+    "wrangler": "^3.60.0"
+  },
+  "keywords": ["cloudflare", "workers", "web3", "anoma", "blockchain", "indexer"],
+  "author": "Bidur",
+  "license": "MIT"
+}

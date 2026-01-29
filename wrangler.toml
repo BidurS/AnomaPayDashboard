@@ -1,0 +1,17 @@
+name = "anomapay-explorer"
+main = "src/backend/index.ts"
+compatibility_date = "2024-01-01"
+
+# Cron Trigger - runs every 5 minutes to index new blocks
+[triggers]
+crons = ["*/5 * * * *"]
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "anomapay-db"
+database_id = "3a23dc95-bff2-4c87-82af-417331a10e52"
+
+# Environment variables (set secrets via `wrangler secret put`)
+# [vars]
+# ADMIN_API_KEY = "your-secret-key" # Better to use: wrangler secret put ADMIN_API_KEY
