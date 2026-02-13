@@ -13,7 +13,9 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240614.0",
+    "drizzle-kit": "^0.31.9",
     "typescript": "^5.4.5",
+    "vitest": "^4.0.18",
     "wrangler": "^4.61.1"
   },
   "keywords": [
@@ -27,7 +29,9 @@
   "author": "Bidur",
   "license": "MIT",
   "dependencies": {
+    "drizzle-orm": "^0.45.1",
     "node-fetch": "^3.3.2",
-    "viem": "^2.45.0"
+    "viem": "^2.45.0",
+    "zod": "^4.3.6"
   }
 }

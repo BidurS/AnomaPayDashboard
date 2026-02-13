@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { ArrowLeft, ExternalLink, Copy, Check, Layers, Wallet, Clock, Fuel, Shield, ArrowRight } from 'lucide-react'
 import { SEO } from './SEO'
+import { HexDecoder } from './HexDecoder'
 import { useTxDetail } from '../lib/api'
 import { useChainContext } from '../context/ChainContext'
 import { shortenAddress, formatCurrency, formatNumber, timeAgo } from '../lib/utils'
@@ -192,9 +193,9 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
                                                     {p.payload_type} #{p.payload_index}
                                                 </span>
                                             </div>
-                                            <code className="text-xs text-gray-600 dark:text-gray-300 font-mono break-all block max-h-20 overflow-hidden">
-                                                {p.blob?.substring(0, 200)}{p.blob?.length > 200 ? '...' : ''}
-                                            </code>
+                                            {p.blob && (
+                                                <HexDecoder hexData={p.blob} className="mt-2" />
+                                            )}
                                         </div>
                                     ))}
                                 </div>
