@@ -1,76 +1,81 @@
-# AnomaPay Multichain Explorer
+# Gnoma Multichain Explorer
 
-A serverless, multichain-ready indexer and analytics dashboard for tracking intents settled via the Anoma Protocol Adapter.
+## 🚀 Gnoma Explorer
+
+**Live Frontend:** [https://anomapay-explorer.pages.dev](https://anomapay-explorer.pages.dev)
+**Live API:** [https://anomapay-explorer.bidurandblog.workers.dev](https://anomapay-explorer.bidurandblog.workers.dev)
+
+A Swiss-design inspired analytics dashboard for the **Anoma Protocol** on Base. This explorer goes beyond simple transaction counting by indexing the cryptographic state of the protocol.
+
+## 🌟 Key Features
+
+### 🛡️ State-Aware Privacy Pulse
+Tracks the **Commitment Tree** state roots (`0x...`) directly from the protocol. Instead of estimating volume, we visualize the actual growth of the anonymity set, providing a true heartbeat of the privacy layer.
+
+### 🧠 Intent Intelligence
+Deeply indexes protocol payloads to classify user actions:
+- **Resource**: Creation of new shielded resources (notes).
+- **Discovery**: Intent discovery and solving operations.
+- **Application**: Direct interactions with privacy-preserving dApps.
+- **External**: Bridging and cross-chain operations.
+
+### ⚡ Smart Indexing (v2.3)
+- **High Precision**: Stores raw `BigInt` values to prevent data overflow on 18-decimal tokens.
+- **Deep Blobs**: Fully indexes intent payloads including raw hex data for offline analysis.
+- **Multi-Asset**: Track flows for any ERC20 entering the shielded pool.
+- **Self-Healing**: Automatically picks up from the last synced block.
 
 ## Stack
 
 - **Backend**: Cloudflare Workers (TypeScript) + D1 Database
-- **Indexer**: Cron-triggered event syncing via `eth_getLogs`
-- **Frontend**: React + Vite + Tailwind CSS (coming soon)
+- **Decoding**: `viem` for reliable event parsing
+- **Frontend**: React + Vite + Tailwind CSS (Swiss Style)
+- **Infrastructure**: Fully serverless, edge-deployed
 
 ## Quick Start
 
-### 1. Install Dependencies
+### 1. Develop Locally
 ```bash
-npm install
+# Start Backend (Worker)
+npm run dev
+
+# Start Frontend (Vite)
+cd frontend
+npm run dev
 ```
 
-### 2. Create D1 Database
-```bash
-npm run db:create
-```
-Copy the `database_id` from the output and paste it into `wrangler.toml`.
+### 2. Database Migration (Critical)
+If you are updating from an older version, you must apply the new schema (v2.3 uses TEXT for monetary values):
 
-### 3. Run Database Migration
 ```bash
+# Local
+npm run db:migrate:local
+
+# Production
 npm run db:migrate
 ```
 
-### 4. Set Admin API Key (Optional)
+### 3. Deploy Everything
+We have an automated script to deploy both the Cloudflare Worker and Pages frontend:
+
 ```bash
-wrangler secret put ADMIN_API_KEY
+./deploy_all.sh
 ```
 
-### 5. Update RPC URL
-Edit the Base chain entry in D1 to use your Alchemy API key:
-```bash
-wrangler d1 execute anomapay-db --command "UPDATE chains SET rpc_url = 'https://base-mainnet.g.alchemy.com/v2/YOUR_KEY' WHERE id = 8453"
-```
-
-### 6. Deploy
-```bash
-npm run deploy
-```
-
-## API Endpoints
+## API Endpoints (v2.3)
 
 ### Public
 - `GET /api/chains` - List enabled chains
-- `GET /api/stats?chainId=8453` - Get chain stats
-- `GET /api/latest-transactions?chainId=8453` - Recent transactions
+- `GET /api/stats` - Network-wide stats (Volume, Solvers, Intents)
+- `GET /api/latest-transactions` - Recent intents with **Payload Types** and Blobs
+- `GET /api/privacy-stats` - Commitment tree roots and pool size history
+- `GET /api/solvers` - Solver leaderboard (TX Count & Volume)
+- `GET /api/network-health` - Pool TVL (Raw Units) and Activity
 
-### Admin (requires `X-Admin-Key` header)
-- `GET /api/admin/chains` - List all chains
-- `POST /api/admin/chains` - Add new chain
-- `PUT /api/admin/chains/:id` - Update chain
-- `DELETE /api/admin/chains/:id` - Delete chain
-
-## Adding a New Chain
-
-```bash
-curl -X POST https://your-worker.workers.dev/api/admin/chains \
-  -H "Content-Type: application/json" \
-  -H "X-Admin-Key: your-secret" \
-  -d '{
-    "id": 1,
-    "name": "Ethereum",
-    "rpc_url": "https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY",
-    "contract_address": "0x...",
-    "start_block": 19000000,
-    "explorer_url": "https://etherscan.io",
-    "icon": "Ξ"
-  }'
-```
+### Admin (requires `X-Admin-Key`)
+- `POST /api/admin/backfill` - Sync historical blocks
+- `POST /api/admin/sync` - Trigger manual sync
+- `POST /api/admin/import` - Bulk upload JSON batches from local indexer
 
 ## License
 

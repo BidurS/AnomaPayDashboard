@@ -1,0 +1,185 @@
+{
+  "events": [
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x3cb66343d1e0607f8657b0b707a023a98363457ac206ba2d09bf779571c44d49",
+      "block_number": 40475985,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 639196,
+      "gas_price_wei": "2570370",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "timestamp": 1767741317
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x7003fb750d421f1abc02c0ba9b545852dcdbbff4a4386308bfa49df49acd76eb",
+      "block_number": 40476125,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 479720,
+      "gas_price_wei": "2480875",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "timestamp": 1767741597
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x1f4a6dac3eae0b7d2c890df9991b2012fb394e8ecb30ae00899e0d637393dc6f",
+      "block_number": 40476150,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 641766,
+      "gas_price_wei": "2366617",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "timestamp": 1767741647
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xddc4c456bb0ceafb5237affaa688e491fe9acdeca2e498bdcb3956fd9a9c2450",
+      "block_number": 40476811,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 479708,
+      "gas_price_wei": "2318292",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "timestamp": 1767742969
+    }
+  ],
+  "payloads": [
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x3cb66343d1e0607f8657b0b707a023a98363457ac206ba2d09bf779571c44d49",
+      "block_number": 40475985,
+      "payload_type": "Discovery",
+      "payload_index": 0,
+      "blob": "0x76c9036ae2f65b6537e74adc9d12358afe6dd11cf399c7f13694323206b0f584",
+      "timestamp": 1767741317
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x7003fb750d421f1abc02c0ba9b545852dcdbbff4a4386308bfa49df49acd76eb",
+      "block_number": 40476125,
+      "payload_type": "Discovery",
+      "payload_index": 0,
+      "blob": "0x05bcf3c6961b16269d29be885b3a6002fde41053a0c88ee9b3e43e67432bb5f6",
+      "timestamp": 1767741597
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x1f4a6dac3eae0b7d2c890df9991b2012fb394e8ecb30ae00899e0d637393dc6f",
+      "block_number": 40476150,
+      "payload_type": "Discovery",
+      "payload_index": 0,
+      "blob": "0x3640c949f82f4b7767a792da421fdf3c33bdc42ccf3e09c9b8becd27c6ef5af6",
+      "timestamp": 1767741647
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xddc4c456bb0ceafb5237affaa688e491fe9acdeca2e498bdcb3956fd9a9c2450",
+      "block_number": 40476811,
+      "payload_type": "Discovery",
+      "payload_index": 0,
+      "blob": "0x8420a4fb2a32f22925c47cc0b8b6351b3029e7b411a4cac52b691bd7926badb4",
+      "timestamp": 1767742969
+    }
+  ],
+  "privacy_stats": [
+    {
+      "chain_id": 8453,
+      "block_number": 40475985,
+      "root_hash": "0x0000000000000000000000000000000000000000000000000000000000000040",
+      "timestamp": 1767741317,
+      "estimated_pool_size": 0
+    },
+    {
+      "chain_id": 8453,
+      "block_number": 40476125,
+      "root_hash": "0x0000000000000000000000000000000000000000000000000000000000000040",
+      "timestamp": 1767741597,
+      "estimated_pool_size": 0
+    },
+    {
+      "chain_id": 8453,
+      "block_number": 40476150,
+      "root_hash": "0x0000000000000000000000000000000000000000000000000000000000000040",
+      "timestamp": 1767741647,
+      "estimated_pool_size": 0
+    },
+    {
+      "chain_id": 8453,
+      "block_number": 40476811,
+      "root_hash": "0x0000000000000000000000000000000000000000000000000000000000000040",
+      "timestamp": 1767742969,
+      "estimated_pool_size": 0
+    }
+  ],
+  "solvers": [
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "1642970222520",
+      "val": "0",
+      "timestamp": 1767741317
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "1190125355000",
+      "val": "0",
+      "timestamp": 1767741597
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "1518814325622",
+      "val": "0",
+      "timestamp": 1767741647
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "1112103218736",
+      "val": "0",
+      "timestamp": 1767742969
+    }
+  ],
+  "assets": [],
+  "daily_stats": [
+    {
+      "chain_id": 8453,
+      "date": "2026-01-06",
+      "count": 1,
+      "volume": "0",
+      "gas": 639196
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-06",
+      "count": 1,
+      "volume": "0",
+      "gas": 479720
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-06",
+      "count": 1,
+      "volume": "0",
+      "gas": 641766
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-06",
+      "count": 1,
+      "volume": "0",
+      "gas": 479708
+    }
+  ]
+}

@@ -1,0 +1,2811 @@
+{
+  "events": [
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x3cf85120bfc74c904a697417b37df99b00bce2a03a075465fcde475eb5dfaf81",
+      "block_number": 41061425,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0xf11d30bd423279f85243a2c7d472902b43fd5822",
+      "value_wei": "0",
+      "gas_used": 502770,
+      "gas_price_wei": "3142832",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768912197
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x485c7de191fbc5cc5c8d62ea2452d3e463109318f1a1b344cf0bb55665e7ade2",
+      "block_number": 41061985,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 502818,
+      "gas_price_wei": "4031052",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768913317
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xd22c82594bccdeb63ce137c9d387a6bea443dd5e0ef1915db2755b50f0a85a28",
+      "block_number": 41062084,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 497806,
+      "gas_price_wei": "4587116",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768913515
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x0cf9e5e90570245b6fdc57c40a4f4e4d45c7b01eeaf666e7ae5e02e4855ebf0b",
+      "block_number": 41062538,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 507806,
+      "gas_price_wei": "11420664",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768914423
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x957c40d766aea6a5cf169db5be238d77cc202fa2ebfb374cb41d1be1d6f47d94",
+      "block_number": 41062698,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 502806,
+      "gas_price_wei": "7629384",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768914743
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x481de46a54be75ebb377cf09bd48b4fd5e8ffec87cd702c17a789a382323c7ae",
+      "block_number": 41062775,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 545369,
+      "gas_price_wei": "7029893",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768914897
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x7cf18404a8ee2d3d986cd93a6bee1a462907b344124b990ca759fb0b82114bf6",
+      "block_number": 41063102,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 497830,
+      "gas_price_wei": "4575449",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768915551
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xef3689fb82779e70f51e8be4012ca90b27fd6e0dc63d06ab1c402f269d600495",
+      "block_number": 41063289,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 502770,
+      "gas_price_wei": "4521058",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768915925
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x42f82936b5a9742ead746800339e2bed370b8f6af6d834a2529636e98c5c38e4",
+      "block_number": 41063541,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 659574,
+      "gas_price_wei": "6214043",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768916429
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x643395af7bfd6aab4fa1a4f5db147ef8d633869131a3496580a40584559a2ec6",
+      "block_number": 41063848,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 492806,
+      "gas_price_wei": "5327219",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768917043
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xc4304f00ace83ff97a7d0975b3c83cd3a1d352883bda2298bd222d618097c383",
+      "block_number": 41063851,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 672485,
+      "gas_price_wei": "5380895",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768917049
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xc0bca50fa718e98ac33eb7eb8e86c1f2473d97c422f65159ba45dd2919c87d42",
+      "block_number": 41063911,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 512746,
+      "gas_price_wei": "5584710",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768917169
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xead4d5fa0145a92a4aba3c56f227a96cf16bd28cdfb345af5b12b8be313ae16a",
+      "block_number": 41063936,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 550357,
+      "gas_price_wei": "5421514",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768917219
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x69bb14368a47ecc34da1444ebb8905ceb815b618febed58f3f17f0a7ca8c9937",
+      "block_number": 41064279,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 667404,
+      "gas_price_wei": "6020413",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768917905
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x2bd87ad7f6c790e76392a4acdc1c7099ef39bf7af4ba0edc17d889d905ceddb3",
+      "block_number": 41064313,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 662364,
+      "gas_price_wei": "5872659",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768917973
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xa5053572e17b2f177b2f0166d7b6f7f4cc3dd642259f3f3fb2d88899db960015",
+      "block_number": 41064626,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 512794,
+      "gas_price_wei": "7261475",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768918599
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xe37917614d428d0d774ebc035b6df4791028183292ba001477c710ce9f6df03f",
+      "block_number": 41064629,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 507842,
+      "gas_price_wei": "7259476",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768918605
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xb00d37fe40253f52361c117246a66505d11cfbe690d8565ecb966faa5d82865b",
+      "block_number": 41064711,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 662321,
+      "gas_price_wei": "15719672",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768918769
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xf036851ea6bc292c2acc66447ce9f4f9e8dd8977de9f5ede3dc09ba418541773",
+      "block_number": 41064803,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 507770,
+      "gas_price_wei": "17837226",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768918953
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xb8b62e1dc28bb9dd9f48109dfbcdc2c33c2f8e3742d86d4e912b77a7614906eb",
+      "block_number": 41064808,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 502806,
+      "gas_price_wei": "17912424",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768918963
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x99ce15d50acbd3108ca84e05253d5f25a30c86d2283a3e1d3cd24c04ec9ae85c",
+      "block_number": 41064809,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 660071,
+      "gas_price_wei": "17977289",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768918965
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xfe8c9828462b1c23666c6ba50873b5bea3c11f87f2aee92dc723e547c51c970b",
+      "block_number": 41064918,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 512782,
+      "gas_price_wei": "13949898",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768919183
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x9bfb44ee5f5e40d31f54f07c0b79032c92641a9bde9cbe3f8174931dbb62257c",
+      "block_number": 41064920,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 668634,
+      "gas_price_wei": "13925540",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768919187
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x75510ec4709e7fac413fba416e0c9e1cecad45d606121dc0685f60c29f22d5d4",
+      "block_number": 41064941,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 663632,
+      "gas_price_wei": "12905120",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768919229
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x737cc4a7566b90de55132fff4874f5250ff92804d652684dd4deb5f878328df1",
+      "block_number": 41064970,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 663582,
+      "gas_price_wei": "12398730",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768919287
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xe4af88d2ae29dc3269430af29a957157495911d67ce3e04e665d3bf12f7c341f",
+      "block_number": 41065786,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 497782,
+      "gas_price_wei": "47805126",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768920919
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x919fffa8dbd49c91c586170f2ecfa73b1c569a05dab9dc1238255af69450d291",
+      "block_number": 41065933,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 507782,
+      "gas_price_wei": "30309103",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768921213
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x81379dfc7c66aa708edefacb271122aa58297c422e2e02887cc894648ad4eeed",
+      "block_number": 41066525,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 502746,
+      "gas_price_wei": "67374848",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768922397
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xe96f9284b1274223ab8a4f35e02cffc7f65ced86f934dfd136a3686d159c7d08",
+      "block_number": 41067103,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 502782,
+      "gas_price_wei": "10729364",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768923553
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x3c7265b495438e523fa50ac6d0dd4dcff7262e171068c3634248ee1a4cc22a11",
+      "block_number": 41067122,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 658805,
+      "gas_price_wei": "10259808",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768923591
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x96d318a4b990d87a93ec48d09a03af6c20df16375d8ca8b1ffca3d16a57c538a",
+      "block_number": 41067241,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 653589,
+      "gas_price_wei": "9769051",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768923829
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xe451448fd6358b5bf5b35a16ce4bd8faa7fc011adce55207768724defd228fac",
+      "block_number": 41067309,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 492818,
+      "gas_price_wei": "9239461",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768923965
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xcfd57ed6170af200b1fd5136fe545bbc4836fbfe0d2b8e6ba26fd24817a16fab",
+      "block_number": 41067375,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 690778,
+      "gas_price_wei": "9169256",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768924097
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x087d3debccc5581b9ae136b056c1fa5d8913778fd1e4dd711cedb5cce3565461",
+      "block_number": 41067455,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 707884,
+      "gas_price_wei": "8409505",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768924257
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x43f0347c1d5a4e27fb513edc51e67d455e39eaee9cd6c87ea6042b15701be664",
+      "block_number": 41067716,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 705949,
+      "gas_price_wei": "7659881",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768924779
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x683820054484cc28b065dfa8e850ab55afc8aaa1c3f126f64b1eff48140f8f8c",
+      "block_number": 41067784,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 659798,
+      "gas_price_wei": "7670677",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768924915
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x16b572bf68cf32b84265af42c76b8308eebbf7e8b61da0d6346368ff2d80edf9",
+      "block_number": 41068465,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 663753,
+      "gas_price_wei": "8171377",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768926277
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x15e31ec15284f0cb565a71d0d38d14de828862dcc916f95ccf8f34a1a0eb803a",
+      "block_number": 41068512,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 502818,
+      "gas_price_wei": "8250262",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768926371
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x974c76aaf6b6cb0dc40e7b127acb52efe071fce10fb4b9161d56f73d41179e87",
+      "block_number": 41068517,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 660206,
+      "gas_price_wei": "8327891",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768926381
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x4651788b15711de798e6900d2b450f0765a785487014d61b9f5d8d494301da70",
+      "block_number": 41068903,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 655050,
+      "gas_price_wei": "8097930",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768927153
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x2a200c800aea69fc9ee54b2f511264ec4b78f9ba86602cf1f32a08c006a7445f",
+      "block_number": 41068942,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 492806,
+      "gas_price_wei": "7404253",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768927231
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xfc20c3992b0a002328434cf5d8e97d333de13a09d1426aa5efe5850d92ae08eb",
+      "block_number": 41069741,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 507842,
+      "gas_price_wei": "10981509",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768928829
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x976401c29ec1e64ef7bea4c8129be106a48330a101910a7df2629dea5ac12148",
+      "block_number": 41070039,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 502806,
+      "gas_price_wei": "6748264",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768929425
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x4d1f787923380a41e2bf8f3dca408e611d5382caa6b25974db9b2667e3ccb16c",
+      "block_number": 41070499,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 502818,
+      "gas_price_wei": "16694841",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768930345
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xcc1133875399b895a35b31b0e1275b7aba7423058d0acbe56dbb784707e05bbe",
+      "block_number": 41070524,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 497770,
+      "gas_price_wei": "33076370",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768930395
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x2edc4c5e21ed7d42af2cb97b27bda2bfcd4472fb55216745aa58e6d2515d5710",
+      "block_number": 41070540,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 502782,
+      "gas_price_wei": "40556299",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768930427
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x136eb04ea6ce9fb4f5f8260a934260c518a3b9a89889ac1c73b8514ff5614ddd",
+      "block_number": 41070618,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 497782,
+      "gas_price_wei": "91732011",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768930583
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xba59e3ec86c14ec747ef65780587c80af1fcc22b95e8d913c5f0db449e924749",
+      "block_number": 41070803,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 497794,
+      "gas_price_wei": "93359274",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768930953
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x759001e5ccb240604e10233a3960f7df7cfa955dd333671a0686ca5387856c9c",
+      "block_number": 41071086,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 661436,
+      "gas_price_wei": "24395629",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768931519
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x9d2b521033ccd80be6fd186c1bc685216c154d1fec4bebd2c5cc7f63d030f159",
+      "block_number": 41071145,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 655548,
+      "gas_price_wei": "20047911",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768931637
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x560d5b9dd334391efcddca13f53bd3e143db6c1a74c171cbeaf9d3f2656e908b",
+      "block_number": 41071214,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 492818,
+      "gas_price_wei": "16679953",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768931775
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xd0b35a68d247317520111eb35c41b92c3a9eed978ccac03d405002a4c7a6cbbe",
+      "block_number": 41071718,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 497806,
+      "gas_price_wei": "6695073",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768932783
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xd349caa506c9fdcc840a58bdf970e5eae0bd528d7ad243e52f9b792c9dff0e57",
+      "block_number": 41071732,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 492782,
+      "gas_price_wei": "5724976",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768932811
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xa243d705243bb88ec1ad1bf3fcaeef7703697901017878b966cbd02d53085ee2",
+      "block_number": 41071811,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 492818,
+      "gas_price_wei": "5689153",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768932969
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x4cc622ef5567feb6e00bf4e197e2d537800bd1ce2c5857908181c0e76089f4d7",
+      "block_number": 41072706,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 487770,
+      "gas_price_wei": "4997062",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768934759
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x9cd16d7df9f7e42ec9def2ce175f576f7208894f4d0468eff8e37d8f80eee001",
+      "block_number": 41072720,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 522794,
+      "gas_price_wei": "5139298",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768934787
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x9917af1a5b6d4b3e98b53fe3bb9172392101c6c8601974fca2a1f2c47df2a203",
+      "block_number": 41072987,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 681114,
+      "gas_price_wei": "5514947",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768935321
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x0ea1754d3fa813b3e600c35a43a42b242d195138dd97e5de3e1d820ec957208d",
+      "block_number": 41073089,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 723960,
+      "gas_price_wei": "5769516",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768935525
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xa1ce456a1efec0d9b28713e821369d58a812d41f1c79e74f47b2cff03ed7ddd4",
+      "block_number": 41073443,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 700760,
+      "gas_price_wei": "5209346",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768936233
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xeb3ec9080c79b8ccb765c20dae332094d59d854c1c798490f5e0470001ff6fd7",
+      "block_number": 41073763,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 681605,
+      "gas_price_wei": "4259878",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768936873
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x2e7aeba92daa6cc6c2f7aeea4142c50b95464c604c6ac1f09c99796dddc298de",
+      "block_number": 41073859,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 512746,
+      "gas_price_wei": "4331016",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768937065
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x20d0c48409aff344ff9ebcd232675f358fd927b2694d5ef86ead64acddfc778c",
+      "block_number": 41073986,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 665450,
+      "gas_price_wei": "4387865",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768937319
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xde9ec027c552389f45bf927a21f3e78d04ffb8fd0ae9e9c9b81b4f6e205a4992",
+      "block_number": 41074169,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 667148,
+      "gas_price_wei": "5732715",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768937685
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x1ba56e3bc6143766528aea352ef28d789ad0c659548d7408acb526ffeda73c62",
+      "block_number": 41074172,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 704512,
+      "gas_price_wei": "5653042",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768937691
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x8e719fb83722254a416e95625143c142f064f5c92ced9d4dcb67e87eb8a05e6f",
+      "block_number": 41074383,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 517794,
+      "gas_price_wei": "7690890",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768938113
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xc582580992224a1b6c725486885ae53da3cccd6399b330236d0bfdd86b2ad804",
+      "block_number": 41074623,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 512758,
+      "gas_price_wei": "8220654",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768938593
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xf532811afcf4982e2c6f92901b4f3366fbf2fcb5acef98ca48d3189ab986c835",
+      "block_number": 41077145,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 512818,
+      "gas_price_wei": "2282306",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768943637
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xe7ba954d72330d0627c01a5e9727dcd28f2d78fb47579c47daac359be31e82cb",
+      "block_number": 41086396,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 507782,
+      "gas_price_wei": "4049533",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768962139
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x547969096feccdbd29a23f25412c1d367b54f9fb859897312b8857183f56f31c",
+      "block_number": 41086703,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 538233,
+      "gas_price_wei": "4103864",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768962753
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xcfdbfa369749da48ce9bee922b179ed8fb80c8b7c22ca9106c26bd76b582bccb",
+      "block_number": 41090366,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 507770,
+      "gas_price_wei": "4602427",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768970079
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xdeed25982593a1f65c5f74d5f672e7e9b0cbc4a1d9b1580d938fcb924d0c7db9",
+      "block_number": 41092013,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 507794,
+      "gas_price_wei": "1970232",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768973373
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x1f4abb2e08e40d2582c5a910db12946e66907828e6408e3703e8fe0e61a4afcf",
+      "block_number": 41092378,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 716629,
+      "gas_price_wei": "3051756",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768974103
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x63b13acbf49ac71a8193e665547889db3ae8af99692e1b48fdb9ef3d997a11fd",
+      "block_number": 41092809,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 670035,
+      "gas_price_wei": "4934728",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768974965
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x7bc82941626acfef3d473b434173e558d65433a7554875db37a542fab6c692d1",
+      "block_number": 41092859,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 715209,
+      "gas_price_wei": "4969153",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768975065
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xc7a5d322770bca64027440db0f5ef5d59772697865a2816ac18d6914809cbec1",
+      "block_number": 41092938,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 658974,
+      "gas_price_wei": "5014764",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768975223
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x2835ceb141b2a48e2f539a73e98eac543963b4f3faa7b48666ee29cb31464b85",
+      "block_number": 41092976,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 699444,
+      "gas_price_wei": "5103235",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768975299
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xf53270323b077eff51850805ad1787e71f77a0bc5a8e2c7389b66aa164a7fe9b",
+      "block_number": 41093340,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 512782,
+      "gas_price_wei": "5007125",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768976027
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xfed90d65bd9b8c7b27f7b8b3137d4769cbc62e75d16cb44e36d237ea5527f6d3",
+      "block_number": 41096012,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 512794,
+      "gas_price_wei": "6086870",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768981371
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x714d9ace6d6acc3229b0876c41f97a87a1f004e2d1f9fcfc17888e2e6e2d5e09",
+      "block_number": 41098841,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 507782,
+      "gas_price_wei": "3882898",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768987029
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x87866483a2887d8a9f028a3804aa0c2849e19059944517f38bdb7e121c4c6cbc",
+      "block_number": 41098888,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 671708,
+      "gas_price_wei": "3870515",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768987123
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xdbb1a19e91e97a280b4270181884634d4fcdb432461c02a2fd1e6cdeacae8d60",
+      "block_number": 41098918,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 705628,
+      "gas_price_wei": "3942544",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768987183
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x50a66eb0bd6170792f98d34c50ac8325cf668d26b947664413e2f614f6fcdefc",
+      "block_number": 41098954,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 512818,
+      "gas_price_wei": "3923518",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768987255
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x6c90e1629e6505fba5afcd2e8ad144dfe26be03a7bd46304c071afe679da4a33",
+      "block_number": 41099565,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 710504,
+      "gas_price_wei": "3698420",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768988477
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x9f0e3558595b7284c2920675c61ba8effb6f94f234bb82ccc6481bf056293d5d",
+      "block_number": 41099918,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 692373,
+      "gas_price_wei": "3186726",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768989183
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xb6154a1d8f71a18860e1c02214a9c1f703056955dd155b6f30e9d5332198fb5f",
+      "block_number": 41100786,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 663570,
+      "gas_price_wei": "3327234",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1768990919
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x0b1dcd3486c878ac935501fd8566776b06d0190b49d557014f5d1006f1ee9110",
+      "block_number": 41106809,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 673158,
+      "gas_price_wei": "5391828",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1769002965
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x2d6c3cd8be3caf97943242b5e5371c39666bff99542b18458b387df7875cb438",
+      "block_number": 41107028,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 507794,
+      "gas_price_wei": "4678786",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1769003403
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xc1a2a31f112e65ee1ef3749cd25d9ed3fde1b165007d4840eef5fca2f9f446bf",
+      "block_number": 41107098,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 507758,
+      "gas_price_wei": "3941179",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1769003543
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x3c4763a2ebdee787e63bc4efb2444121c35933693f52dce9edb215ab804b3203",
+      "block_number": 41107121,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 502758,
+      "gas_price_wei": "4073777",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1769003589
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x48e9e694ee1c1a47235581a2c9f93b12e363fea4298a8457935f373329766f78",
+      "block_number": 41107210,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 507782,
+      "gas_price_wei": "4814604",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1769003767
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xd61e16a7c43697505febaf57beabec9eac468aa054bc4f46709b5bec77eb08dc",
+      "block_number": 41107283,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 502794,
+      "gas_price_wei": "4872873",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1769003913
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x503861130bb3a926dc8dc5074f888a4b0b792cca07572bad7681e369459f4714",
+      "block_number": 41107353,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 502806,
+      "gas_price_wei": "6380011",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1769004053
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x0ee5224d857ddb38c1b7f978f35dc362f2aed8798c3b38d539308b2b3b20706c",
+      "block_number": 41107678,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 497782,
+      "gas_price_wei": "10892963",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1769004703
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x308486ed163b8af574b4763da1608e2aa594108dba43ac7da10533ff32650714",
+      "block_number": 41107781,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 507782,
+      "gas_price_wei": "12756367",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1769004909
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xaef6a701103f03221a14836410a9a6e63cce6489d46ea3d4b7280988f5037cda",
+      "block_number": 41107806,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 502830,
+      "gas_price_wei": "12019274",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1769004959
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x6b899eddcb7c54d926e0c20e1a0e83cf65d00914f09b607fc2e7ae07162db5f6",
+      "block_number": 41108408,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 502794,
+      "gas_price_wei": "10942236",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1769006163
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x16e60f4f7fad13321d59f11cdee3527a0f54e9380cd6aeb37c90775433e1ed5a",
+      "block_number": 41108511,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 497782,
+      "gas_price_wei": "8307062",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1769006369
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x554ad6b1d423f2cd20ab19b160237549e0c4adb26576ee3b96209831b078a6fe",
+      "block_number": 41108538,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 502794,
+      "gas_price_wei": "8690848",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1769006423
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x838c5eb61677261b24b808fc2360641bf43c1f3fca7132dcdce73eda7faabc22",
+      "block_number": 41108589,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 497794,
+      "gas_price_wei": "8399466",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1769006525
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x3def6a478252ee374c4f99aa44897c92c1b246fdc880f1d110019812f73180d7",
+      "block_number": 41108599,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 652145,
+      "gas_price_wei": "8423220",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": null,
+      "timestamp": 1769006545
+    }
+  ],
+  "payloads": [],
+  "privacy_stats": [],
+  "solvers": [
+    {
+      "chain_id": 8453,
+      "address": "0xf11d30bd423279f85243a2c7d472902b43fd5822",
+      "count": 1,
+      "gas": "1580121644640",
+      "val": "0",
+      "timestamp": 1768912197
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2026885504536",
+      "val": "0",
+      "timestamp": 1768913317
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2283493867496",
+      "val": "0",
+      "timestamp": 1768913515
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "5799481703184",
+      "val": "0",
+      "timestamp": 1768914423
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3836100051504",
+      "val": "0",
+      "timestamp": 1768914743
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3833885715517",
+      "val": "0",
+      "timestamp": 1768914897
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2277795775670",
+      "val": "0",
+      "timestamp": 1768915551
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2273052330660",
+      "val": "0",
+      "timestamp": 1768915925
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "4098621197682",
+      "val": "0",
+      "timestamp": 1768916429
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2625285486514",
+      "val": "0",
+      "timestamp": 1768917043
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3618571174075",
+      "val": "0",
+      "timestamp": 1768917049
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2863537713660",
+      "val": "0",
+      "timestamp": 1768917169
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2983768180498",
+      "val": "0",
+      "timestamp": 1768917219
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "4018047717852",
+      "val": "0",
+      "timestamp": 1768917905
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3889837905876",
+      "val": "0",
+      "timestamp": 1768917973
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3723640811150",
+      "val": "0",
+      "timestamp": 1768918599
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3686666810792",
+      "val": "0",
+      "timestamp": 1768918605
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "10411468878712",
+      "val": "0",
+      "timestamp": 1768918769
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "9057208246020",
+      "val": "0",
+      "timestamp": 1768918953
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "9006474261744",
+      "val": "0",
+      "timestamp": 1768918963
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "11866287127519",
+      "val": "0",
+      "timestamp": 1768918965
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "7153256596236",
+      "val": "0",
+      "timestamp": 1768919183
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "9311089512360",
+      "val": "0",
+      "timestamp": 1768919187
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "8564250595840",
+      "val": "0",
+      "timestamp": 1768919229
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "8227574050860",
+      "val": "0",
+      "timestamp": 1768919287
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "23796531230532",
+      "val": "0",
+      "timestamp": 1768920919
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "15390416939546",
+      "val": "0",
+      "timestamp": 1768921213
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "33872435332608",
+      "val": "0",
+      "timestamp": 1768922397
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "5394531090648",
+      "val": "0",
+      "timestamp": 1768923553
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "6759212809440",
+      "val": "0",
+      "timestamp": 1768923591
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "6384944274039",
+      "val": "0",
+      "timestamp": 1768923829
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "4553372691098",
+      "val": "0",
+      "timestamp": 1768923965
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "6333920321168",
+      "val": "0",
+      "timestamp": 1768924097
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "5952954037420",
+      "val": "0",
+      "timestamp": 1768924257
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "5407485332069",
+      "val": "0",
+      "timestamp": 1768924779
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "5061097343246",
+      "val": "0",
+      "timestamp": 1768924915
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "5423775997881",
+      "val": "0",
+      "timestamp": 1768926277
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "4148380238316",
+      "val": "0",
+      "timestamp": 1768926371
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "5498123605546",
+      "val": "0",
+      "timestamp": 1768926381
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "5304549046500",
+      "val": "0",
+      "timestamp": 1768927153
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3648860303918",
+      "val": "0",
+      "timestamp": 1768927231
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "5576871493578",
+      "val": "0",
+      "timestamp": 1768928829
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3393067628784",
+      "val": "0",
+      "timestamp": 1768929425
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "8394466561938",
+      "val": "0",
+      "timestamp": 1768930345
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "16464424694900",
+      "val": "0",
+      "timestamp": 1768930395
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "20390977123818",
+      "val": "0",
+      "timestamp": 1768930427
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "45662543899602",
+      "val": "0",
+      "timestamp": 1768930583
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "46473686441556",
+      "val": "0",
+      "timestamp": 1768930953
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "16136147263244",
+      "val": "0",
+      "timestamp": 1768931519
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "13142367960228",
+      "val": "0",
+      "timestamp": 1768931637
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "8220181077554",
+      "val": "0",
+      "timestamp": 1768931775
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3332847509838",
+      "val": "0",
+      "timestamp": 1768932783
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2821165123232",
+      "val": "0",
+      "timestamp": 1768932811
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2803717003154",
+      "val": "0",
+      "timestamp": 1768932969
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2437416931740",
+      "val": "0",
+      "timestamp": 1768934759
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2686794158612",
+      "val": "0",
+      "timestamp": 1768934787
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3756307610958",
+      "val": "0",
+      "timestamp": 1768935321
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "4176898803360",
+      "val": "0",
+      "timestamp": 1768935525
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3650501302960",
+      "val": "0",
+      "timestamp": 1768936233
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2903554144190",
+      "val": "0",
+      "timestamp": 1768936873
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2220711129936",
+      "val": "0",
+      "timestamp": 1768937065
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2919904764250",
+      "val": "0",
+      "timestamp": 1768937319
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3824569346820",
+      "val": "0",
+      "timestamp": 1768937685
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3982635925504",
+      "val": "0",
+      "timestamp": 1768937691
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3982296696660",
+      "val": "0",
+      "timestamp": 1768938113
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "4215206103732",
+      "val": "0",
+      "timestamp": 1768938593
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "1170407598308",
+      "val": "0",
+      "timestamp": 1768943637
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2056279965806",
+      "val": "0",
+      "timestamp": 1768962139
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2208835032312",
+      "val": "0",
+      "timestamp": 1768962753
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2336974357790",
+      "val": "0",
+      "timestamp": 1768970079
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "1000471988208",
+      "val": "0",
+      "timestamp": 1768973373
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2186976850524",
+      "val": "0",
+      "timestamp": 1768974103
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3306440475480",
+      "val": "0",
+      "timestamp": 1768974965
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3553982947977",
+      "val": "0",
+      "timestamp": 1768975065
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3304599092136",
+      "val": "0",
+      "timestamp": 1768975223
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3569427101340",
+      "val": "0",
+      "timestamp": 1768975299
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2567563571750",
+      "val": "0",
+      "timestamp": 1768976027
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3121310414780",
+      "val": "0",
+      "timestamp": 1768981371
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "1971665712236",
+      "val": "0",
+      "timestamp": 1768987029
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2599855889620",
+      "val": "0",
+      "timestamp": 1768987123
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2781969437632",
+      "val": "0",
+      "timestamp": 1768987183
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2012050653724",
+      "val": "0",
+      "timestamp": 1768987255
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2627742203680",
+      "val": "0",
+      "timestamp": 1768988477
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2206403040798",
+      "val": "0",
+      "timestamp": 1768989183
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2207852665380",
+      "val": "0",
+      "timestamp": 1768990919
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3629552152824",
+      "val": "0",
+      "timestamp": 1769002965
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2375859458084",
+      "val": "0",
+      "timestamp": 1769003403
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2001165166682",
+      "val": "0",
+      "timestamp": 1769003543
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2048123976966",
+      "val": "0",
+      "timestamp": 1769003589
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2444769248328",
+      "val": "0",
+      "timestamp": 1769003767
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "2450051307162",
+      "val": "0",
+      "timestamp": 1769003913
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "3207907810866",
+      "val": "0",
+      "timestamp": 1769004053
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "5422320908066",
+      "val": "0",
+      "timestamp": 1769004703
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "6477453547994",
+      "val": "0",
+      "timestamp": 1769004909
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "6043651545420",
+      "val": "0",
+      "timestamp": 1769004959
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "5501690607384",
+      "val": "0",
+      "timestamp": 1769006163
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "4135105936484",
+      "val": "0",
+      "timestamp": 1769006369
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "4369706229312",
+      "val": "0",
+      "timestamp": 1769006423
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "4181203778004",
+      "val": "0",
+      "timestamp": 1769006525
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "5493160806900",
+      "val": "0",
+      "timestamp": 1769006545
+    }
+  ],
+  "assets": [],
+  "daily_stats": [
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 502770
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 502818
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 497806
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 507806
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 502806
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 545369
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 497830
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 502770
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 659574
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 492806
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 672485
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 512746
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 550357
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 667404
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 662364
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 512794
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 507842
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 662321
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 507770
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 502806
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 660071
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 512782
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 668634
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 663632
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 663582
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 497782
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 507782
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 502746
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 502782
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 658805
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 653589
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 492818
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 690778
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 707884
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 705949
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 659798
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 663753
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 502818
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 660206
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 655050
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 492806
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 507842
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 502806
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 502818
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 497770
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 502782
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 497782
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 497794
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 661436
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 655548
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 492818
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 497806
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 492782
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 492818
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 487770
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 522794
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 681114
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 723960
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 700760
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 681605
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 512746
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 665450
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 667148
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 704512
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 517794
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 512758
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 512818
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 507782
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 538233
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 507770
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 507794
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 716629
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 670035
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 715209
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 658974
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 699444
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 512782
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 512794
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 507782
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 671708
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 705628
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 512818
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 710504
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 692373
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 663570
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 673158
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 507794
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 507758
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 502758
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 507782
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 502794
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 502806
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 497782
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 507782
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 502830
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 502794
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 497782
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 502794
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 497794
+    },
+    {
+      "chain_id": 8453,
+      "date": "2026-01-21",
+      "count": 1,
+      "volume": "0",
+      "gas": 652145
+    }
+  ]
+}

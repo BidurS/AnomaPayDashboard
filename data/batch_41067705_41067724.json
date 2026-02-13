@@ -1,0 +1,170 @@
+{
+  "events": [
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x43f0347c1d5a4e27fb513edc51e67d455e39eaee9cd6c87ea6042b15701be664",
+      "block_number": 41067716,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 705949,
+      "gas_price_wei": "7659881",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "decoded_input": [
+        {
+          "actions": [
+            {
+              "logicVerifierInputs": [
+                {
+                  "tag": "0xca49a4651c01e129976c479162e41cce64666b0fc52885b69baedf8061acb57c",
+                  "verifyingKey": "0x678b37ba70cfb1787c2436d7eb2ef3c588d1e1d6f30a7248e79436bd15f3fc11",
+                  "appData": {
+                    "resourcePayload": [],
+                    "discoveryPayload": [],
+                    "externalPayload": [
+                      {
+                        "deletionCriterion": 0,
+                        "blob": "0x000000000000000000000000fee5b48919100c192e017992810c9539ebd002490000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000001000000000000000000000000833589fcd6edb6e08f4c7c32d4f71b54bda0291300000000000000000000000000000000000000000000000000000000000186a00000000000000000000000005fa67702ac636429ae5ff615089f908e464f23960000000000000000000000000000000000000000000000000000000000000000"
+                      }
+                    ],
+                    "applicationPayload": []
+                  },
+                  "proof": "0x"
+                },
+                {
+                  "tag": "0x0d48d9144434ba02024280bc12df0c7beb420da36c372ab28a2beb8bfc5b9dd6",
+                  "verifyingKey": "0x678b37ba70cfb1787c2436d7eb2ef3c588d1e1d6f30a7248e79436bd15f3fc11",
+                  "appData": {
+                    "resourcePayload": [
+                      {
+                        "deletionCriterion": 1,
+                        "blob": "0x19010000000000004c0eb7ff78bd21d48365271a316627be03528a7ab0b905c5d0b31cfb81ed7b9ef683bb8d7e46ba64c48671556806e1e1c36d675c9c01a1c76d8420ecfd37c0e71c7a565e711ab958371a67b0ed9a0c3ffe7de26ed57600ee921ef92e0912d4e743a1c89fdfb4beb97abdeacfd358d7c4a2035d3ceb61bbdc2952838a4c3a5871290f252ed917b6ddb0ee088d4504ec1f753fa46368f192a5ea4440b00a1603d96a36de08b23767de07a8a4a9545c118e8367a8bf616e7085212cfb50b40d60170d8d3eea8130a3c7e1aa4e54c156e2d9792d4a41d8d1473281a90e23b8af07d02991be94388cd803479b6bb356eedc02c58f12852fb82406eb695b96b0141a7e103e023c9feb0f755a72dedabf9fe2e8e48331e5e0408729baf6eede6c14b8e160a8276aba21000000000000000365468cd91c3b6b67355128fa9f279cde0dde7599f6cab4f34301f97812dc81d40000"
+                      }
+                    ],
+                    "discoveryPayload": [
+                      {
+                        "deletionCriterion": 1,
+                        "blob": "0x1100000000000000df695d1eb08b969f2f10e30f72d66e6439c1cbc5c17a8aef8ef7df8e302100000000000000035a186b30bca24004b91b6ba8824164eaead76a1e5a72ce8f2e0991c6a6b529230000"
+                      }
+                    ],
+                    "externalPayload": [],
+                    "applicationPayload": []
+                  },
+                  "proof": "0x"
+                },
+                {
+                  "tag": "0x6bc12e0151fddb7c24ee3dd31c370edc3a67ef320fac62d9fd703e721eff88e2",
+                  "verifyingKey": "0x678b37ba70cfb1787c2436d7eb2ef3c588d1e1d6f30a7248e79436bd15f3fc11",
+                  "appData": {
+                    "resourcePayload": [],
+                    "discoveryPayload": [],
+                    "externalPayload": [],
+                    "applicationPayload": []
+                  },
+                  "proof": "0x"
+                },
+                {
+                  "tag": "0x14c504d8a7b583cef8a9e1283255daccada760a36d1a973c8e326eca84a43e47",
+                  "verifyingKey": "0x83d603b23e090c1400b018adb61f516386e9f2d523f983c3c417ab49b2037585",
+                  "appData": {
+                    "resourcePayload": [],
+                    "discoveryPayload": [],
+                    "externalPayload": [],
+                    "applicationPayload": []
+                  },
+                  "proof": "0x"
+                }
+              ],
+              "complianceVerifierInputs": [
+                {
+                  "proof": "0x",
+                  "instance": {
+                    "consumed": {
+                      "nullifier": "0x6bc12e0151fddb7c24ee3dd31c370edc3a67ef320fac62d9fd703e721eff88e2",
+                      "logicRef": "0x678b37ba70cfb1787c2436d7eb2ef3c588d1e1d6f30a7248e79436bd15f3fc11",
+                      "commitmentTreeRoot": "0xfdb5d7d596b3a25b0322a39cbdb0606942ec8cb0b063bb98c66a22a475434ec0"
+                    },
+                    "created": {
+                      "commitment": "0xca49a4651c01e129976c479162e41cce64666b0fc52885b69baedf8061acb57c",
+                      "logicRef": "0x678b37ba70cfb1787c2436d7eb2ef3c588d1e1d6f30a7248e79436bd15f3fc11"
+                    },
+                    "unitDeltaX": "0x0137e2d320bb3b95cd6914c7bd63457579cbd73cbdf145d3ff584f28cc8c12f2",
+                    "unitDeltaY": "0x20707c04377972f8357e4d1e924a08a45599a53ff2e71d484c97b1e5bfeb027a"
+                  }
+                },
+                {
+                  "proof": "0x",
+                  "instance": {
+                    "consumed": {
+                      "nullifier": "0x14c504d8a7b583cef8a9e1283255daccada760a36d1a973c8e326eca84a43e47",
+                      "logicRef": "0x83d603b23e090c1400b018adb61f516386e9f2d523f983c3c417ab49b2037585",
+                      "commitmentTreeRoot": "0xcc1d2f838445db7aec431df9ee8a871f40e7aa5e064fc056633ef8c60fab7b06"
+                    },
+                    "created": {
+                      "commitment": "0x0d48d9144434ba02024280bc12df0c7beb420da36c372ab28a2beb8bfc5b9dd6",
+                      "logicRef": "0x678b37ba70cfb1787c2436d7eb2ef3c588d1e1d6f30a7248e79436bd15f3fc11"
+                    },
+                    "unitDeltaX": "0xb5737ff7b12756e4f99ef071ad4f84bf5cee25650ed37f671086313463b406c8",
+                    "unitDeltaY": "0xfb331f69c579b835fd8d4f773d67caec0ebb1dbef31541775684013340cf45a8"
+                  }
+                }
+              ]
+            }
+          ],
+          "deltaProof": "0xf96a927923e3c1e78844f25dbfe3e43351cd28e4c23b05095900e5601d40863e3b1e9751f7d2922eaff754d05256d98d72c0eed3561ed080f468bd9a1df743841b",
+          "aggregationProof": "0x73c457ba2964204d8ca9b5e91333618dd4f24b39bdcd104c550d8548e9e613e097668e7f2c9fadc32a1e1d76314664a1550194a6439ff17b97314ad9a8b212dbd369c4fe0576e61614c7b1787d3998acd24deac09c610bd218da77e11820a516fb69bba010344c093096858f74b37f88c2d89bb765306cbb1e48e2634bd1ec2447bb6d8e121785bc34e24821f69a31deddd6e0f7b4468b92c78efcf1d221ddf03c9aa29925c43ea0d553e56e68a276f9d568c362bf72e9ace7429c831b3b67dbebfe3ca82e9d7f495579d99868ae4edb4d766c9fc0d6e804aa167abe3161a69d7bd8a707187947bab976cbb3e2920605af409db1c6503facc08c0212fd68e0850d31a7fe"
+        }
+      ],
+      "timestamp": 1768924779
+    }
+  ],
+  "payloads": [
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x43f0347c1d5a4e27fb513edc51e67d455e39eaee9cd6c87ea6042b15701be664",
+      "block_number": 41067716,
+      "payload_type": "Resource",
+      "payload_index": 0,
+      "blob": "0x000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000e000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000001000000000000000000000000833589fcd6edb6e08f4c7c32d4f71b54bda0291300000000000000000000000000000000000000000000000000000000000186a00000000000000000000000005fa67702ac636429ae5ff615089f908e464f23960000000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": 1768924779
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x43f0347c1d5a4e27fb513edc51e67d455e39eaee9cd6c87ea6042b15701be664",
+      "block_number": 41067716,
+      "payload_type": "Discovery",
+      "payload_index": 0,
+      "blob": "0x40617c000cc224091e632ad722b72787f67bef40e4d09d3f6f72c8884a74f98e",
+      "timestamp": 1768924779
+    }
+  ],
+  "privacy_stats": [
+    {
+      "chain_id": 8453,
+      "block_number": 41067716,
+      "root_hash": "0x0000000000000000000000000000000000000000000000000000000000000040",
+      "timestamp": 1768924779,
+      "estimated_pool_size": 0
+    }
+  ],
+  "solvers": [
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "5407485332069",
+      "val": "0",
+      "timestamp": 1768924779
+    }
+  ],
+  "assets": [],
+  "daily_stats": [
+    {
+      "chain_id": 8453,
+      "date": "2026-01-20",
+      "count": 1,
+      "volume": "0",
+      "gas": 705949
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "events": [
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x0a9c0736b15ba8c6503ff21c6b88a4ca839776b88858071d978aa03819891c2a",
+      "block_number": 39677171,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x15b1d4cbd9260be416e8082cf01c5e025cca7f68",
+      "value_wei": "0",
+      "gas_used": 571023,
+      "gas_price_wei": "705000",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "timestamp": 1766143689
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xa725be78ee0f80d091d695df61a7ccc860354fec3de555a9d5208de312e224f4",
+      "block_number": 39677187,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x15b1d4cbd9260be416e8082cf01c5e025cca7f68",
+      "value_wei": "0",
+      "gas_used": 474378,
+      "gas_price_wei": "700000",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "timestamp": 1766143721
+    }
+  ],
+  "payloads": [
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x0a9c0736b15ba8c6503ff21c6b88a4ca839776b88858071d978aa03819891c2a",
+      "block_number": 39677171,
+      "payload_type": "Resource",
+      "payload_index": 0,
+      "blob": "0x000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000001a000000000000000000000000000000000000000000000000000000000000001400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000833589fcd6edb6e08f4c7c32d4f71b54bda0291300000000000000000000000000000000000000000000000000000000000000012a5ba8379f562489c137af02cb9745bdc201b7e0e221ccbecc351ddf3b5ff79d0000000000000000000000000000000000000000000000000000000070dbd88000000000000000000000000015b1d4cbd9260be416e8082cf01c5e025cca7f68bdd3faeb31be3a1709800be695b818cbb06a558eab7760e67f41b90f8e01c43b4b796b028f6d9afcb9611a8bfca45ef7c3c73272ca08b2c3e550d419f27656c026dd70f422bed8207d5344d608bf437e4e82fe33f67d468dde3b177e771dc85c000000000000000000000000000000000000000000000000000000000000001b0000000000000000000000000000000000000000000000000000000000000000",
+      "timestamp": 1766143689
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x0a9c0736b15ba8c6503ff21c6b88a4ca839776b88858071d978aa03819891c2a",
+      "block_number": 39677171,
+      "payload_type": "Discovery",
+      "payload_index": 0,
+      "blob": "0x2733cf0e77561402649746576e7781d1bb3a789c45081a308cacd77e6fd50237",
+      "timestamp": 1766143689
+    },
+    {
+      "chain_id": 8453,
+      "tx_hash": "0xa725be78ee0f80d091d695df61a7ccc860354fec3de555a9d5208de312e224f4",
+      "block_number": 39677187,
+      "payload_type": "Discovery",
+      "payload_index": 0,
+      "blob": "0x6be378aa5c8fbf9a5a064ae094195cd24488abf4aee6ee509f20a2201f48a32f",
+      "timestamp": 1766143721
+    }
+  ],
+  "privacy_stats": [
+    {
+      "chain_id": 8453,
+      "block_number": 39677171,
+      "root_hash": "0x0000000000000000000000000000000000000000000000000000000000000040",
+      "timestamp": 1766143689,
+      "estimated_pool_size": 0
+    },
+    {
+      "chain_id": 8453,
+      "block_number": 39677187,
+      "root_hash": "0x0000000000000000000000000000000000000000000000000000000000000040",
+      "timestamp": 1766143721,
+      "estimated_pool_size": 0
+    }
+  ],
+  "solvers": [
+    {
+      "chain_id": 8453,
+      "address": "0x15b1d4cbd9260be416e8082cf01c5e025cca7f68",
+      "count": 1,
+      "gas": "402571215000",
+      "val": "0",
+      "timestamp": 1766143689
+    },
+    {
+      "chain_id": 8453,
+      "address": "0x15b1d4cbd9260be416e8082cf01c5e025cca7f68",
+      "count": 1,
+      "gas": "332064600000",
+      "val": "0",
+      "timestamp": 1766143721
+    }
+  ],
+  "assets": [],
+  "daily_stats": [
+    {
+      "chain_id": 8453,
+      "date": "2025-12-19",
+      "count": 1,
+      "volume": "0",
+      "gas": 571023
+    },
+    {
+      "chain_id": 8453,
+      "date": "2025-12-19",
+      "count": 1,
+      "volume": "0",
+      "gas": 474378
+    }
+  ]
+}

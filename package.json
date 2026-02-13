@@ -1,7 +1,7 @@
 {
   "name": "anomapay-explorer",
   "version": "1.0.0",
-  "description": "AnomaPay Multichain Explorer - Analytics dashboard for Anoma Protocol Adapter",
+  "description": "Gnoma Multichain Explorer - Analytics dashboard for Anoma Protocol Adapter",
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
@@ -14,9 +14,20 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240614.0",
     "typescript": "^5.4.5",
-    "wrangler": "^3.60.0"
+    "wrangler": "^4.61.1"
   },
-  "keywords": ["cloudflare", "workers", "web3", "anoma", "blockchain", "indexer"],
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "web3",
+    "anoma",
+    "blockchain",
+    "indexer"
+  ],
   "author": "Bidur",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "viem": "^2.45.0"
+  }
 }

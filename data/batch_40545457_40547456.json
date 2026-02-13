@@ -1,0 +1,56 @@
+{
+  "events": [
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x5b3a4e21daeaa322dce88fa231fd037285b6bd9c552e5859e51c88aff9e33676",
+      "block_number": 40547088,
+      "event_type": "TransactionExecuted",
+      "solver_address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "value_wei": "0",
+      "gas_used": 1446211,
+      "gas_price_wei": "6873025",
+      "data_json": "[\"0x1cc9a0755dd734c1ebfe98b68ece200037e363eb366d0dee04e420e2f23cc010\"]",
+      "timestamp": 1767883523
+    }
+  ],
+  "payloads": [
+    {
+      "chain_id": 8453,
+      "tx_hash": "0x5b3a4e21daeaa322dce88fa231fd037285b6bd9c552e5859e51c88aff9e33676",
+      "block_number": 40547088,
+      "payload_type": "Discovery",
+      "payload_index": 0,
+      "blob": "0x3bc7d423060e800c91a9207992733e02337d65fa41418870da59cc43cf3bc7bd",
+      "timestamp": 1767883523
+    }
+  ],
+  "privacy_stats": [
+    {
+      "chain_id": 8453,
+      "block_number": 40547088,
+      "root_hash": "0x0000000000000000000000000000000000000000000000000000000000000040",
+      "timestamp": 1767883523,
+      "estimated_pool_size": 0
+    }
+  ],
+  "solvers": [
+    {
+      "chain_id": 8453,
+      "address": "0x6bbbccabc08d73a087c8c33619b70217f0f3c838",
+      "count": 1,
+      "gas": "9939844358275",
+      "val": "0",
+      "timestamp": 1767883523
+    }
+  ],
+  "assets": [],
+  "daily_stats": [
+    {
+      "chain_id": 8453,
+      "date": "2026-01-08",
+      "count": 1,
+      "volume": "0",
+      "gas": 1446211
+    }
+  ]
+}

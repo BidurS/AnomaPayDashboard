@@ -15,3 +15,5 @@ database_id = "3a23dc95-bff2-4c87-82af-417331a10e52"
 # Environment variables (set secrets via `wrangler secret put`)
 # [vars]
 # ADMIN_API_KEY = "your-secret-key" # Better to use: wrangler secret put ADMIN_API_KEY
+# DISCORD_WEBHOOK_URL             # Set via: wrangler secret put DISCORD_WEBHOOK_URL
+
