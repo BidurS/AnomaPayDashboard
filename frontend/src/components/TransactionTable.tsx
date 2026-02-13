@@ -53,7 +53,7 @@ export function TransactionTable({ searchQuery, onTxClick, onSolverClick }: Tran
     const hasData = transactions.length > 0
 
     return (
-        <section className="py-16">
+        <section id="transaction-table" className="py-16">
             <div className="max-w-7xl mx-auto px-6 lg:px-8">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}

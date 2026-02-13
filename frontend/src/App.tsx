@@ -19,19 +19,44 @@ function Layout() {
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
 
-  // Determine view for Header
-  const currentView = location.pathname === '/faq' ? 'faq' : 'explorer'
+  // Determine current view for Header active state
+  const getView = () => {
+    if (location.pathname === '/faq') return 'faq'
+    if (location.pathname.startsWith('/solver')) return 'solvers'
+    if (location.pathname.startsWith('/tx')) return 'transactions'
+    return 'explorer'
+  }
+
+  const handleNavigate = (view: string) => {
+    switch (view) {
+      case 'faq':
+        navigate('/faq')
+        break
+      case 'solvers':
+        navigate('/')
+        // Scroll to solver leaderboard after navigation
+        setTimeout(() => {
+          document.getElementById('solver-leaderboard')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 100)
+        break
+      case 'transactions':
+        navigate('/')
+        setTimeout(() => {
+          document.getElementById('transaction-table')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 100)
+        break
+      default:
+        navigate('/')
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white flex flex-col transition-colors duration-200">
-      {/* Hide Header on Admin pages if desired, or keep it. Let's keep it but maybe simplified? 
-          For now, keep it everywhere except maybe explicit admin layout if admin layout has its own header.
-          AdminLayout has its own Header. So we might want to conditionally render this Header.
-      */}
       {!location.pathname.startsWith('/admin') && (
         <Header
-          currentView={currentView}
-          onNavigate={(v) => navigate(v === 'faq' ? '/faq' : '/')}
+          currentView={getView()}
+          onNavigate={handleNavigate}
           onSearch={setSearchQuery}
         />
       )}
@@ -85,4 +110,3 @@ function App() {
 }
 
 export default App
-
