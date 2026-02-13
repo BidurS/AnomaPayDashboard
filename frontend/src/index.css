@@ -2,6 +2,8 @@
 
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   /* Swiss Design Color Palette */
   --swiss-red: #FF0000;
@@ -221,34 +223,89 @@ h6 {
 }
 
 /* Dark mode overrides */
-.dark-mode {
+/* Dark mode overrides */
+/* Dark mode overrides */
+html.dark,
+.dark body {
   background-color: var(--swiss-black);
+  color: var(--swiss-white);
+  min-height: 100vh;
+}
+
+.dark .swiss-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+}
+
+/* Global Dark Mode Text & Borders */
+.dark .text-black {
   color: var(--swiss-white);
 }
 
-.dark-mode .glass {
-  background: rgba(0, 0, 0, 0.9);
-  border-color: rgba(255, 255, 255, 0.1);
+.dark .border-black {
+  border-color: var(--swiss-white);
 }
 
-.dark-mode .swiss-card {
+.dark .swiss-subtitle {
+  color: var(--swiss-gray-400);
+}
+
+.dark .glass {
+  background: rgba(0, 0, 0, 0.9);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark .swiss-card {
   background: #111;
   border-color: var(--swiss-white);
 }
 
-.dark-mode .swiss-card:hover {
+.dark .swiss-card:hover {
   box-shadow: 8px 8px 0 var(--swiss-red);
 }
 
-.dark-mode .swiss-table th {
-  border-color: rgba(255, 255, 255, 0.3);
+/* Table Dark Mode */
+.dark .swiss-table th {
+  border-bottom: 2px solid var(--swiss-white);
   color: var(--swiss-gray-400);
 }
 
-.dark-mode .swiss-table td {
-  border-color: rgba(255, 255, 255, 0.1);
+.dark .swiss-table td {
+  border-bottom: 1px solid var(--swiss-gray-800);
+  color: var(--swiss-gray-200);
 }
 
-.dark-mode .swiss-table tr:hover td {
-  background: rgba(255, 255, 255, 0.05);
+.dark .swiss-table tr:hover td {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Buttons Dark Mode */
+.dark .swiss-button {
+  background: var(--swiss-white);
+  color: var(--swiss-black);
+  border-color: var(--swiss-white);
+}
+
+.dark .swiss-button:hover {
+  background: var(--swiss-black);
+  color: var(--swiss-white);
+  border-color: var(--swiss-white);
+}
+
+/* Inputs Dark Mode */
+.dark input {
+  background: #111;
+  border-color: var(--swiss-gray-600);
+  color: white;
+}
+
+.dark input:focus {
+  border-color: var(--swiss-white);
+  background: #000;
+}
+
+/* Invert Utility for Icons/Images if needed */
+.dark .invert-on-dark {
+  filter: invert(1);
 }

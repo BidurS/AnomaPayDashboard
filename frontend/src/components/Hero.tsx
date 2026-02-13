@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Shield, Zap, Users, Layers } from 'lucide-react'
+import { Shield, Zap, Users, Layers, Coins, Fuel } from 'lucide-react'
 import { useStats, useNetworkHealth } from '../lib/api'
 import { useChainContext } from '../context/ChainContext'
 import { formatCurrency, formatNumber } from '../lib/utils'
@@ -38,7 +38,7 @@ function StatCard({ title, value, subValue, icon: Icon, delay = 0, accent = 'bla
                     <Icon className="w-5 h-5 text-gray-400" />
                 </div>
 
-                <div className="swiss-number text-black">
+                <div className="swiss-number text-black dark:text-white">
                     {value}
                 </div>
                 {subValue && (
@@ -64,10 +64,10 @@ export function Hero() {
                     className="text-center mb-16"
                 >
                     <p className="swiss-subtitle mb-4">Real-time Analytics</p>
-                    <h1 className="swiss-title">
+                    <h1 className="swiss-title text-black dark:text-white">
                         <span className="text-[#FF0000]">Gnoma</span> Explorer
                     </h1>
-                    <p className="text-gray-600 mt-6 max-w-xl mx-auto">
+                    <p className="text-gray-600 dark:text-gray-400 mt-6 max-w-xl mx-auto">
                         Tracking intents settled via the Anoma Protocol Adapter
                     </p>
                     <div className="swiss-divider w-24 mx-auto mt-8" />
@@ -85,10 +85,10 @@ export function Hero() {
                     />
 
                     <StatCard
-                        title="Shielded Liquidity Depth"
-                        value={loading ? '—' : formatCurrency(health?.tvl || 0)}
-                        subValue={`${health?.shieldingRate || 0}% Shielding Rate`}
-                        icon={Shield}
+                        title="Assets Tracked"
+                        value={loading ? '—' : formatNumber(stats?.assetCount || 0)}
+                        subValue="Unique Tokens"
+                        icon={Coins}
                         delay={0.1}
                         accent="red"
                     />
@@ -121,10 +121,10 @@ export function Hero() {
                     />
 
                     <StatCard
-                        title="Solver Intelligence (IQ)"
-                        value={loading ? '—' : '98.4'}
-                        subValue="Intent Complexity Score"
-                        icon={Zap}
+                        title="Gas Consumed"
+                        value={loading ? '—' : formatNumber(stats?.totalGasUsed || 0)}
+                        subValue="Total Gas Units"
+                        icon={Fuel}
                         delay={0.35}
                         accent="red"
                     />

@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS daily_stats;
 DROP TABLE IF EXISTS asset_flows;
 DROP TABLE IF EXISTS privacy_pool_stats;
 DROP TABLE IF EXISTS payloads;
+DROP TABLE IF EXISTS token_transfers;
 
 -- Core events table for all indexed transactions
 CREATE TABLE events (
@@ -117,6 +118,28 @@ CREATE INDEX idx_asset_flows_chain ON asset_flows(chain_id, tx_count DESC);
 CREATE INDEX idx_privacy_pool_chain_block ON privacy_pool_stats(chain_id, block_number DESC);
 CREATE INDEX idx_payloads_chain_type ON payloads(chain_id, payload_type);
 CREATE INDEX idx_payloads_chain_time ON payloads(chain_id, timestamp DESC);
+
+-- Token transfers for multi-asset tracking
+CREATE TABLE token_transfers (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  chain_id INTEGER NOT NULL,
+  tx_hash TEXT NOT NULL,
+  block_number INTEGER NOT NULL,
+  token_address TEXT NOT NULL,
+  token_symbol TEXT DEFAULT 'UNKNOWN',
+  token_decimals INTEGER DEFAULT 18,
+  from_address TEXT NOT NULL,
+  to_address TEXT NOT NULL,
+  amount_raw TEXT NOT NULL,     -- Raw amount string
+  amount_display REAL DEFAULT 0, -- Human-readable (amount / 10^decimals)
+  amount_usd REAL DEFAULT 0,    -- USD value at time of tx
+  timestamp INTEGER DEFAULT (strftime('%s', 'now')),
+  CONSTRAINT uniq_chain_tx_token UNIQUE (chain_id, tx_hash, token_address, from_address, to_address)
+);
+
+CREATE INDEX idx_token_transfers_chain_time ON token_transfers(chain_id, timestamp DESC);
+CREATE INDEX idx_token_transfers_token ON token_transfers(chain_id, token_address);
+CREATE INDEX idx_token_transfers_tx ON token_transfers(chain_id, tx_hash);
 
 -- Seed Base chain
 INSERT INTO chains (id, name, rpc_url, contract_address, start_block, explorer_url, icon, is_enabled)

@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 // API base URL - use relative path in dev (proxied), full URL in production
-const API_URL = import.meta.env.DEV ? '' : 'https://anomapay-explorer.bidurandblog.workers.dev'
+export const API_BASE_url = import.meta.env.DEV ? '' : 'https://anomapay-explorer.bidurandblog.workers.dev'
+const API_URL = API_BASE_url
 
 // Types
 export interface Chain {
@@ -15,9 +16,8 @@ export interface Stats {
     totalVolume: number
     intentCount: number
     uniqueSolvers: number
-    avgGasPrice: string
-    gasSavedETH: number
-    intentSatisfactionIndex?: number
+    totalGasUsed: number
+    assetCount: number
 }
 
 export interface Transaction {
@@ -31,6 +31,36 @@ export interface Transaction {
     primary_type?: string
 }
 
+export interface TransactionDetail extends Transaction {
+    event_type: string
+    gas_price_wei: string
+    decoded_input: string
+    payloads: PayloadDetail[]
+    tokenTransfers: TokenTransfer[]
+    privacyRoot: { root_hash: string; estimated_pool_size: number } | null
+}
+
+export interface PayloadDetail {
+    payload_type: string
+    payload_index: number
+    blob: string
+    timestamp: number
+}
+
+export interface TokenTransfer {
+    tx_hash?: string
+    block_number?: number
+    token_address: string
+    token_symbol: string
+    token_decimals: number
+    from_address: string
+    to_address: string
+    amount_raw: string
+    amount_display: number
+    amount_usd: number
+    timestamp: number
+}
+
 export interface Solver {
     address: string
     tx_count: number
@@ -38,6 +68,12 @@ export interface Solver {
     total_value_processed: string
     first_seen: number
     last_seen: number
+}
+
+export interface SolverDetail extends Solver {
+    totalVolumeUsd: number
+    recentTransactions: Transaction[]
+    dailyActivity: { date: string; count: number }[]
 }
 
 export interface DailyStat {
@@ -59,9 +95,7 @@ export interface Asset {
 
 export interface NetworkHealth {
     tvl: number
-    dailyVolume: number
-    dailyTxCount: number
-    shieldingRate: string
+    shieldingRate: number
 }
 
 export interface PayloadStat {
@@ -69,7 +103,33 @@ export interface PayloadStat {
     count: number
 }
 
-// Fetch chains from API
+export interface AssetSummary {
+    token_address: string
+    token_symbol: string
+    token_decimals: number
+    transfer_count: number
+    total_amount: number
+    total_usd: number
+}
+
+// =============================================================
+//  Auto-refresh hook - 30s polling  
+// =============================================================
+function useAutoRefresh(refetchFn: () => void, intervalMs = 30000) {
+    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+    useEffect(() => {
+        intervalRef.current = setInterval(refetchFn, intervalMs)
+        return () => {
+            if (intervalRef.current) clearInterval(intervalRef.current)
+        }
+    }, [refetchFn, intervalMs])
+}
+
+// =============================================================
+//  Hooks
+// =============================================================
+
 export function useChains() {
     const [chains, setChains] = useState<Chain[]>([])
     const [loading, setLoading] = useState(true)
@@ -90,13 +150,11 @@ export function useChains() {
     return { chains, loading }
 }
 
-// Fetch stats for a chain
 export function useStats(chainId: number) {
     const [stats, setStats] = useState<Stats | null>(null)
     const [loading, setLoading] = useState(true)
 
     const refetch = useCallback(() => {
-        setLoading(true)
         fetch(`${API_URL}/api/stats?chainId=${chainId}`)
             .then(res => res.json())
             .then(data => {
@@ -107,18 +165,15 @@ export function useStats(chainId: number) {
     }, [chainId])
 
     useEffect(() => {
+        setLoading(true)
         refetch()
     }, [refetch])
+
+    useAutoRefresh(refetch)
 
     return { stats, loading, refetch }
 }
 
-
-
-// Fetch from Blockscout
-
-
-// Fetch transactions for a chain
 export function useTransactions(chainId: number, searchQuery?: string, page = 1, limit = 20) {
     const [transactions, setTransactions] = useState<Transaction[]>([])
     const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, totalPages: 1 })
@@ -162,22 +217,19 @@ export function useTransactions(chainId: number, searchQuery?: string, page = 1,
         refetch()
     }, [refetch])
 
+    useAutoRefresh(refetch)
+
     return { transactions, pagination, loading, refetch }
 }
 
-
-
-
-
-// Alias for backwards compatibility
 export const useLatestTransactions = useTransactions
 
-// NEW: Fetch solver leaderboard
+// Fetch solver leaderboard
 export function useSolvers(chainId: number) {
     const [solvers, setSolvers] = useState<Solver[]>([])
     const [loading, setLoading] = useState(true)
 
-    useEffect(() => {
+    const refetch = useCallback(() => {
         fetch(`${API_URL}/api/solvers?chainId=${chainId}`)
             .then(res => res.json())
             .then(data => {
@@ -187,10 +239,15 @@ export function useSolvers(chainId: number) {
             .catch(() => setLoading(false))
     }, [chainId])
 
+    useEffect(() => {
+        refetch()
+    }, [refetch])
+
+    useAutoRefresh(refetch)
+
     return { solvers, loading }
 }
 
-// NEW: Fetch daily stats for charts
 export function useDailyStats(chainId: number, days = 7) {
     const [dailyStats, setDailyStats] = useState<DailyStat[]>([])
     const [loading, setLoading] = useState(true)
@@ -208,7 +265,6 @@ export function useDailyStats(chainId: number, days = 7) {
     return { dailyStats, loading }
 }
 
-// NEW: Fetch asset popularity
 export function useAssets(chainId: number) {
     const [assets, setAssets] = useState<Asset[]>([])
     const [loading, setLoading] = useState(true)
@@ -226,12 +282,11 @@ export function useAssets(chainId: number) {
     return { assets, loading }
 }
 
-// NEW: Fetch network health
 export function useNetworkHealth(chainId: number) {
     const [health, setHealth] = useState<NetworkHealth | null>(null)
     const [loading, setLoading] = useState(true)
 
-    useEffect(() => {
+    const refetch = useCallback(() => {
         fetch(`${API_URL}/api/network-health?chainId=${chainId}`)
             .then(res => res.json())
             .then(data => {
@@ -241,10 +296,15 @@ export function useNetworkHealth(chainId: number) {
             .catch(() => setLoading(false))
     }, [chainId])
 
+    useEffect(() => {
+        refetch()
+    }, [refetch])
+
+    useAutoRefresh(refetch)
+
     return { health, loading }
 }
 
-// NEW: Fetch intent distribution
 export function usePayloadStats(chainId: number) {
     const [stats, setStats] = useState<PayloadStat[]>([])
     const [loading, setLoading] = useState(true)
@@ -260,4 +320,92 @@ export function usePayloadStats(chainId: number) {
     }, [chainId])
 
     return { stats, loading }
+}
+
+// =============================================================
+//  NEW: Transaction Detail hook
+// =============================================================
+export function useTxDetail(chainId: number, txHash: string | null) {
+    const [tx, setTx] = useState<TransactionDetail | null>(null)
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+
+    useEffect(() => {
+        if (!txHash) { setTx(null); return }
+        setLoading(true)
+        setError(null)
+        fetch(`${API_URL}/api/tx/${txHash}?chainId=${chainId}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Not found')
+                return res.json()
+            })
+            .then(data => {
+                setTx(data)
+                setLoading(false)
+            })
+            .catch(e => {
+                setError(e.message)
+                setLoading(false)
+            })
+    }, [chainId, txHash])
+
+    return { tx, loading, error }
+}
+
+// =============================================================
+//  NEW: Solver Detail hook
+// =============================================================
+export function useSolverDetail(chainId: number, address: string | null) {
+    const [solver, setSolver] = useState<SolverDetail | null>(null)
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+
+    useEffect(() => {
+        if (!address) { setSolver(null); return }
+        setLoading(true)
+        setError(null)
+        fetch(`${API_URL}/api/solver/${address}?chainId=${chainId}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Not found')
+                return res.json()
+            })
+            .then(data => {
+                setSolver(data)
+                setLoading(false)
+            })
+            .catch(e => {
+                setError(e.message)
+                setLoading(false)
+            })
+    }, [chainId, address])
+
+    return { solver, loading, error }
+}
+
+// =============================================================
+//  NEW: Token Transfers hook
+// =============================================================
+export function useTokenTransfers(chainId: number) {
+    const [transfers, setTransfers] = useState<TokenTransfer[]>([])
+    const [assetSummary, setAssetSummary] = useState<AssetSummary[]>([])
+    const [loading, setLoading] = useState(true)
+
+    const refetch = useCallback(() => {
+        fetch(`${API_URL}/api/token-transfers?chainId=${chainId}&limit=50`)
+            .then(res => res.json())
+            .then(data => {
+                setTransfers(data.data || [])
+                setAssetSummary(data.assetSummary || [])
+                setLoading(false)
+            })
+            .catch(() => setLoading(false))
+    }, [chainId])
+
+    useEffect(() => {
+        refetch()
+    }, [refetch])
+
+    useAutoRefresh(refetch)
+
+    return { transfers, assetSummary, loading }
 }

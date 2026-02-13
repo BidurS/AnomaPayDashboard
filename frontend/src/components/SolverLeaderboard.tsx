@@ -30,8 +30,8 @@ export function SolverLeaderboard() {
                 >
                     <div className="flex items-center gap-4 mb-8">
                         <div className="w-2 h-8 bg-[#FFCC00]" />
-                        <Trophy className="w-6 h-6" />
-                        <h2 className="text-2xl font-extrabold uppercase tracking-tight">Solver Leaderboard</h2>
+                        <Trophy className="w-6 h-6 text-black dark:text-white" />
+                        <h2 className="text-2xl font-extrabold uppercase tracking-tight text-black dark:text-white">Solver Leaderboard</h2>
                     </div>
 
                     <div className="swiss-card overflow-hidden">
@@ -62,18 +62,19 @@ export function SolverLeaderboard() {
                                                 transition={{ delay: 0.1 + i * 0.05 }}
                                             >
                                                 <td>
-                                                    <div className={`w-8 h-8 flex items-center justify-center font-bold text-sm ${i === 0 ? 'bg-[#FFCC00]' :
-                                                        i === 1 ? 'bg-gray-300' :
-                                                            i === 2 ? 'bg-orange-300' : 'bg-gray-100'
-                                                        } border-2 border-black`}>
+                                                    <div className={`w-8 h-8 flex items-center justify-center font-bold text-sm ${i === 0 ? 'bg-[#FFCC00] text-black' :
+                                                        i === 1 ? 'bg-gray-300 text-black' :
+                                                            i === 2 ? 'bg-orange-300 text-black' : 'bg-gray-100 dark:bg-gray-800 text-black dark:text-white'
+                                                        } border-2 border-black dark:border-white`}>
                                                         {i + 1}
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <div className="flex items-center gap-3">
-                                                        <code className="font-mono text-sm font-bold">
+                                                        <a href={`#/solver/${solver.address}`}
+                                                            className="font-mono text-sm font-bold text-[#0066CC] dark:text-[#3399FF] hover:underline cursor-pointer">
                                                             {shortenAddress(solver.address)}
-                                                        </code>
+                                                        </a>
                                                         {topMaster?.address === solver.address && (
                                                             <span className="swiss-badge flex items-center gap-1">
                                                                 <Zap className="w-3 h-3" />
@@ -82,16 +83,16 @@ export function SolverLeaderboard() {
                                                         )}
                                                     </div>
                                                 </td>
-                                                <td className="text-right font-bold tabular-nums">
+                                                <td className="text-right font-bold tabular-nums text-black dark:text-white">
                                                     {formatNumber(solver.tx_count)}
                                                 </td>
-                                                <td className="text-right font-bold tabular-nums">
+                                                <td className="text-right font-bold tabular-nums text-black dark:text-white">
                                                     {formatNumber(parseFloat(solver.total_value_processed || '0') / 1e18)}
                                                 </td>
                                                 <td className="text-right">
-                                                    <div className="flex items-center justify-end gap-2">
+                                                    <div className="flex items-center justify-end gap-2 text-black dark:text-white">
                                                         <span className="font-bold tabular-nums">{solver.masteryScore.toFixed(1)}</span>
-                                                        <Award className="w-4 h-4 text-[#0066CC]" />
+                                                        <Award className="w-4 h-4 text-[#0066CC] dark:text-[#3399FF]" />
                                                     </div>
                                                 </td>
                                             </motion.tr>
@@ -106,7 +107,7 @@ export function SolverLeaderboard() {
                         )}
 
                         {solversWithMastery.length > 0 && (
-                            <div className="p-4 border-t-2 border-black bg-gray-50 text-center">
+                            <div className="p-4 border-t-2 border-black dark:border-white bg-gray-50 dark:bg-gray-900 text-center">
                                 <p className="text-xs text-gray-500 uppercase tracking-wider">
                                     Intent Mastery = (Volume Settled + (Transaction Count × 2)) / 10
                                 </p>
