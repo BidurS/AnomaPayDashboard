@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, ExternalLink, Zap, Menu, X, Users, ArrowRightLeft, HelpCircle, Home as HomeIcon } from 'lucide-react'
+import { ChevronDown, ExternalLink, Menu, X, Users, ArrowRightLeft, HelpCircle, Home as HomeIcon } from 'lucide-react'
 import { ThemeToggle } from './ThemeToggle'
 import { useChainContext } from '../context/ChainContext'
 import { cn } from '../lib/utils'
@@ -37,9 +37,7 @@ export function Header({ currentView, onNavigate, onSearch }: HeaderProps) {
                 <div className="h-16 sm:h-20 flex items-center justify-between gap-3">
                     {/* Logo */}
                     <div className="flex items-center gap-3 cursor-pointer shrink-0" onClick={() => onNavigate('explorer')}>
-                        <div className="h-10 w-10 sm:h-12 sm:w-12 bg-[#FF0000] flex items-center justify-center">
-                            <Zap className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="currentColor" />
-                        </div>
+                        <img src="/logo.svg" alt="Gnoma Logo" className="h-10 w-10 sm:h-12 sm:w-12 object-contain" />
                         <div className="hidden sm:block">
                             <h1 className="text-lg sm:text-xl font-extrabold tracking-tight uppercase text-black dark:text-white">Gnoma</h1>
                             <p className="text-[9px] sm:text-[10px] font-semibold tracking-[0.3em] text-gray-500 dark:text-gray-400 uppercase">Explorer</p>

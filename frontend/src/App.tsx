@@ -24,6 +24,13 @@ function Layout() {
     if (location.pathname === '/faq') return 'faq'
     if (location.pathname.startsWith('/solver')) return 'solvers'
     if (location.pathname.startsWith('/tx')) return 'transactions'
+
+    // Check query params for scroll sections on Home
+    const params = new URLSearchParams(location.search)
+    const section = params.get('section')
+    if (section === 'solvers') return 'solvers'
+    if (section === 'transactions') return 'transactions'
+
     return 'explorer'
   }
 
@@ -33,14 +40,14 @@ function Layout() {
         navigate('/faq')
         break
       case 'solvers':
-        navigate('/')
+        navigate({ pathname: '/', search: 'section=solvers' }, { replace: true })
         // Scroll to solver leaderboard after navigation
         setTimeout(() => {
           document.getElementById('solver-leaderboard')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
         }, 100)
         break
       case 'transactions':
-        navigate('/')
+        navigate({ pathname: '/', search: 'section=transactions' }, { replace: true })
         setTimeout(() => {
           document.getElementById('transaction-table')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
         }, 100)

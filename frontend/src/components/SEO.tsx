@@ -12,7 +12,8 @@ export function SEO({ title, description, image, type = 'website' }: SEOProps) {
     const siteTitle = 'Gnoma Multichain Explorer';
     const metaTitle = title ? `${title} | ${siteTitle}` : siteTitle;
     const metaDescription = description || 'Advanced Multichain Explorer for Anoma Protocol. Real-time solver analytics, transaction tracking, and privacy metrics.';
-    const metaImage = image || '/og-image.png';
+    const domain = 'https://anomapay-explorer.pages.dev';
+    const metaImage = image ? (image.startsWith('http') ? image : `${domain}${image}`) : `${domain}/og-image.png?v=2`;
 
     return (
         <Helmet>
