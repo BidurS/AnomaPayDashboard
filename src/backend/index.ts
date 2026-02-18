@@ -1,7 +1,9 @@
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 import { createDb } from './db';
 import { runBlockscoutIndexer } from './services/blockscoutIndexer';
 import { withCache } from './utils/cache';
-import { sendDiscordAlert, checkAndAlertHealth } from './utils/alerts';
+import { sendDiscordAlert } from './utils/alerts';
 import { chainIdSchema, daysSchema, txHashSchema, addressSchema, parseQueryParam } from './utils/validators';
 import { rpcRequest } from './utils/rpc';
 import * as schema from './db/schema';
@@ -18,136 +20,211 @@ export interface Env {
   DISCORD_WEBHOOK_URL?: string;
 }
 
+const app = new Hono<{ Bindings: Env }>();
+
+// Middleware: CORS
+app.use('/*', cors());
+
+// Middleware: Global Error Handler
+app.onError(async (err, c) => {
+  console.error(err);
+  await sendDiscordAlert(c.env.DISCORD_WEBHOOK_URL, 'API Error', `**Path**: ${c.req.path}\n**Error**: ${err.message}`, 'critical');
+  return c.json({ error: err.message }, 500);
+});
+
+// Helper to pass empty headers to controllers (controllers manually add CORS, but Hono handles it too)
+// We pass {} so controllers don't override Hono's headers with duplicates or conflicts if they merge.
+// Ideally, we'd refactor controllers to not set headers, but this is a safe interim step.
+const corsHeaders = {};
+
+// --- Admin Routes (`/api/admin/*`) ---
+// Middleware: Admin Auth
+app.use('/api/admin/*', async (c, next) => {
+  const apiKey = c.req.header('X-Admin-Key');
+  if (!c.env.ADMIN_API_KEY || apiKey !== c.env.ADMIN_API_KEY) {
+    return c.json({ error: 'Unauthorized' }, 401);
+  }
+  await next();
+});
+
+app.post('/api/admin/login', (c) => c.json({ success: true }));
+
+app.get('/api/admin/chains', (c) => chainController.handleGetAdminChains(createDb(c.env.DB), corsHeaders));
+app.post('/api/admin/chains', async (c) => chainController.handleAddChain(createDb(c.env.DB), await c.req.json(), corsHeaders));
+app.put('/api/admin/chains/:id', async (c) => {
+  const id = parseInt(c.req.param('id'));
+  return chainController.handleUpdateChain(createDb(c.env.DB), id, await c.req.json(), corsHeaders);
+});
+app.delete('/api/admin/chains/:id', async (c) => {
+  const id = parseInt(c.req.param('id'));
+  return chainController.handleDeleteChain(createDb(c.env.DB), id, corsHeaders);
+});
+
+app.post('/api/admin/backfill', async (c) => {
+  const body = await c.req.json() as { chainId?: number; fromBlock?: number; toBlock?: number };
+  return adminController.handleHistoricalBackfill(createDb(c.env.DB), body.chainId || 8453, body.fromBlock, body.toBlock, corsHeaders);
+});
+
+app.post('/api/admin/import', async (c) => {
+  return adminController.handleImportData(createDb(c.env.DB), await c.req.json(), corsHeaders);
+});
+
+app.post('/api/admin/sync', async (c) => {
+  try {
+    const db = createDb(c.env.DB);
+    const body = await c.req.json() as { chainId?: number };
+    const targetChainId = body.chainId || 8453;
+
+    const chain = await db.select().from(schema.chains).where(eq(schema.chains.id, targetChainId)).get();
+    if (!chain) return c.json({ error: 'Chain not found' }, 404);
+
+    const indexerResults = await runBlockscoutIndexer(db, { id: chain.id, rpcUrl: chain.rpcUrl, contractAddress: chain.contractAddress });
+    const syncState = await db.select().from(schema.syncState).where(eq(schema.syncState.chainId, targetChainId)).get();
+
+    return c.json({ success: true, lastBlock: syncState?.lastBlock, updatedAt: syncState?.updatedAt, indexerResults }, 200);
+  } catch (e: any) {
+    return c.json({ success: false, error: e.message, stack: e.stack }, 500);
+  }
+});
+
+app.get('/api/admin/debug-sync', async (c) => {
+  const db = createDb(c.env.DB);
+  const chain = await db.select().from(schema.chains).where(eq(schema.chains.id, 8453)).get();
+  const syncState = await db.select().from(schema.syncState).where(eq(schema.syncState.chainId, 8453)).get();
+
+  const info: any = { chain: chain ? { id: chain.id, name: chain.name, rpcUrl: chain.rpcUrl, contractAddress: chain.contractAddress, startBlock: chain.startBlock } : null, syncState };
+
+  try {
+    const blockHex = await rpcRequest(chain!.rpcUrl, 'eth_blockNumber', []);
+    info.currentBlock = parseInt(blockHex, 16);
+    info.gap = info.currentBlock - (syncState?.lastBlock || 0);
+
+    // Test eth_getLogs with a small range
+    const fromBlock = syncState?.lastBlock || chain!.startBlock;
+    const toBlock = fromBlock + 100;
+    const logs = await rpcRequest(chain!.rpcUrl, 'eth_getLogs', [{
+      fromBlock: '0x' + fromBlock.toString(16),
+      toBlock: '0x' + toBlock.toString(16),
+      address: chain!.contractAddress,
+    }]);
+    info.testLogs = { fromBlock, toBlock, count: logs?.length ?? 0 };
+  } catch (e: any) {
+    info.rpcError = e.message;
+  }
+  return c.json(info);
+});
+
+
+// --- Public Routes ---
+
+// Helper for query param validation
+const getChainId = (c: any) => {
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  if (!cid.success) throw new Error('Invalid chainId'); // Error handler will catch this
+  return cid.data;
+};
+
+app.get('/api/chains', (c) => withCache(c.req.raw, 300, () => chainController.handleGetChains(createDb(c.env.DB), corsHeaders)));
+
+app.get('/api/proxy/blockscout', async (c) => {
+  const CONTRACT_ADDRESS = '0x9ed43c229480659bf6b6607c46d7b96c6d760cbb';
+  try {
+    const resp = await fetch(`https://base.blockscout.com/api/v2/addresses/${CONTRACT_ADDRESS}/transactions?filter=to`, {
+      headers: { 'User-Agent': 'Cloudflare-Worker' }
+    });
+    const data = await resp.json();
+    return c.json(data);
+  } catch (e: any) {
+    return c.json({ error: 'Failed to fetch from Blockscout', details: e.message }, 502);
+  }
+});
+
+app.get('/api/health', (c) => {
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  if (!cid.success) return cid.response;
+  return statsController.handleGetHealth(createDb(c.env.DB), cid.data, corsHeaders);
+});
+
+app.get('/api/stats', (c) => {
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  if (!cid.success) return cid.response;
+  return withCache(c.req.raw, 60, () => statsController.handleGetStats(createDb(c.env.DB), cid.data, corsHeaders));
+});
+
+app.get('/api/latest-transactions', (c) => {
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  if (!cid.success) return cid.response;
+  return withCache(c.req.raw, 5, () => transactionController.handleGetLatestTransactions(createDb(c.env.DB), cid.data, corsHeaders));
+});
+
+app.get('/api/solvers', (c) => {
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  if (!cid.success) return cid.response;
+  return withCache(c.req.raw, 60, () => solverController.handleGetSolvers(createDb(c.env.DB), cid.data, corsHeaders));
+});
+
+app.get('/api/daily-stats', (c) => {
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  if (!cid.success) return cid.response;
+  const d = parseQueryParam(daysSchema, c.req.query('days'));
+  if (!d.success) return d.response;
+  return withCache(c.req.raw, 300, () => statsController.handleGetDailyStats(createDb(c.env.DB), cid.data, d.data, corsHeaders));
+});
+
+app.get('/api/assets', (c) => {
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  if (!cid.success) return cid.response;
+  return withCache(c.req.raw, 60, () => statsController.handleGetAssets(createDb(c.env.DB), cid.data, corsHeaders));
+});
+
+app.get('/api/network-health', (c) => {
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  if (!cid.success) return cid.response;
+  return withCache(c.req.raw, 60, () => statsController.handleGetNetworkHealth(createDb(c.env.DB), cid.data, corsHeaders));
+});
+
+app.get('/api/privacy-stats', (c) => {
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  if (!cid.success) return cid.response;
+  return withCache(c.req.raw, 60, () => statsController.handleGetPrivacyStats(createDb(c.env.DB), cid.data, corsHeaders));
+});
+
+app.get('/api/payload-stats', (c) => {
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  if (!cid.success) return cid.response;
+  return withCache(c.req.raw, 300, () => statsController.handleGetPayloadStats(createDb(c.env.DB), cid.data, corsHeaders));
+});
+
+app.get('/api/transactions', (c) => {
+  // transactions controller likely checks query params on its own or we should pass URL search params
+  const url = new URL(c.req.url); // construct URL object to pass searchParams
+  return transactionController.handleGetTransactions(createDb(c.env.DB), url.searchParams, corsHeaders);
+});
+
+app.get('/api/token-transfers', (c) => {
+  const url = new URL(c.req.url);
+  return transactionController.handleGetTokenTransfers(createDb(c.env.DB), url.searchParams, corsHeaders);
+});
+
+app.get('/api/tx/:hash', (c) => {
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  if (!cid.success) return cid.response;
+  const h = parseQueryParam(txHashSchema, c.req.param('hash'));
+  if (!h.success) return h.response;
+  return transactionController.handleGetTxDetail(createDb(c.env.DB), cid.data, h.data, corsHeaders);
+});
+
+app.get('/api/solver/:address', (c) => {
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  if (!cid.success) return cid.response;
+  const a = parseQueryParam(addressSchema, c.req.param('address'));
+  if (!a.success) return a.response;
+  return solverController.handleGetSolverDetail(createDb(c.env.DB), cid.data, a.data, corsHeaders);
+});
+
+// Export the Hono app and the scheduled handler
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
-    const url = new URL(request.url);
-    const method = request.method;
-    const corsHeaders = {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Key',
-    };
-
-    if (method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
-
-    const db = createDb(env.DB);
-
-    try {
-      // Admin Routes — handle first, before chainId validation (admin POST endpoints don't always have chainId)
-      if (url.pathname.startsWith('/api/admin/')) {
-        const apiKey = request.headers.get('X-Admin-Key');
-        if (!env.ADMIN_API_KEY || apiKey !== env.ADMIN_API_KEY) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
-
-        if (url.pathname === '/api/admin/login' && method === 'POST') {
-          return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
-        }
-        if (url.pathname === '/api/admin/chains') {
-          if (method === 'GET') return chainController.handleGetAdminChains(db, corsHeaders);
-          if (method === 'POST') return chainController.handleAddChain(db, await request.json(), corsHeaders);
-        }
-        if (url.pathname.match(/^\/api\/admin\/chains\/\d+$/)) {
-          const chainId = parseInt(url.pathname.split('/').pop()!);
-          if (method === 'PUT') return chainController.handleUpdateChain(db, chainId, await request.json(), corsHeaders);
-          if (method === 'DELETE') return chainController.handleDeleteChain(db, chainId, corsHeaders);
-        }
-
-        if (url.pathname === '/api/admin/backfill' && method === 'POST') {
-          const body = await request.json() as { chainId?: number; fromBlock?: number; toBlock?: number };
-          return adminController.handleHistoricalBackfill(db, body.chainId || 8453, body.fromBlock, body.toBlock, corsHeaders);
-        }
-        if (url.pathname === '/api/admin/sync' && method === 'POST') {
-          try {
-            const body = await request.json() as { chainId?: number };
-            const targetChainId = body.chainId || 8453;
-
-            const chain = await db.select().from(schema.chains).where(eq(schema.chains.id, targetChainId)).get();
-            if (!chain) return new Response(JSON.stringify({ error: 'Chain not found' }), { status: 404, headers: corsHeaders });
-
-            const indexerResults = await runBlockscoutIndexer(db, { id: chain.id, rpcUrl: chain.rpcUrl, contractAddress: chain.contractAddress });
-            const syncState = await db.select().from(schema.syncState).where(eq(schema.syncState.chainId, targetChainId)).get();
-
-            return new Response(JSON.stringify({ success: true, lastBlock: syncState?.lastBlock, updatedAt: syncState?.updatedAt, indexerResults }, null, 2), { headers: corsHeaders });
-          } catch (e: any) {
-            return new Response(JSON.stringify({ success: false, error: e.message, stack: e.stack }), { status: 500, headers: corsHeaders });
-          }
-        }
-        if (url.pathname === '/api/admin/debug-sync' && method === 'GET') {
-          const chain = await db.select().from(schema.chains).where(eq(schema.chains.id, 8453)).get();
-          const syncState = await db.select().from(schema.syncState).where(eq(schema.syncState.chainId, 8453)).get();
-          const info: any = { chain: chain ? { id: chain.id, name: chain.name, rpcUrl: chain.rpcUrl, contractAddress: chain.contractAddress, startBlock: chain.startBlock } : null, syncState };
-          try {
-            const blockHex = await rpcRequest(chain!.rpcUrl, 'eth_blockNumber', []);
-            info.currentBlock = parseInt(blockHex, 16);
-            info.gap = info.currentBlock - (syncState?.lastBlock || 0);
-            // Test eth_getLogs with a small range
-            const fromBlock = syncState?.lastBlock || chain!.startBlock;
-            const toBlock = fromBlock + 100;
-            const logs = await rpcRequest(chain!.rpcUrl, 'eth_getLogs', [{
-              fromBlock: '0x' + fromBlock.toString(16),
-              toBlock: '0x' + toBlock.toString(16),
-              address: chain!.contractAddress,
-            }]);
-            info.testLogs = { fromBlock, toBlock, count: logs?.length ?? 0 };
-          } catch (e: any) {
-            info.rpcError = e.message;
-          }
-          return new Response(JSON.stringify(info, null, 2), { headers: corsHeaders });
-        }
-        if (url.pathname === '/api/admin/import' && method === 'POST') {
-          return adminController.handleImportData(db, await request.json(), corsHeaders);
-        }
-        return new Response(JSON.stringify({ error: 'Not Found' }), { status: 404, headers: corsHeaders });
-      }
-
-      // --- Validate common query params (public routes only) ---
-      const cid = parseQueryParam(chainIdSchema, url.searchParams.get('chainId'));
-      if (!cid.success) return cid.response;
-      const chainId = cid.data;
-
-      // Public Endpoints
-      if (url.pathname === '/api/chains') return withCache(request, 300, () => chainController.handleGetChains(db, corsHeaders));
-      if (url.pathname === '/api/proxy/blockscout') return handleProxyBlockscout(corsHeaders);
-      if (url.pathname === '/api/health') return statsController.handleGetHealth(db, chainId, corsHeaders);
-
-      if (url.pathname === '/api/stats') return withCache(request, 60, () => statsController.handleGetStats(db, chainId, corsHeaders));
-      if (url.pathname === '/api/latest-transactions') return withCache(request, 5, () => transactionController.handleGetLatestTransactions(db, chainId, corsHeaders));
-      if (url.pathname === '/api/solvers') return withCache(request, 60, () => solverController.handleGetSolvers(db, chainId, corsHeaders));
-      if (url.pathname === '/api/daily-stats') {
-        const d = parseQueryParam(daysSchema, url.searchParams.get('days'));
-        if (!d.success) return d.response;
-        return withCache(request, 300, () => statsController.handleGetDailyStats(db, chainId, d.data, corsHeaders));
-      }
-      if (url.pathname === '/api/assets') return withCache(request, 60, () => statsController.handleGetAssets(db, chainId, corsHeaders));
-      if (url.pathname === '/api/network-health') return withCache(request, 60, () => statsController.handleGetNetworkHealth(db, chainId, corsHeaders));
-      if (url.pathname === '/api/privacy-stats') return withCache(request, 60, () => statsController.handleGetPrivacyStats(db, chainId, corsHeaders));
-      if (url.pathname === '/api/payload-stats') return withCache(request, 300, () => statsController.handleGetPayloadStats(db, chainId, corsHeaders));
-
-      if (url.pathname === '/api/transactions') return transactionController.handleGetTransactions(db, url.searchParams, corsHeaders);
-      if (url.pathname === '/api/token-transfers') return transactionController.handleGetTokenTransfers(db, url.searchParams, corsHeaders);
-
-      // Dynamic routes with validation
-      const txMatch = url.pathname.match(/^\/api\/tx\/(.+)$/);
-      if (txMatch) {
-        const h = parseQueryParam(txHashSchema, txMatch[1]);
-        if (!h.success) return h.response;
-        return transactionController.handleGetTxDetail(db, chainId, h.data, corsHeaders);
-      }
-
-      const solverMatch = url.pathname.match(/^\/api\/solver\/(.+)$/);
-      if (solverMatch) {
-        const a = parseQueryParam(addressSchema, solverMatch[1]);
-        if (!a.success) return a.response;
-        return solverController.handleGetSolverDetail(db, chainId, a.data, corsHeaders);
-      }
-
-      return new Response(JSON.stringify({ message: 'Gnoma Explorer API', version: '3.0' }), { headers: corsHeaders });
-    } catch (e: any) {
-      // Send error to Discord on uncaught exceptions
-      await sendDiscordAlert(env.DISCORD_WEBHOOK_URL, 'API Error', `**Path**: ${url.pathname}\n**Error**: ${e.message}`, 'critical');
-      return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders });
-    }
-  },
+  fetch: app.fetch,
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
     const db = createDb(env.DB);
     try {
@@ -181,17 +258,3 @@ export default {
     }
   }
 };
-
-// Helper: Proxy Blockscout
-async function handleProxyBlockscout(headers: any) {
-  const CONTRACT_ADDRESS = '0x9ed43c229480659bf6b6607c46d7b96c6d760cbb';
-  try {
-    const resp = await fetch(`https://base.blockscout.com/api/v2/addresses/${CONTRACT_ADDRESS}/transactions?filter=to`, {
-      headers: { 'User-Agent': 'Cloudflare-Worker' }
-    });
-    const data = await resp.json();
-    return new Response(JSON.stringify(data), { headers });
-  } catch (e: any) {
-    return new Response(JSON.stringify({ error: 'Failed to fetch from Blockscout', details: e.message }), { status: 502, headers });
-  }
-}
