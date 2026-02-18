@@ -5,7 +5,11 @@ import path from 'path';
 // CONFIG
 const WORKER_URL = 'https://anomapay-explorer.bidurandblog.workers.dev';
 const ENDPOINT = '/api/admin/import';
-const ADMIN_KEY = '12e259c33033199b7b5136364976862cdbb6cd2fc8d03ded1bc0816de01f8ab1';
+const ADMIN_KEY = process.env.ADMIN_KEY;
+if (!ADMIN_KEY) {
+    console.error("❌ Error: ADMIN_KEY environment variable is not set.");
+    process.exit(1);
+}
 const DATA_DIR = 'data';
 const CONCURRENCY = 20; // Parallel uploads
 

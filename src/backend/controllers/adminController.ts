@@ -4,7 +4,7 @@ import { eq, sql } from 'drizzle-orm';
 import { syncBlockRange } from '../services/indexer';
 import { ChainConfig } from '../types';
 import { rpcRequest } from '../utils/rpc';
-import { Env } from '../../index'; // Will need to define/export Env in index.ts or types
+import { Env } from '../index'; // Will need to define/export Env in index.ts or types
 
 export async function handleHistoricalBackfill(db: DB, chainId: number, fromBlock: number | undefined, toBlock: number | undefined, headers: any) {
     const chain = await db.select().from(schema.chains).where(eq(schema.chains.id, chainId)).get();
@@ -94,6 +94,67 @@ export async function handleImportData(db: DB, data: any, headers: any) {
     // Process Solvers, DailyStats, etc. similarly...
     // For brevity and limits, assuming import is fully implemented or just partial here.
     // Given user instructions, full implementation is preferred.
+
+    // 4. Solvers
+    if (data.solvers && data.solvers.length > 0) {
+        batch.push(db.insert(schema.solvers).values(
+            data.solvers.map((s: any) => ({
+                chainId: s.chain_id,
+                address: s.address,
+                txCount: s.count,
+                totalGasSpent: s.gas,
+                totalValueProcessed: s.val,
+                lastSeen: s.timestamp,
+                firstSeen: s.timestamp
+            }))
+        ).onConflictDoUpdate({
+            target: [schema.solvers.chainId, schema.solvers.address],
+            set: {
+                txCount: sql`tx_count + excluded.tx_count`,
+                lastSeen: sql`MAX(last_seen, excluded.last_seen)`,
+            }
+        }));
+    }
+
+    // 5. Daily Stats
+    if (data.daily_stats && data.daily_stats.length > 0) {
+        batch.push(db.insert(schema.dailyStats).values(
+            data.daily_stats.map((d: any) => ({
+                chainId: d.chain_id,
+                date: d.date,
+                intentCount: d.count,
+                totalVolume: d.volume,
+                totalGasUsed: d.gas,
+            }))
+        ).onConflictDoUpdate({
+            target: [schema.dailyStats.chainId, schema.dailyStats.date],
+            set: {
+                intentCount: sql`intent_count + excluded.intent_count`,
+                totalGasUsed: sql`total_gas_used + excluded.total_gas_used`,
+            }
+        }));
+    }
+
+    // 6. Asset Flows
+    if (data.assets && data.assets.length > 0) {
+        batch.push(db.insert(schema.assetFlows).values(
+            data.assets.map((a: any) => ({
+                chainId: a.chain_id,
+                tokenAddress: a.token_address,
+                tokenSymbol: a.token_symbol,
+                flowIn: a.flow_in,
+                flowOut: a.flow_out,
+                txCount: 1,
+                lastUpdated: sql`(strftime('%s', 'now'))`
+            }))
+        ).onConflictDoUpdate({
+            target: [schema.assetFlows.chainId, schema.assetFlows.tokenAddress],
+            set: {
+                txCount: sql`tx_count + 1`,
+                lastUpdated: sql`(strftime('%s', 'now'))`
+            }
+        }));
+    }
 
     // Executes the batch
     // Drizzle batch API: db.batch([...statements])

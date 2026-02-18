@@ -143,4 +143,4 @@ CREATE INDEX idx_token_transfers_tx ON token_transfers(chain_id, tx_hash);
 
 -- Seed Base chain
 INSERT INTO chains (id, name, rpc_url, contract_address, start_block, explorer_url, icon, is_enabled)
-VALUES (8453, 'Base', 'https://base-mainnet.g.alchemy.com/v2/ZqhzKnOk-vuf5jZa42Idv', '0x9ed43c229480659bf6b6607c46d7b96c6d760cbb', 39561457, 'https://basescan.org', '🔵', 1);
+VALUES (8453, 'Base', 'https://mainnet.base.org', '0x9ed43c229480659bf6b6607c46d7b96c6d760cbb', 39561457, 'https://basescan.org', '🔵', 1);

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowUpRight, Copy, Check, Layers, Download, RefreshCw } from 'lucide-react'
-import { useLatestTransactions } from '../lib/api'
+import { useLatestTransactions, type Transaction } from '../lib/api'
 import { useChainContext } from '../context/ChainContext'
 import { shortenAddress, cn, formatWei } from '../lib/utils'
 
@@ -36,11 +36,11 @@ export function TransactionTable({ searchQuery, onTxClick, onSolverClick }: Tran
     const exportCSV = () => {
         if (!transactions.length) return
         const headers = ['tx_hash', 'block_number', 'solver_address', 'value_wei', 'gas_used', 'timestamp', 'type']
-        const rows = transactions.map(tx => [
+        const rows = transactions.map((tx: Transaction) => [
             tx.tx_hash, tx.block_number, tx.solver_address, tx.value_wei, tx.gas_used,
             new Date(tx.timestamp * 1000).toISOString(), tx.primary_type || ''
         ])
-        const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
+        const csv = [headers.join(','), ...rows.map((r: any[]) => r.join(','))].join('\n')
         const blob = new Blob([csv], { type: 'text/csv' })
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
@@ -113,7 +113,7 @@ export function TransactionTable({ searchQuery, onTxClick, onSolverClick }: Tran
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {transactions.map((tx, i) => (
+                                        {transactions.map((tx: Transaction, i: number) => (
                                             <motion.tr
                                                 key={tx.tx_hash}
                                                 initial={{ opacity: 0, x: -20 }}

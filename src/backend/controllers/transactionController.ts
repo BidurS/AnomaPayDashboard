@@ -33,7 +33,7 @@ export async function handleGetTransactions(db: DB, params: URLSearchParams, hea
         conditions.push(or(
             eq(schema.events.solverAddress, address.toLowerCase()),
             sql`json_extract(${schema.events.decodedInput}, "$.args.transaction.actions[0].appData") LIKE ${address.toLowerCase()}`
-        ));
+        )!);
     } else if (hash) {
         conditions.push(eq(schema.events.txHash, hash));
     }
