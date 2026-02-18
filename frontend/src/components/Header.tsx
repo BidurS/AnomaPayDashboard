@@ -39,7 +39,12 @@ export function Header({ currentView, onNavigate, onSearch }: HeaderProps) {
                     <div className="flex items-center gap-3 cursor-pointer shrink-0" onClick={() => onNavigate('explorer')}>
                         <img src="/logo.svg" alt="Gnoma Logo" className="h-10 w-10 sm:h-12 sm:w-12 object-contain" />
                         <div className="hidden sm:block">
-                            <h1 className="text-lg sm:text-xl font-extrabold tracking-tight uppercase text-black dark:text-white">Gnoma</h1>
+                            <h1 className="text-lg sm:text-xl font-extrabold tracking-tight uppercase text-black dark:text-white transition-all hover:scale-105 duration-200"
+                                style={{
+                                    textShadow: '1px 1px 0 #ddd, 2px 2px 0 #ccc, 3px 3px 0 #bbb, 4px 4px 0 #aaa, 5px 5px 0 #999, 6px 6px 1px rgba(0,0,0,0.1), 0 0 5px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.3), 0 3px 5px rgba(0,0,0,0.2), 0 5px 10px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.2), 0 20px 20px rgba(0,0,0,0.15)'
+                                }}>
+                                Gnoma
+                            </h1>
                             <p className="text-[9px] sm:text-[10px] font-semibold tracking-[0.3em] text-gray-500 dark:text-gray-400 uppercase">Explorer</p>
                         </div>
                     </div>
@@ -152,7 +157,7 @@ export function Header({ currentView, onNavigate, onSearch }: HeaderProps) {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="hidden sm:flex p-2.5 border-2 border-black hover:bg-black hover:text-white transition-colors dark:border-white dark:hover:bg-white dark:hover:text-black text-black dark:text-white"
-                                title="View on Base Explorer"
+                                title={`View on ${activeChain?.name} Explorer`}
                             >
                                 <ExternalLink className="w-4 h-4" />
                             </a>

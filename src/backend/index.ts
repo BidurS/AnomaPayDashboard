@@ -58,8 +58,15 @@ export default {
         }
         if (url.pathname === '/api/admin/sync' && method === 'POST') {
           try {
-            const indexerResults = await runBlockscoutIndexer(db);
-            const syncState = await db.select().from(schema.syncState).where(eq(schema.syncState.chainId, 8453)).get();
+            const body = await request.json() as { chainId?: number };
+            const targetChainId = body.chainId || 8453;
+
+            const chain = await db.select().from(schema.chains).where(eq(schema.chains.id, targetChainId)).get();
+            if (!chain) return new Response(JSON.stringify({ error: 'Chain not found' }), { status: 404, headers: corsHeaders });
+
+            const indexerResults = await runBlockscoutIndexer(db, { id: chain.id, rpcUrl: chain.rpcUrl, contractAddress: chain.contractAddress });
+            const syncState = await db.select().from(schema.syncState).where(eq(schema.syncState.chainId, targetChainId)).get();
+
             return new Response(JSON.stringify({ success: true, lastBlock: syncState?.lastBlock, updatedAt: syncState?.updatedAt, indexerResults }, null, 2), { headers: corsHeaders });
           } catch (e: any) {
             return new Response(JSON.stringify({ success: false, error: e.message, stack: e.stack }), { status: 500, headers: corsHeaders });
@@ -144,11 +151,30 @@ export default {
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
     const db = createDb(env.DB);
     try {
-      const result = await runBlockscoutIndexer(db);
-      // Alert if indexer found errors
-      if (result.errors.length > 0) {
+      const activeChains = await db.select().from(schema.chains).where(eq(schema.chains.isEnabled, 1));
+
+      const results = await Promise.allSettled(activeChains.map(async (chain) => {
+        return runBlockscoutIndexer(db, { id: chain.id, rpcUrl: chain.rpcUrl, contractAddress: chain.contractAddress });
+      }));
+
+      // Collect errors
+      const errors: string[] = [];
+      let totalTxs = 0;
+
+      results.forEach((r, i) => {
+        if (r.status === 'fulfilled') {
+          totalTxs += r.value.newTransactions;
+          if (r.value.errors.length > 0) {
+            errors.push(`Chain ${activeChains[i].id}: ${r.value.errors.join(', ')}`);
+          }
+        } else {
+          errors.push(`Chain ${activeChains[i].id} CRASH: ${r.reason.message}`);
+        }
+      });
+
+      if (errors.length > 0) {
         await sendDiscordAlert(env.DISCORD_WEBHOOK_URL, 'Indexer Warnings',
-          `Processed ${result.newTransactions} txs with ${result.errors.length} errors:\n${result.errors.slice(0, 3).join('\n')}`, 'warning');
+          `Processed ${totalTxs} txs total. Errors:\n${errors.slice(0, 5).join('\n')}`, 'warning');
       }
     } catch (e: any) {
       await sendDiscordAlert(env.DISCORD_WEBHOOK_URL, 'Indexer Crash', `The scheduled indexer failed:\n\`\`\`\n${e.message}\n\`\`\``, 'critical');

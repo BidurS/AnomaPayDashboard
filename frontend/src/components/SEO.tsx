@@ -13,7 +13,7 @@ export function SEO({ title, description, image, type = 'website' }: SEOProps) {
     const metaTitle = title ? `${title} | ${siteTitle}` : siteTitle;
     const metaDescription = description || 'Advanced Multichain Explorer for Anoma Protocol. Real-time solver analytics, transaction tracking, and privacy metrics.';
     const domain = 'https://anomapay-explorer.pages.dev';
-    const metaImage = image ? (image.startsWith('http') ? image : `${domain}${image}`) : `${domain}/og-image.png?v=2`;
+    const metaImage = image ? (image.startsWith('http') ? image : `${domain}${image}`) : `${domain}/social-card.png`;
 
     return (
         <Helmet>

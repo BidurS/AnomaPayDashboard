@@ -41,7 +41,7 @@ export async function handleImportData(db: DB, data: any, headers: any) {
     // D1 batch support with Drizzle
     const batch: any[] = [];
 
-    if (data.events) {
+    if (data.events && data.events.length > 0) {
         batch.push(db.insert(schema.events).values(
             data.events.map((e: any) => ({
                 chainId: e.chain_id,
@@ -62,7 +62,7 @@ export async function handleImportData(db: DB, data: any, headers: any) {
         }));
     }
 
-    if (data.payloads) {
+    if (data.payloads && data.payloads.length > 0) {
         batch.push(db.insert(schema.payloads).values(
             data.payloads.map((p: any) => ({
                 chainId: p.chain_id,
@@ -76,7 +76,7 @@ export async function handleImportData(db: DB, data: any, headers: any) {
         ).onConflictDoNothing());
     }
 
-    if (data.privacy_stats) {
+    if (data.privacy_stats && data.privacy_stats.length > 0) {
         batch.push(db.insert(schema.privacyPoolStats).values(
             data.privacy_stats.map((p: any) => ({
                 chainId: p.chain_id,

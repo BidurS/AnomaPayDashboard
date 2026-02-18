@@ -3,6 +3,8 @@ import { useState } from 'react'
 import { HashRouter, Routes, Route, useNavigate, useLocation, Outlet, useParams } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import { ChainProvider } from './context/ChainContext'
+import { ThemeProvider } from './context/ThemeContext'
+import { BackgroundEffects } from './components/effects/BackgroundEffects'
 import { Header } from './components/Header'
 import { Home } from './components/Home'
 import { TransactionDetail } from './components/TransactionDetail'
@@ -59,20 +61,25 @@ function Layout() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white flex flex-col transition-colors duration-200">
-      {!location.pathname.startsWith('/admin') && (
-        <Header
-          currentView={getView()}
-          onNavigate={handleNavigate}
-          onSearch={setSearchQuery}
-        />
-      )}
+    <div className="min-h-screen bg-transparent text-black dark:text-white flex flex-col transition-colors duration-200 relative">
+      <BackgroundEffects />
 
-      <main className="flex-1">
-        <Outlet context={{ searchQuery }} />
-      </main>
+      {/* Content wrapper with z-index to sit above background */}
+      <div className="z-10 flex flex-col min-h-screen">
+        {!location.pathname.startsWith('/admin') && (
+          <Header
+            currentView={getView()}
+            onNavigate={handleNavigate}
+            onSearch={setSearchQuery}
+          />
+        )}
 
-      {!location.pathname.startsWith('/admin') && <Footer />}
+        <main className="flex-1">
+          <Outlet context={{ searchQuery }} />
+        </main>
+
+        {!location.pathname.startsWith('/admin') && <Footer />}
+      </div>
     </div>
   )
 }
@@ -93,25 +100,27 @@ function SolverProfileWrapper() {
 function App() {
   return (
     <ChainProvider>
-      <HelmetProvider>
-        <HashRouter>
-          <Routes>
-            <Route element={<Layout />}>
-              <Route path="/" element={<Home />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/tx/:hash" element={<TxDetailWrapper />} />
-              <Route path="/solver/:address" element={<SolverProfileWrapper />} />
+      <ThemeProvider>
+        <HelmetProvider>
+          <HashRouter>
+            <Routes>
+              <Route element={<Layout />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/tx/:hash" element={<TxDetailWrapper />} />
+                <Route path="/solver/:address" element={<SolverProfileWrapper />} />
 
-              {/* Admin Routes */}
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboard />} />
-                <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="login" element={<AdminLogin />} />
+                {/* Admin Routes */}
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="dashboard" element={<AdminDashboard />} />
+                  <Route path="login" element={<AdminLogin />} />
+                </Route>
               </Route>
-            </Route>
-          </Routes>
-        </HashRouter>
-      </HelmetProvider>
+            </Routes>
+          </HashRouter>
+        </HelmetProvider>
+      </ThemeProvider>
     </ChainProvider>
   )
 }

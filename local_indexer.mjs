@@ -10,7 +10,7 @@ const CONTRACT_ADDRESS = '0x9ed43c229480659bf6b6607c46d7b96c6d760cbb';
 // Vault/Pool
 const SHIELDED_POOL_ADDRESS = '0x990c1773c28b985c2cf32c0a920192bd8717c871'.toLowerCase();
 
-const START_BLOCK = 41061425; // Resume from last synced block
+const START_BLOCK = 42290000; // Resume from recent block for quick sync
 const END_BLOCK = 0; // 0 = Auto-detect latest block
 const BATCH_SIZE = 20;
 const CONCURRENCY = 1;

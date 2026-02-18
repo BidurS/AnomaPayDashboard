@@ -7,9 +7,16 @@ import { DB } from '../db';
 import * as schema from '../db/schema';
 import { eq, sql } from 'drizzle-orm';
 
-const CONTRACT_ADDRESS = '0x9ed43c229480659bf6b6607c46d7b96c6d760cbb';
-const BLOCKSCOUT_BASE = 'https://base.blockscout.com/api/v2';
-const CHAIN_ID = 8453;
+// Helper to get Blockscout API URL
+function getBlockscoutApiUrl(chainId: number): string {
+    switch (chainId) {
+        case 1: return 'https://eth.blockscout.com/api/v2';
+        case 10: return 'https://optimism.blockscout.com/api/v2';
+        case 8453: return 'https://base.blockscout.com/api/v2';
+        case 42161: return 'https://arbitrum.blockscout.com/api/v2';
+        default: throw new Error(`Unsupported chain ID: ${chainId}`);
+    }
+}
 
 const TOPICS: Record<string, string> = {
     '0x10dd528db2c49add6545679b976df90d24c035d6a75b17f41b700e8c18ca5364': 'TransactionExecuted',
@@ -37,6 +44,7 @@ const PAYLOAD_TYPE_MAP: Record<string, string> = {
 };
 
 interface IndexerResult {
+    chainId: number;
     newTransactions: number;
     newPayloads: number;
     newPrivacyRoots: number;
@@ -45,35 +53,44 @@ interface IndexerResult {
     pages: number;
 }
 
+export type ChainConfig = {
+    id: number;
+    rpcUrl: string;
+    contractAddress: string;
+};
+
 /**
  * Main entry point for the cron-based Blockscout indexer.
  * Fetches the latest transactions from Blockscout, checks which are new,
  * and imports them into the database.
  */
-export async function runBlockscoutIndexer(db: DB): Promise<IndexerResult> {
+export async function runBlockscoutIndexer(db: DB, chain: ChainConfig): Promise<IndexerResult> {
     const result: IndexerResult = {
+        chainId: chain.id,
         newTransactions: 0, newPayloads: 0, newPrivacyRoots: 0,
         newTokenTransfers: 0, errors: [], pages: 0,
     };
 
+    const apiUrl = getBlockscoutApiUrl(chain.id);
+
     try {
         // Step 1: Fetch recent transactions from Blockscout (newest first)
-        const newTxs = await fetchNewTransactions(db, result);
+        const newTxs = await fetchNewTransactions(db, chain, apiUrl, result);
         if (newTxs.length === 0) return result;
 
         // Step 2: Fetch logs for these transactions
-        const { payloads, privacyStats } = await fetchAndProcessLogs(db, newTxs, result);
+        const { payloads, privacyStats } = await fetchAndProcessLogs(db, chain, apiUrl, newTxs, result);
 
         // Step 3: Fetch token transfers
-        const tokenTransfers = await fetchTokenTransfersForTxs(newTxs, result);
+        const tokenTransfers = await fetchTokenTransfersForTxs(chain, apiUrl, newTxs, result);
 
         // Step 4: Insert everything into DB
-        await insertData(db, newTxs, payloads, privacyStats, tokenTransfers, result);
+        await insertData(db, chain.id, newTxs, payloads, privacyStats, tokenTransfers, result);
 
         // Step 5: Update sync state with highest block
         const maxBlock = Math.max(...newTxs.map(t => t.blockNumber));
         await db.insert(schema.syncState).values({
-            chainId: CHAIN_ID,
+            chainId: chain.id,
             lastBlock: maxBlock,
             updatedAt: Math.floor(Date.now() / 1000),
         }).onConflictDoUpdate({
@@ -106,14 +123,14 @@ interface TxRecord {
     timestamp: number;
 }
 
-async function fetchNewTransactions(db: DB, result: IndexerResult): Promise<TxRecord[]> {
+async function fetchNewTransactions(db: DB, chain: ChainConfig, apiUrl: string, result: IndexerResult): Promise<TxRecord[]> {
     const newTxs: TxRecord[] = [];
     let nextPageParams: any = null;
     let foundExisting = false;
 
     // Fetch up to 3 pages (150 txs) of recent transactions
     for (let page = 0; page < 3 && !foundExisting; page++) {
-        let url = `${BLOCKSCOUT_BASE}/addresses/${CONTRACT_ADDRESS}/transactions?filter=to`;
+        let url = `${apiUrl}/addresses/${chain.contractAddress}/transactions?filter=to`;
         if (nextPageParams) {
             url += `&${new URLSearchParams(nextPageParams).toString()}`;
         }
@@ -179,7 +196,7 @@ interface PrivacyRecord {
 }
 
 async function fetchAndProcessLogs(
-    db: DB, txs: TxRecord[], result: IndexerResult
+    db: DB, chain: ChainConfig, apiUrl: string, txs: TxRecord[], result: IndexerResult
 ): Promise<{ payloads: PayloadRecord[]; privacyStats: PrivacyRecord[] }> {
     const payloads: PayloadRecord[] = [];
     const privacyStats: PrivacyRecord[] = [];
@@ -191,7 +208,7 @@ async function fetchAndProcessLogs(
     let foundOld = false;
 
     for (let page = 0; page < 2 && !foundOld; page++) {
-        let url = `${BLOCKSCOUT_BASE}/addresses/${CONTRACT_ADDRESS}/logs`;
+        let url = `${apiUrl}/addresses/${chain.contractAddress}/logs`;
         if (nextPageParams) {
             url += `?${new URLSearchParams(nextPageParams).toString()}`;
         }
@@ -222,7 +239,7 @@ async function fetchAndProcessLogs(
                 if (PAYLOAD_TYPE_MAP[eventType]) {
                     const blob = log.decoded?.parameters?.[2]?.value || log.data || '';
                     payloads.push({
-                        chainId: CHAIN_ID,
+                        chainId: chain.id,
                         txHash: log.transaction_hash,
                         blockNumber,
                         payloadType: PAYLOAD_TYPE_MAP[eventType],
@@ -236,7 +253,7 @@ async function fetchAndProcessLogs(
                 if (eventType === 'CommitmentTreeRootAdded') {
                     const root = log.decoded?.parameters?.[0]?.value || log.data?.substring(0, 66) || '';
                     privacyStats.push({
-                        chainId: CHAIN_ID,
+                        chainId: chain.id,
                         blockNumber,
                         rootHash: root,
                         timestamp,
@@ -276,13 +293,13 @@ interface TransferRecord {
     timestamp: number;
 }
 
-async function fetchTokenTransfersForTxs(txs: TxRecord[], result: IndexerResult): Promise<TransferRecord[]> {
+async function fetchTokenTransfersForTxs(chain: ChainConfig, apiUrl: string, txs: TxRecord[], result: IndexerResult): Promise<TransferRecord[]> {
     const transfers: TransferRecord[] = [];
 
     for (const tx of txs) {
         try {
             const res = await fetch(
-                `${BLOCKSCOUT_BASE}/transactions/${tx.txHash}/token-transfers`,
+                `${apiUrl}/transactions/${tx.txHash}/token-transfers`,
                 { headers: { 'User-Agent': 'Gnoma-Indexer/3.0' } }
             );
             if (!res.ok) continue;
@@ -299,7 +316,7 @@ async function fetchTokenTransfersForTxs(txs: TxRecord[], result: IndexerResult)
                     const amountDisplay = parseFloat(amountRaw) / Math.pow(10, decimals);
 
                     transfers.push({
-                        chainId: CHAIN_ID,
+                        chainId: chain.id,
                         txHash: tx.txHash,
                         blockNumber: tx.blockNumber,
                         tokenAddress: tokenAddr,
@@ -328,6 +345,7 @@ async function fetchTokenTransfersForTxs(txs: TxRecord[], result: IndexerResult)
 // ─────────────────────────────────────────────────────────
 async function insertData(
     db: DB,
+    chainId: number,
     txs: TxRecord[],
     payloads: PayloadRecord[],
     privacyStats: PrivacyRecord[],
@@ -338,7 +356,7 @@ async function insertData(
     if (txs.length > 0) {
         await db.insert(schema.events).values(
             txs.map(t => ({
-                chainId: CHAIN_ID,
+                chainId: chainId,
                 txHash: t.txHash,
                 blockNumber: t.blockNumber,
                 eventType: 'TransactionExecuted',
@@ -365,7 +383,7 @@ async function insertData(
     if (privacyStats.length > 0) {
         const [poolQuery] = await db.select({
             poolSize: sql<number>`MAX(${schema.privacyPoolStats.estimatedPoolSize})`
-        }).from(schema.privacyPoolStats).where(eq(schema.privacyPoolStats.chainId, CHAIN_ID));
+        }).from(schema.privacyPoolStats).where(eq(schema.privacyPoolStats.chainId, chainId));
         let poolSize = poolQuery?.poolSize || 0;
 
         privacyStats.sort((a, b) => a.blockNumber - b.blockNumber);
@@ -397,7 +415,7 @@ async function insertData(
 
     for (const [addr, s] of solverMap) {
         await db.insert(schema.solvers).values({
-            chainId: CHAIN_ID,
+            chainId: chainId,
             address: addr,
             txCount: s.count,
             totalGasSpent: s.gas.toString(),
@@ -431,7 +449,7 @@ async function insertData(
 
     for (const [date, d] of dailyMap) {
         await db.insert(schema.dailyStats).values({
-            chainId: CHAIN_ID,
+            chainId: chainId,
             date,
             intentCount: d.count,
             totalVolume: Math.round(d.vol * 100).toString(),

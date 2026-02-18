@@ -79,7 +79,7 @@ const FAQ_ITEMS: FAQItem[] = [
     },
     {
         q: "What blockchain does Gnoma support?",
-        a: "Currently, Gnoma Explorer indexes the Anoma Protocol Adapter deployed on Base (Chain ID: 8453). The architecture supports multiple chains — additional networks can be added through the admin interface by providing the contract address, RPC URL, and starting block number.",
+        a: "Gnoma Explorer natively supports **Base**, **Ethereum Mainnet**, **Optimism**, and **Arbitrum One**. You can easily switch between networks using the chain selector in the top navigation bar. The architecture is designed to be chain-agnostic, allowing us to rapidly onboard new EVM-compatible networks as the Anoma ecosystem expands.",
         icon: Globe,
         category: "Technical"
     },
@@ -88,7 +88,10 @@ const FAQ_ITEMS: FAQItem[] = [
 const CATEGORIES = ['Platform', 'Metrics', 'Solvers', 'Technical']
 
 const CONTRACTS = [
-    { name: "Anoma Protocol Adapter", address: "0x9ED43C229480659bF6B6607C46d7B96c6D760cBB", type: "Core" },
+    { name: "Anoma Adapter (Base)", address: "0x9ED43C229480659bF6B6607C46d7B96c6D760cBB", type: "Core" },
+    { name: "Anoma Adapter (ETH)", address: "0x46E622226F93Ed52C584F3f66135CD06AF01c86c", type: "Core" },
+    { name: "Anoma Adapter (OP)", address: "0x094 FCC095323080e71a037b2B1e3519c07dd84F8", type: "Core" },
+    { name: "Anoma Adapter (ARB)", address: "0x6d0A05E3535bd4D2C32AaD37FFB28fd0E1e528c3", type: "Core" },
     { name: "Shielded Pool", address: "0x990c1773c28b985c2cf32c0a920192bd8717c871", type: "Core" },
     { name: "USDC", address: "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913", type: "Asset" },
     { name: "WETH", address: "0x4200000000000000000000000000000000000006", type: "Asset" },
@@ -105,8 +108,8 @@ function AccordionItem({ item, isOpen, onToggle, index }: { item: FAQItem; isOpe
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.04 }}
             className={`rounded-lg transition-all duration-200 ${isOpen
-                    ? 'bg-white dark:bg-gray-900 shadow-lg shadow-black/5 dark:shadow-white/5 ring-2 ring-[#FF0000]/20'
-                    : 'bg-gray-50 dark:bg-gray-900/50 hover:bg-white dark:hover:bg-gray-900 hover:shadow-md'
+                ? 'bg-white dark:bg-gray-900 shadow-lg shadow-black/5 dark:shadow-white/5 ring-2 ring-[#FF0000]/20'
+                : 'bg-gray-50 dark:bg-gray-900/50 hover:bg-white dark:hover:bg-gray-900 hover:shadow-md'
                 }`}
         >
             <button
@@ -114,8 +117,8 @@ function AccordionItem({ item, isOpen, onToggle, index }: { item: FAQItem; isOpe
                 className="w-full flex items-center gap-5 px-6 py-5 text-left group"
             >
                 <div className={`p-2.5 rounded-lg transition-all duration-200 shrink-0 ${isOpen
-                        ? 'bg-[#FF0000] text-white shadow-md shadow-red-500/25'
-                        : 'bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-400 group-hover:bg-[#FF0000]/10 group-hover:text-[#FF0000]'
+                    ? 'bg-[#FF0000] text-white shadow-md shadow-red-500/25'
+                    : 'bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-400 group-hover:bg-[#FF0000]/10 group-hover:text-[#FF0000]'
                     }`}>
                     <Icon className="w-5 h-5" />
                 </div>
@@ -124,8 +127,8 @@ function AccordionItem({ item, isOpen, onToggle, index }: { item: FAQItem; isOpe
                     <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mt-0.5 block">{item.category}</span>
                 </div>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${isOpen
-                        ? 'bg-[#FF0000]/10 text-[#FF0000]'
-                        : 'bg-gray-100 dark:bg-gray-800 text-gray-400'
+                    ? 'bg-[#FF0000]/10 text-[#FF0000]'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-400'
                     }`}>
                     <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
                 </div>
@@ -194,8 +197,8 @@ export function FAQ() {
                 <button
                     onClick={() => { setActiveCategory('all'); setOpenIndex(null) }}
                     className={`px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all rounded-full ${activeCategory === 'all'
-                            ? 'bg-black dark:bg-white text-white dark:text-black shadow-lg'
-                            : 'bg-gray-100 dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 hover:text-black dark:hover:text-white'
+                        ? 'bg-black dark:bg-white text-white dark:text-black shadow-lg'
+                        : 'bg-gray-100 dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 hover:text-black dark:hover:text-white'
                         }`}
                 >
                     All ({FAQ_ITEMS.length})
@@ -207,8 +210,8 @@ export function FAQ() {
                             key={cat}
                             onClick={() => { setActiveCategory(cat); setOpenIndex(null) }}
                             className={`px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all rounded-full ${activeCategory === cat
-                                    ? 'bg-[#FF0000] text-white shadow-lg shadow-red-500/20'
-                                    : 'bg-gray-100 dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 hover:text-black dark:hover:text-white'
+                                ? 'bg-[#FF0000] text-white shadow-lg shadow-red-500/20'
+                                : 'bg-gray-100 dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 hover:text-black dark:hover:text-white'
                                 }`}
                         >
                             {cat} ({count})
@@ -243,7 +246,7 @@ export function FAQ() {
                     </h3>
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 rounded-full">
                         <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-500">Base Network</span>
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-500">Multi-Chain</span>
                     </div>
                 </div>
 
@@ -273,8 +276,8 @@ export function FAQ() {
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <span className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full ${c.type === 'Core'
-                                                ? 'bg-[#FF0000]/10 text-[#FF0000]'
-                                                : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
+                                            ? 'bg-[#FF0000]/10 text-[#FF0000]'
+                                            : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
                                             }`}>
                                             {c.type}
                                         </span>
@@ -302,7 +305,7 @@ export function FAQ() {
 
                 <div className="grid sm:grid-cols-3 gap-6">
                     {[
-                        { emoji: "⛓️", title: "On-Chain", desc: "Anoma Protocol Adapter emits events on Base for every intent settled, payload submitted, and privacy pool update." },
+                        { emoji: "⛓️", title: "On-Chain", desc: "Anoma Protocol Adapter emits events on supported chains for every intent settled, payload submitted, and privacy pool update." },
                         { emoji: "🔄", title: "Indexer", desc: "Our Blockscout-powered indexer fetches and processes new transactions every 5 minutes via automated cron jobs." },
                         { emoji: "📊", title: "Dashboard", desc: "Data is stored in Cloudflare D1 and served via edge Workers for real-time analytics with sub-100ms latency." },
                     ].map((step, i) => (
@@ -331,3 +334,4 @@ export function FAQ() {
         </section>
     )
 }
+// Updated: 2026-02-13 Multi-chain FAQ

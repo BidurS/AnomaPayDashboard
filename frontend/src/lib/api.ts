@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 
 // API base URL - use relative path in dev (proxied), full URL in production
-export const API_BASE_url = import.meta.env.DEV ? '' : 'https://anomapay-explorer.bidurandblog.workers.dev'
+export const API_BASE_url = import.meta.env.DEV ? '' : 'https://anoma-api.bidurandblog.workers.dev'
 const API_URL = API_BASE_url
 
 // Types
