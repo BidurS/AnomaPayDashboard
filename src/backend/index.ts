@@ -33,8 +33,6 @@ app.onError(async (err, c) => {
 });
 
 // Helper to pass empty headers to controllers (controllers manually add CORS, but Hono handles it too)
-// We pass {} so controllers don't override Hono's headers with duplicates or conflicts if they merge.
-// Ideally, we'd refactor controllers to not set headers, but this is a safe interim step.
 const corsHeaders = {};
 
 // --- Admin Routes (`/api/admin/*`) ---
@@ -117,13 +115,6 @@ app.get('/api/admin/debug-sync', async (c) => {
 
 // --- Public Routes ---
 
-// Helper for query param validation
-const getChainId = (c: any) => {
-  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
-  if (!cid.success) throw new Error('Invalid chainId'); // Error handler will catch this
-  return cid.data;
-};
-
 app.get('/api/chains', (c) => withCache(c.req.raw, 300, () => chainController.handleGetChains(createDb(c.env.DB), corsHeaders)));
 
 app.get('/api/proxy/blockscout', async (c) => {
@@ -140,64 +131,63 @@ app.get('/api/proxy/blockscout', async (c) => {
 });
 
 app.get('/api/health', (c) => {
-  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId') || null);
   if (!cid.success) return cid.response;
   return statsController.handleGetHealth(createDb(c.env.DB), cid.data, corsHeaders);
 });
 
 app.get('/api/stats', (c) => {
-  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId') || null);
   if (!cid.success) return cid.response;
   return withCache(c.req.raw, 60, () => statsController.handleGetStats(createDb(c.env.DB), cid.data, corsHeaders));
 });
 
 app.get('/api/latest-transactions', (c) => {
-  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId') || null);
   if (!cid.success) return cid.response;
   return withCache(c.req.raw, 5, () => transactionController.handleGetLatestTransactions(createDb(c.env.DB), cid.data, corsHeaders));
 });
 
 app.get('/api/solvers', (c) => {
-  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId') || null);
   if (!cid.success) return cid.response;
   return withCache(c.req.raw, 60, () => solverController.handleGetSolvers(createDb(c.env.DB), cid.data, corsHeaders));
 });
 
 app.get('/api/daily-stats', (c) => {
-  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId') || null);
   if (!cid.success) return cid.response;
-  const d = parseQueryParam(daysSchema, c.req.query('days'));
+  const d = parseQueryParam(daysSchema, c.req.query('days') || null);
   if (!d.success) return d.response;
   return withCache(c.req.raw, 300, () => statsController.handleGetDailyStats(createDb(c.env.DB), cid.data, d.data, corsHeaders));
 });
 
 app.get('/api/assets', (c) => {
-  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId') || null);
   if (!cid.success) return cid.response;
   return withCache(c.req.raw, 60, () => statsController.handleGetAssets(createDb(c.env.DB), cid.data, corsHeaders));
 });
 
 app.get('/api/network-health', (c) => {
-  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId') || null);
   if (!cid.success) return cid.response;
   return withCache(c.req.raw, 60, () => statsController.handleGetNetworkHealth(createDb(c.env.DB), cid.data, corsHeaders));
 });
 
 app.get('/api/privacy-stats', (c) => {
-  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId') || null);
   if (!cid.success) return cid.response;
   return withCache(c.req.raw, 60, () => statsController.handleGetPrivacyStats(createDb(c.env.DB), cid.data, corsHeaders));
 });
 
 app.get('/api/payload-stats', (c) => {
-  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId') || null);
   if (!cid.success) return cid.response;
   return withCache(c.req.raw, 300, () => statsController.handleGetPayloadStats(createDb(c.env.DB), cid.data, corsHeaders));
 });
 
 app.get('/api/transactions', (c) => {
-  // transactions controller likely checks query params on its own or we should pass URL search params
-  const url = new URL(c.req.url); // construct URL object to pass searchParams
+  const url = new URL(c.req.url);
   return transactionController.handleGetTransactions(createDb(c.env.DB), url.searchParams, corsHeaders);
 });
 
@@ -207,51 +197,43 @@ app.get('/api/token-transfers', (c) => {
 });
 
 app.get('/api/tx/:hash', (c) => {
-  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId') || null);
   if (!cid.success) return cid.response;
-  const h = parseQueryParam(txHashSchema, c.req.param('hash'));
+  const h = parseQueryParam(txHashSchema, c.req.param('hash') || null);
   if (!h.success) return h.response;
   return transactionController.handleGetTxDetail(createDb(c.env.DB), cid.data, h.data, corsHeaders);
 });
 
 app.get('/api/solver/:address', (c) => {
-  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId'));
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId') || null);
   if (!cid.success) return cid.response;
-  const a = parseQueryParam(addressSchema, c.req.param('address'));
+  const a = parseQueryParam(addressSchema, c.req.param('address') || null);
   if (!a.success) return a.response;
   return solverController.handleGetSolverDetail(createDb(c.env.DB), cid.data, a.data, corsHeaders);
 });
 
-// Export the Hono app and the scheduled handler
 export default {
   fetch: app.fetch,
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
     const db = createDb(env.DB);
     try {
       const activeChains = await db.select().from(schema.chains).where(eq(schema.chains.isEnabled, 1));
-
       const results = await Promise.allSettled(activeChains.map(async (chain) => {
         return runBlockscoutIndexer(db, { id: chain.id, rpcUrl: chain.rpcUrl, contractAddress: chain.contractAddress });
       }));
-
-      // Collect errors
+      // ... error handling
       const errors: string[] = [];
       let totalTxs = 0;
-
       results.forEach((r, i) => {
         if (r.status === 'fulfilled') {
           totalTxs += r.value.newTransactions;
-          if (r.value.errors.length > 0) {
-            errors.push(`Chain ${activeChains[i].id}: ${r.value.errors.join(', ')}`);
-          }
+          if (r.value.errors.length > 0) errors.push(`Chain ${activeChains[i].id}: ${r.value.errors.join(', ')}`);
         } else {
           errors.push(`Chain ${activeChains[i].id} CRASH: ${r.reason.message}`);
         }
       });
-
       if (errors.length > 0) {
-        await sendDiscordAlert(env.DISCORD_WEBHOOK_URL, 'Indexer Warnings',
-          `Processed ${totalTxs} txs total. Errors:\n${errors.slice(0, 5).join('\n')}`, 'warning');
+        await sendDiscordAlert(env.DISCORD_WEBHOOK_URL, 'Indexer Warnings', `Processed ${totalTxs} txs total. Errors:\n${errors.slice(0, 5).join('\n')}`, 'warning');
       }
     } catch (e: any) {
       await sendDiscordAlert(env.DISCORD_WEBHOOK_URL, 'Indexer Crash', `The scheduled indexer failed:\n\`\`\`\n${e.message}\n\`\`\``, 'critical');
