@@ -97,31 +97,37 @@ function SolverProfileWrapper() {
   return <SolverProfile address={address!} onBack={() => navigate('/')} onTxClick={(hash) => navigate(`/tx/${hash}`)} />
 }
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
+
 function App() {
   return (
-    <ChainProvider>
-      <ThemeProvider>
-        <HelmetProvider>
-          <HashRouter>
-            <Routes>
-              <Route element={<Layout />}>
-                <Route path="/" element={<Home />} />
-                <Route path="/faq" element={<FAQ />} />
-                <Route path="/tx/:hash" element={<TxDetailWrapper />} />
-                <Route path="/solver/:address" element={<SolverProfileWrapper />} />
+    <QueryClientProvider client={queryClient}>
+      <ChainProvider>
+        <ThemeProvider>
+          <HelmetProvider>
+            <HashRouter>
+              <Routes>
+                <Route element={<Layout />}>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/faq" element={<FAQ />} />
+                  <Route path="/tx/:hash" element={<TxDetailWrapper />} />
+                  <Route path="/solver/:address" element={<SolverProfileWrapper />} />
 
-                {/* Admin Routes */}
-                <Route path="/admin" element={<AdminLayout />}>
-                  <Route index element={<AdminDashboard />} />
-                  <Route path="dashboard" element={<AdminDashboard />} />
-                  <Route path="login" element={<AdminLogin />} />
+                  {/* Admin Routes */}
+                  <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<AdminDashboard />} />
+                    <Route path="dashboard" element={<AdminDashboard />} />
+                    <Route path="login" element={<AdminLogin />} />
+                  </Route>
                 </Route>
-              </Route>
-            </Routes>
-          </HashRouter>
-        </HelmetProvider>
-      </ThemeProvider>
-    </ChainProvider>
+              </Routes>
+            </HashRouter>
+          </HelmetProvider>
+        </ThemeProvider>
+      </ChainProvider>
+    </QueryClientProvider>
   )
 }
 

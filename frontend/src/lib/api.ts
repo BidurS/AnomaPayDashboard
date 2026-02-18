@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useQuery, keepPreviousData } from '@tanstack/react-query'
 
 // API base URL - use relative path in dev (proxied), full URL in production
-export const API_BASE_url = import.meta.env.DEV ? '' : 'https://anoma-api.bidurandblog.workers.dev'
+export const API_BASE_url = import.meta.env.DEV ? '' : 'https://anomapay-explorer.bidurandblog.workers.dev'
 const API_URL = API_BASE_url
 
 // Types
@@ -113,299 +113,182 @@ export interface AssetSummary {
 }
 
 // =============================================================
-//  Auto-refresh hook - 30s polling  
-// =============================================================
-function useAutoRefresh(refetchFn: () => void, intervalMs = 30000) {
-    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-    useEffect(() => {
-        intervalRef.current = setInterval(refetchFn, intervalMs)
-        return () => {
-            if (intervalRef.current) clearInterval(intervalRef.current)
-        }
-    }, [refetchFn, intervalMs])
-}
-
-// =============================================================
-//  Hooks
+//  Hooks (TanStack Query)
 // =============================================================
 
 export function useChains() {
-    const [chains, setChains] = useState<Chain[]>([])
-    const [loading, setLoading] = useState(true)
+    const { data: chains, isLoading } = useQuery({
+        queryKey: ['chains'],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/chains`);
+            if (!res.ok) throw new Error('Failed to fetch chains');
+            return res.json() as Promise<Chain[]>;
+        },
+        staleTime: 1000 * 60 * 5, // 5 minutes
+    });
 
-    useEffect(() => {
-        fetch(`${API_URL}/api/chains`)
-            .then(res => res.json())
-            .then(data => {
-                setChains(data)
-                setLoading(false)
-            })
-            .catch(() => {
-                setChains([{ id: 8453, name: 'Base', explorer_url: 'https://basescan.org', icon: '🔵' }])
-                setLoading(false)
-            })
-    }, [])
+    // Fallback if API fails (optional, based on previous logic)
+    const fallbackChains = chains || [{ id: 8453, name: 'Base', explorer_url: 'https://basescan.org', icon: '🔵' }];
 
-    return { chains, loading }
+    return { chains: fallbackChains, loading: isLoading };
 }
 
 export function useStats(chainId: number) {
-    const [stats, setStats] = useState<Stats | null>(null)
-    const [loading, setLoading] = useState(true)
+    const { data: stats, isLoading, refetch } = useQuery({
+        queryKey: ['stats', chainId],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/stats?chainId=${chainId}`);
+            return res.json() as Promise<Stats>;
+        },
+        refetchInterval: 10000, // Poll every 10s
+    });
 
-    const refetch = useCallback(() => {
-        fetch(`${API_URL}/api/stats?chainId=${chainId}`)
-            .then(res => res.json())
-            .then(data => {
-                setStats(data)
-                setLoading(false)
-            })
-            .catch(() => setLoading(false))
-    }, [chainId])
-
-    useEffect(() => {
-        setLoading(true)
-        refetch()
-    }, [refetch])
-
-    useAutoRefresh(refetch)
-
-    return { stats, loading, refetch }
+    return { stats: stats || null, loading: isLoading, refetch };
 }
 
 export function useTransactions(chainId: number, searchQuery?: string, page = 1, limit = 20) {
-    const [transactions, setTransactions] = useState<Transaction[]>([])
-    const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, totalPages: 1 })
-    const [loading, setLoading] = useState(true)
+    const { data, isLoading, refetch } = useQuery({
+        queryKey: ['transactions', chainId, searchQuery, page, limit],
+        queryFn: async () => {
+            let url = `${API_URL}/api/transactions?chainId=${chainId}&page=${page}&limit=${limit}`;
 
-    const refetch = useCallback(async () => {
-        setLoading(true)
-        let url = `${API_URL}/api/transactions?chainId=${chainId}&page=${page}&limit=${limit}`
+            if (searchQuery) {
+                let query = searchQuery.trim();
+                if (!query.startsWith('0x') && /^[0-9a-fA-F]+$/.test(query)) query = `0x${query}`;
 
-        if (searchQuery) {
-            let query = searchQuery.trim()
-            if (!query.startsWith('0x') && /^[0-9a-fA-F]+$/.test(query)) query = `0x${query}`
-
-            if (query.length === 66) {
-                url = `${API_URL}/api/transactions?chainId=${chainId}&hash=${query}`
-            } else if (query.startsWith('0x')) {
-                url = `${API_URL}/api/transactions?chainId=${chainId}&address=${query}&page=${page}&limit=${limit}`
+                if (query.length === 66) {
+                    url = `${API_URL}/api/transactions?chainId=${chainId}&hash=${query}`;
+                } else if (query.startsWith('0x')) {
+                    url = `${API_URL}/api/transactions?chainId=${chainId}&address=${query}&page=${page}&limit=${limit}`;
+                }
             }
-        }
 
-        try {
             const res = await fetch(url);
-            const data = await res.json();
+            return res.json();
+        },
+        placeholderData: keepPreviousData,
+        refetchInterval: 10000, // Poll every 10s
+    });
 
-            if (data.pagination) {
-                setTransactions(data.data || []);
-                setPagination(data.pagination);
-            } else {
-                setTransactions(Array.isArray(data) ? data : []);
-                setPagination({ page, limit, total: data.length, totalPages: 1 });
-            }
-        } catch (e) {
-            console.error(e);
-            setTransactions([]);
-        } finally {
-            setLoading(false);
-        }
-    }, [chainId, searchQuery, page, limit])
+    const transactions = data?.data || (Array.isArray(data) ? data : []) || [];
+    const pagination = data?.pagination || { page, limit, total: transactions.length, totalPages: 1 };
 
-    useEffect(() => {
-        refetch()
-    }, [refetch])
-
-    useAutoRefresh(refetch)
-
-    return { transactions, pagination, loading, refetch }
+    return { transactions, pagination, loading: isLoading, refetch };
 }
 
-export const useLatestTransactions = useTransactions
+export const useLatestTransactions = useTransactions;
 
-// Fetch solver leaderboard
 export function useSolvers(chainId: number) {
-    const [solvers, setSolvers] = useState<Solver[]>([])
-    const [loading, setLoading] = useState(true)
+    const { data: solvers, isLoading, refetch } = useQuery({
+        queryKey: ['solvers', chainId],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/solvers?chainId=${chainId}`);
+            return res.json() as Promise<Solver[]>;
+        },
+        refetchInterval: 30000,
+    });
 
-    const refetch = useCallback(() => {
-        fetch(`${API_URL}/api/solvers?chainId=${chainId}`)
-            .then(res => res.json())
-            .then(data => {
-                setSolvers(data || [])
-                setLoading(false)
-            })
-            .catch(() => setLoading(false))
-    }, [chainId])
-
-    useEffect(() => {
-        refetch()
-    }, [refetch])
-
-    useAutoRefresh(refetch)
-
-    return { solvers, loading }
+    return { solvers: solvers || [], loading: isLoading, refetch };
 }
 
 export function useDailyStats(chainId: number, days = 7) {
-    const [dailyStats, setDailyStats] = useState<DailyStat[]>([])
-    const [loading, setLoading] = useState(true)
+    const { data: dailyStats, isLoading } = useQuery({
+        queryKey: ['dailyStats', chainId, days],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/daily-stats?chainId=${chainId}&days=${days}`);
+            return res.json() as Promise<DailyStat[]>;
+        },
+        refetchInterval: 60000,
+    });
 
-    useEffect(() => {
-        fetch(`${API_URL}/api/daily-stats?chainId=${chainId}&days=${days}`)
-            .then(res => res.json())
-            .then(data => {
-                setDailyStats(data || [])
-                setLoading(false)
-            })
-            .catch(() => setLoading(false))
-    }, [chainId, days])
-
-    return { dailyStats, loading }
+    return { dailyStats: dailyStats || [], loading: isLoading };
 }
 
 export function useAssets(chainId: number) {
-    const [assets, setAssets] = useState<Asset[]>([])
-    const [loading, setLoading] = useState(true)
+    const { data: assets, isLoading } = useQuery({
+        queryKey: ['assets', chainId],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/assets?chainId=${chainId}`);
+            return res.json() as Promise<Asset[]>;
+        },
+        refetchInterval: 60000,
+    });
 
-    useEffect(() => {
-        fetch(`${API_URL}/api/assets?chainId=${chainId}`)
-            .then(res => res.json())
-            .then(data => {
-                setAssets(data || [])
-                setLoading(false)
-            })
-            .catch(() => setLoading(false))
-    }, [chainId])
-
-    return { assets, loading }
+    return { assets: assets || [], loading: isLoading };
 }
 
 export function useNetworkHealth(chainId: number) {
-    const [health, setHealth] = useState<NetworkHealth | null>(null)
-    const [loading, setLoading] = useState(true)
+    const { data: health, isLoading } = useQuery({
+        queryKey: ['networkHealth', chainId],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/network-health?chainId=${chainId}`);
+            return res.json() as Promise<NetworkHealth>;
+        },
+        refetchInterval: 15000,
+    });
 
-    const refetch = useCallback(() => {
-        fetch(`${API_URL}/api/network-health?chainId=${chainId}`)
-            .then(res => res.json())
-            .then(data => {
-                setHealth(data)
-                setLoading(false)
-            })
-            .catch(() => setLoading(false))
-    }, [chainId])
-
-    useEffect(() => {
-        refetch()
-    }, [refetch])
-
-    useAutoRefresh(refetch)
-
-    return { health, loading }
+    return { health: health || null, loading: isLoading };
 }
 
 export function usePayloadStats(chainId: number) {
-    const [stats, setStats] = useState<PayloadStat[]>([])
-    const [loading, setLoading] = useState(true)
+    const { data: stats, isLoading } = useQuery({
+        queryKey: ['payloadStats', chainId],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/payload-stats?chainId=${chainId}`);
+            return res.json() as Promise<PayloadStat[]>;
+        },
+        refetchInterval: 60000,
+    });
 
-    useEffect(() => {
-        fetch(`${API_URL}/api/payload-stats?chainId=${chainId}`)
-            .then(res => res.json())
-            .then(data => {
-                setStats(data || [])
-                setLoading(false)
-            })
-            .catch(() => setLoading(false))
-    }, [chainId])
-
-    return { stats, loading }
+    return { stats: stats || [], loading: isLoading };
 }
 
-// =============================================================
-//  NEW: Transaction Detail hook
-// =============================================================
 export function useTxDetail(chainId: number, txHash: string | null) {
-    const [tx, setTx] = useState<TransactionDetail | null>(null)
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState<string | null>(null)
+    const { data: tx, isLoading, error } = useQuery({
+        queryKey: ['txDetail', chainId, txHash],
+        queryFn: async () => {
+            if (!txHash) return null;
+            const res = await fetch(`${API_URL}/api/tx/${txHash}?chainId=${chainId}`);
+            if (!res.ok) throw new Error('Not found');
+            return res.json() as Promise<TransactionDetail>;
+        },
+        enabled: !!txHash,
+        retry: 1,
+    });
 
-    useEffect(() => {
-        if (!txHash) { setTx(null); return }
-        setLoading(true)
-        setError(null)
-        fetch(`${API_URL}/api/tx/${txHash}?chainId=${chainId}`)
-            .then(res => {
-                if (!res.ok) throw new Error('Not found')
-                return res.json()
-            })
-            .then(data => {
-                setTx(data)
-                setLoading(false)
-            })
-            .catch(e => {
-                setError(e.message)
-                setLoading(false)
-            })
-    }, [chainId, txHash])
-
-    return { tx, loading, error }
+    return { tx: tx || null, loading: isLoading, error: error ? error.message : null };
 }
 
-// =============================================================
-//  NEW: Solver Detail hook
-// =============================================================
 export function useSolverDetail(chainId: number, address: string | null) {
-    const [solver, setSolver] = useState<SolverDetail | null>(null)
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState<string | null>(null)
+    const { data: solver, isLoading, error } = useQuery({
+        queryKey: ['solverDetail', chainId, address],
+        queryFn: async () => {
+            if (!address) return null;
+            const res = await fetch(`${API_URL}/api/solver/${address}?chainId=${chainId}`);
+            if (!res.ok) throw new Error('Not found');
+            return res.json() as Promise<SolverDetail>;
+        },
+        enabled: !!address,
+        retry: 1,
+    });
 
-    useEffect(() => {
-        if (!address) { setSolver(null); return }
-        setLoading(true)
-        setError(null)
-        fetch(`${API_URL}/api/solver/${address}?chainId=${chainId}`)
-            .then(res => {
-                if (!res.ok) throw new Error('Not found')
-                return res.json()
-            })
-            .then(data => {
-                setSolver(data)
-                setLoading(false)
-            })
-            .catch(e => {
-                setError(e.message)
-                setLoading(false)
-            })
-    }, [chainId, address])
-
-    return { solver, loading, error }
+    return { solver: solver || null, loading: isLoading, error: error ? error.message : null };
 }
 
-// =============================================================
-//  NEW: Token Transfers hook
-// =============================================================
 export function useTokenTransfers(chainId: number) {
-    const [transfers, setTransfers] = useState<TokenTransfer[]>([])
-    const [assetSummary, setAssetSummary] = useState<AssetSummary[]>([])
-    const [loading, setLoading] = useState(true)
+    const { data, isLoading, refetch } = useQuery({
+        queryKey: ['tokenTransfers', chainId],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/token-transfers?chainId=${chainId}&limit=50`);
+            return res.json() as Promise<{ data: TokenTransfer[], assetSummary: AssetSummary[] }>;
+        },
+        refetchInterval: 15000,
+    });
 
-    const refetch = useCallback(() => {
-        fetch(`${API_URL}/api/token-transfers?chainId=${chainId}&limit=50`)
-            .then(res => res.json())
-            .then(data => {
-                setTransfers(data.data || [])
-                setAssetSummary(data.assetSummary || [])
-                setLoading(false)
-            })
-            .catch(() => setLoading(false))
-    }, [chainId])
-
-    useEffect(() => {
-        refetch()
-    }, [refetch])
-
-    useAutoRefresh(refetch)
-
-    return { transfers, assetSummary, loading }
+    return {
+        transfers: data?.data || [],
+        assetSummary: data?.assetSummary || [],
+        loading: isLoading,
+        refetch
+    };
 }
