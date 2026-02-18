@@ -14,6 +14,7 @@ export const events = sqliteTable('events', {
     gasPriceWei: text('gas_price_wei').default('0'),
     dataJson: text('data_json').notNull(),
     decodedInput: text('decoded_input'), // JSON string of decoded input
+    primaryPayloadType: text('primary_payload_type'), // Optimization to avoid subqueries
     timestamp: integer('timestamp').default(sql`(strftime('%s', 'now'))`),
 }, (table) => ({
     uniqChainTx: unique('uniq_chain_tx').on(table.chainId, table.txHash),

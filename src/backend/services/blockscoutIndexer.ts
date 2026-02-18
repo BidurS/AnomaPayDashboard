@@ -5,7 +5,7 @@
  */
 import { DB } from '../db';
 import * as schema from '../db/schema';
-import { eq, sql } from 'drizzle-orm';
+import { eq, sql, inArray, and } from 'drizzle-orm';
 
 // Helper to get Blockscout API URL
 function getBlockscoutApiUrl(chainId: number): string {
@@ -85,21 +85,8 @@ export async function runBlockscoutIndexer(db: DB, chain: ChainConfig): Promise<
         const tokenTransfers = await fetchTokenTransfersForTxs(chain, apiUrl, newTxs, result);
 
         // Step 4: Insert everything into DB
-        await insertData(db, chain.id, newTxs, payloads, privacyStats, tokenTransfers, result);
-
-        // Step 5: Update sync state with highest block
-        const maxBlock = Math.max(...newTxs.map(t => t.blockNumber));
-        await db.insert(schema.syncState).values({
-            chainId: chain.id,
-            lastBlock: maxBlock,
-            updatedAt: Math.floor(Date.now() / 1000),
-        }).onConflictDoUpdate({
-            target: schema.syncState.chainId,
-            set: {
-                lastBlock: sql`MAX(${schema.syncState.lastBlock}, ${maxBlock})`,
-                updatedAt: Math.floor(Date.now() / 1000),
-            },
-        });
+        const maxBlock = Math.max(...newTxs.map(t => t.blockNumber), 0);
+        await insertData(db, chain.id, newTxs, payloads, privacyStats, tokenTransfers, result, maxBlock);
 
     } catch (e: any) {
         result.errors.push(`Top-level: ${e.message}`);
@@ -340,9 +327,8 @@ async function fetchTokenTransfersForTxs(chain: ChainConfig, apiUrl: string, txs
 }
 
 // ─────────────────────────────────────────────────────────
-//  Step 4: Insert all data into D1
+//  Helper: Retry Fetch
 // ─────────────────────────────────────────────────────────
-// Helper: Retry Fetch
 async function fetchWithRetry(url: string, retries = 3, backoff = 1000): Promise<Response> {
     for (let i = 0; i < retries; i++) {
         try {
@@ -363,6 +349,7 @@ async function fetchWithRetry(url: string, retries = 3, backoff = 1000): Promise
     throw new Error(`Failed to fetch ${url} after ${retries} retries`);
 }
 
+
 // ─────────────────────────────────────────────────────────
 //  Step 4: Insert all data into D1 (Atomic Batch)
 // ─────────────────────────────────────────────────────────
@@ -373,9 +360,18 @@ async function insertData(
     payloads: PayloadRecord[],
     privacyStats: PrivacyRecord[],
     tokenTransfers: TransferRecord[],
-    result: IndexerResult
+    result: IndexerResult,
+    maxBlock: number
 ) {
     const batch: any[] = [];
+
+    // Map TxHash -> Primary Payload Type
+    const txTypeMap = new Map<string, string>();
+    for (const p of payloads) {
+        if (!txTypeMap.has(p.txHash.toLowerCase())) {
+            txTypeMap.set(p.txHash.toLowerCase(), p.payloadType);
+        }
+    }
 
     // 1. Events (Transactions)
     if (txs.length > 0) {
@@ -392,11 +388,15 @@ async function insertData(
                     gasPriceWei: t.gasPriceWei,
                     dataJson: t.dataJson,
                     decodedInput: t.decodedInput,
+                    primaryPayloadType: txTypeMap.get(t.txHash.toLowerCase()) || null,
                     timestamp: t.timestamp,
                 }))
             ).onConflictDoUpdate({
                 target: [schema.events.chainId, schema.events.txHash],
-                set: { decodedInput: sql`excluded.decoded_input` },
+                set: {
+                    decodedInput: sql`excluded.decoded_input`,
+                    primaryPayloadType: sql`excluded.primary_payload_type`
+                },
             })
         );
     }
@@ -408,13 +408,6 @@ async function insertData(
 
     // 3. Privacy Stats
     if (privacyStats.length > 0) {
-        // Compute pool size relative to DB state implies a read-then-write dependency
-        // In a true batch, we can't read mid-batch comfortably if relying on JS logic.
-        // However, we can optimistically insert.
-        // For accurate pool size, we really need a sequential read. 
-        // We will keep this logic OUTSIDE the write batch for calculation, 
-        // but include the INSERT in the batch.
-
         const [poolQuery] = await db.select({
             poolSize: sql<number>`MAX(${schema.privacyPoolStats.estimatedPoolSize})`
         }).from(schema.privacyPoolStats).where(eq(schema.privacyPoolStats.chainId, chainId));
@@ -434,76 +427,126 @@ async function insertData(
         batch.push(db.insert(schema.tokenTransfers).values(tokenTransfers).onConflictDoNothing());
     }
 
-    // 5. Solvers (Upsert)
-    // Aggregation must happen in JS, then we generate one UPSERT per solver.
-    // D1/SQLite doesn't support batching multiple DIFFERENT insert statements easily in one query string 
-    // unless using `db.batch([...checks])`. Drizzle supports this.
-    const solverMap = new Map<string, { count: number; gas: bigint; val: bigint; ts: number }>();
+    // 5. Solvers (Upsert with BigInt Safety)
+    const solverUpdates = new Map<string, { count: number; gas: bigint; val: bigint; ts: number }>();
     for (const tx of txs) {
         const addr = tx.solverAddress?.toLowerCase();
         if (!addr || addr === '0x0') continue;
-        const s = solverMap.get(addr) || { count: 0, gas: BigInt(0), val: BigInt(0), ts: 0 };
+        const s = solverUpdates.get(addr) || { count: 0, gas: BigInt(0), val: BigInt(0), ts: 0 };
         s.count++;
         s.gas += BigInt(tx.gasUsed);
         s.val += BigInt(tx.valueWei || '0');
         s.ts = Math.max(s.ts, tx.timestamp);
-        solverMap.set(addr, s);
+        solverUpdates.set(addr, s);
     }
 
-    for (const [addr, s] of solverMap) {
-        batch.push(
-            db.insert(schema.solvers).values({
-                chainId: chainId,
-                address: addr,
-                txCount: s.count,
-                totalGasSpent: s.gas.toString(),
-                totalValueProcessed: s.val.toString(),
-                firstSeen: Math.floor(Date.now() / 1000),
-                lastSeen: s.ts,
-            }).onConflictDoUpdate({
-                target: [schema.solvers.chainId, schema.solvers.address],
-                set: {
-                    txCount: sql`${schema.solvers.txCount} + ${s.count}`,
-                    totalGasSpent: sql`CAST(CAST(${schema.solvers.totalGasSpent} AS INTEGER) + ${s.gas.toString()} AS TEXT)`,
-                    lastSeen: sql`excluded.last_seen`,
-                    totalValueProcessed: sql`CAST(CAST(${schema.solvers.totalValueProcessed} AS INTEGER) + ${s.val.toString()} AS TEXT)`,
-                },
-            })
-        );
+    if (solverUpdates.size > 0) {
+        const addresses = Array.from(solverUpdates.keys());
+        // Fetch existing values to add safely in JS
+        // Chunking inArray to avoid getting too many params error if many solvers
+        // Simplified: assuming < 100 solvers per batch
+        const existingSolvers = await db.select().from(schema.solvers)
+            .where(and(eq(schema.solvers.chainId, chainId), inArray(schema.solvers.address, addresses)));
+
+        const existingMap = new Map(existingSolvers.map(s => [s.address.toLowerCase(), s]));
+
+        for (const [addr, update] of solverUpdates) {
+            const existing = existingMap.get(addr);
+            const currentCount = existing?.txCount || 0;
+            const currentGas = BigInt(existing?.totalGasSpent || '0');
+            const currentValue = BigInt(existing?.totalValueProcessed || '0');
+            const currentLastSeen = existing?.lastSeen || 0;
+
+            batch.push(
+                db.insert(schema.solvers).values({
+                    chainId: chainId,
+                    address: addr,
+                    txCount: update.count,
+                    totalGasSpent: update.gas.toString(),
+                    totalValueProcessed: update.val.toString(),
+                    firstSeen: Math.floor(Date.now() / 1000),
+                    lastSeen: update.ts,
+                }).onConflictDoUpdate({
+                    target: [schema.solvers.chainId, schema.solvers.address],
+                    set: {
+                        txCount: currentCount + update.count,
+                        totalGasSpent: (currentGas + update.gas).toString(),
+                        totalValueProcessed: (currentValue + update.val).toString(),
+                        lastSeen: Math.max(currentLastSeen, update.ts)
+                    },
+                })
+            );
+        }
     }
 
-    // 6. Daily Stats (Upsert)
-    const dailyMap = new Map<string, { count: number; vol: number; gas: number; solvers: Set<string> }>();
+    // 6. Daily Stats (Upsert with BigInt Safety)
+    const dailyUpdates = new Map<string, { count: number; vol: number; gas: number; solvers: Set<string> }>();
     for (const tx of txs) {
         const date = new Date(tx.timestamp * 1000).toISOString().split('T')[0];
-        const d = dailyMap.get(date) || { count: 0, vol: 0, gas: 0, solvers: new Set() };
+        const d = dailyUpdates.get(date) || { count: 0, vol: 0, gas: 0, solvers: new Set() };
         d.count++;
         d.gas += tx.gasUsed;
         d.solvers.add(tx.solverAddress?.toLowerCase());
-        dailyMap.set(date, d);
+        dailyUpdates.set(date, d);
     }
+    // Add volume from transfers
     for (const t of tokenTransfers) {
         const date = new Date(t.timestamp * 1000).toISOString().split('T')[0];
-        if (dailyMap.has(date)) dailyMap.get(date)!.vol += t.amountUsd;
+        if (!dailyUpdates.has(date)) dailyUpdates.set(date, { count: 0, vol: 0, gas: 0, solvers: new Set() });
+        dailyUpdates.get(date)!.vol += t.amountUsd;
     }
 
-    for (const [date, d] of dailyMap) {
+    if (dailyUpdates.size > 0) {
+        const dates = Array.from(dailyUpdates.keys());
+        const existingDaily = await db.select().from(schema.dailyStats)
+            .where(and(eq(schema.dailyStats.chainId, chainId), inArray(schema.dailyStats.date, dates)));
+
+        const existingMap = new Map(existingDaily.map(d => [d.date, d]));
+
+        for (const [date, update] of dailyUpdates) {
+            const existing = existingMap.get(date);
+            const currentIntentCount = existing?.intentCount || 0;
+            // Volume is stored as TEXT but it's technically a float-like USD value multiplied by 100?
+            // "Math.round(d.vol * 100).toString()"
+            const currentVolume = BigInt(existing?.totalVolume || '0');
+            const newVolume = BigInt(Math.round(update.vol * 100)); // Cents
+            const currentGas = existing?.totalGasUsed || 0;
+            const currentSolvers = existing?.uniqueSolvers || 0;
+
+            batch.push(
+                db.insert(schema.dailyStats).values({
+                    chainId: chainId,
+                    date,
+                    intentCount: update.count,
+                    totalVolume: newVolume.toString(),
+                    uniqueSolvers: update.solvers.size,
+                    totalGasUsed: update.gas,
+                    gasSaved: 0,
+                }).onConflictDoUpdate({
+                    target: [schema.dailyStats.chainId, schema.dailyStats.date],
+                    set: {
+                        intentCount: currentIntentCount + update.count,
+                        totalVolume: (currentVolume + newVolume).toString(),
+                        uniqueSolvers: Math.max(currentSolvers, update.solvers.size),
+                        totalGasUsed: currentGas + update.gas,
+                    },
+                })
+            );
+        }
+    }
+
+    // 7. Atomic Sync State Update
+    if (maxBlock > 0) {
         batch.push(
-            db.insert(schema.dailyStats).values({
+            db.insert(schema.syncState).values({
                 chainId: chainId,
-                date,
-                intentCount: d.count,
-                totalVolume: Math.round(d.vol * 100).toString(),
-                uniqueSolvers: d.solvers.size,
-                totalGasUsed: d.gas,
-                gasSaved: 0,
+                lastBlock: maxBlock,
+                updatedAt: Math.floor(Date.now() / 1000),
             }).onConflictDoUpdate({
-                target: [schema.dailyStats.chainId, schema.dailyStats.date],
+                target: schema.syncState.chainId,
                 set: {
-                    intentCount: sql`${schema.dailyStats.intentCount} + ${d.count}`,
-                    totalVolume: sql`CAST(CAST(${schema.dailyStats.totalVolume} AS INTEGER) + ${Math.round(d.vol * 100)} AS TEXT)`,
-                    uniqueSolvers: sql`MAX(${schema.dailyStats.uniqueSolvers}, ${d.solvers.size})`,
-                    totalGasUsed: sql`${schema.dailyStats.totalGasUsed} + ${d.gas}`,
+                    lastBlock: sql`MAX(${schema.syncState.lastBlock}, ${maxBlock})`,
+                    updatedAt: Math.floor(Date.now() / 1000),
                 },
             })
         );

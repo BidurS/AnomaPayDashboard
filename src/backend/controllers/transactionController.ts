@@ -10,7 +10,7 @@ export async function handleGetLatestTransactions(db: DB, chainId: number, heade
         value_wei: schema.events.valueWei,
         gas_used: schema.events.gasUsed,
         timestamp: schema.events.timestamp,
-        primary_type: sql<string>`(SELECT payload_type FROM payloads WHERE payloads.tx_hash = events.tx_hash LIMIT 1)`
+        primary_type: schema.events.primaryPayloadType
     }).from(schema.events)
         .where(eq(schema.events.chainId, chainId))
         .orderBy(desc(schema.events.blockNumber))
@@ -51,7 +51,8 @@ export async function handleGetTransactions(db: DB, params: URLSearchParams, hea
         value_wei: schema.events.valueWei,
         gas_used: schema.events.gasUsed,
         timestamp: schema.events.timestamp,
-        decoded_input: schema.events.decodedInput
+        decoded_input: schema.events.decodedInput,
+        primary_type: schema.events.primaryPayloadType
     }).from(schema.events)
         .where(and(...conditions))
         .orderBy(desc(schema.events.blockNumber))
