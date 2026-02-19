@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowLeft, ExternalLink, Copy, Check, Layers, Wallet, Clock, Fuel, Shield, ArrowRight } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Copy, Check, Layers, Wallet, Clock, Fuel, Shield, ArrowRight, FileJson, Activity, Box } from 'lucide-react'
 import { SEO } from './SEO'
 import { HexDecoder } from './HexDecoder'
 import { useTxDetail } from '../lib/api'
@@ -26,12 +26,10 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
 
     if (loading) {
         return (
-            <section className="py-16">
-                <div className="max-w-5xl mx-auto px-6">
-                    <div className="text-center py-24">
-                        <div className="inline-block w-8 h-8 border-4 border-black border-t-transparent animate-spin mb-4" />
-                        <p className="text-gray-500 uppercase text-sm tracking-wider">Loading transaction...</p>
-                    </div>
+            <section className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
+                <div className="text-center">
+                    <div className="w-12 h-12 border-4 border-black dark:border-white border-t-transparent rounded-full animate-spin mb-6 mx-auto" />
+                    <p className="font-mono text-sm uppercase tracking-widest text-gray-500 animate-pulse">Syncing Transaction...</p>
                 </div>
             </section>
         )
@@ -39,15 +37,14 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
 
     if (error || !tx) {
         return (
-            <section className="py-16">
-                <div className="max-w-5xl mx-auto px-6">
-                    <button onClick={onBack} className="flex items-center gap-2 mb-8 text-sm font-bold uppercase tracking-wider hover:text-red-600 transition-colors">
-                        <ArrowLeft className="w-4 h-4" /> Back to Explorer
-                    </button>
-                    <div className="swiss-card p-12 text-center">
-                        <p className="text-gray-500 uppercase tracking-wider">Transaction not found</p>
-                        <code className="text-xs mt-2 block text-gray-400">{txHash}</code>
-                    </div>
+            <section className="min-h-screen py-20 px-6 max-w-5xl mx-auto">
+                <button onClick={onBack} className="group flex items-center gap-2 mb-12 text-sm font-bold uppercase tracking-wider hover:text-[#FF0000] transition-colors">
+                    <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" /> Back
+                </button>
+                <div className="swiss-border p-12 text-center bg-gray-50 dark:bg-zinc-900">
+                    <h2 className="text-2xl font-bold uppercase mb-4">Transaction Missing</h2>
+                    <p className="text-gray-500 uppercase tracking-wider text-sm mb-6">The requested transaction could not be indexed</p>
+                    <code className="font-mono text-xs bg-gray-200 dark:bg-black px-3 py-1.5 rounded">{txHash}</code>
                 </div>
             </section>
         )
@@ -57,179 +54,213 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
     const hasPayloads = tx.payloads && tx.payloads.length > 0
 
     return (
-        <>
+        <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white pb-20">
             <SEO
                 title={tx ? `Tx ${shortenAddress(txHash)}` : 'Transaction Detail'}
                 description={`View transaction details for ${txHash} on Gnoma Explorer.`}
                 type="article"
             />
-            <section className="py-16 swiss-grid">
-                <div className="max-w-5xl mx-auto px-6 lg:px-8">
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                        {/* Back button */}
-                        <button onClick={onBack} className="flex items-center gap-2 mb-8 text-sm font-bold uppercase tracking-wider hover:text-red-600 transition-colors text-black dark:text-white">
-                            <ArrowLeft className="w-4 h-4" /> Back to Explorer
-                        </button>
 
-                        {/* Header */}
-                        <div className="flex items-center gap-4 mb-8">
-                            <div className="w-2 h-12 bg-[#FF0000]" />
-                            <div>
-                                <h1 className="text-2xl font-extrabold uppercase tracking-tight text-black dark:text-white">Transaction Detail</h1>
-                                <div className="flex items-center gap-2 mt-1">
-                                    <code className="font-mono text-sm text-gray-600 dark:text-gray-400">{shortenAddress(txHash, 16, 12)}</code>
-                                    <button onClick={copyHash} className="p-1 border border-black dark:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors text-black dark:text-white">
-                                        {copiedHash ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                                    </button>
-                                    {activeChain?.explorer_url && (
-                                        <a href={`${activeChain.explorer_url}/tx/${txHash}`} target="_blank" rel="noopener noreferrer"
-                                            className="p-1 border border-black dark:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors text-black dark:text-white">
-                                            <ExternalLink className="w-3 h-3" />
-                                        </a>
-                                    )}
-                                </div>
+            {/* Split Pane Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 min-h-screen">
+
+                {/* Left Pane: Core Metrics & Metadata (Sticky) */}
+                <aside className="lg:col-span-4 lg:h-screen lg:sticky lg:top-0 bg-gray-50 dark:bg-zinc-900 border-r border-black dark:border-white p-6 lg:p-10 flex flex-col overflow-y-auto no-scrollbar">
+                    <button onClick={onBack} className="group flex items-center gap-2 mb-10 text-xs font-bold uppercase tracking-[0.15em] hover:text-[#FF0000] transition-colors">
+                        <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" /> Back
+                    </button>
+
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+                        <div className="inline-block px-2 py-1 bg-[#FF0000] text-white text-[10px] font-bold uppercase tracking-widest mb-4">
+                            {tx.event_type}
+                        </div>
+                        <h1 className="text-4xl font-extrabold uppercase tracking-tight mb-4 break-words leading-[0.9]">
+                            Transaction<br />Detail
+                        </h1>
+                        <div className="group flex items-center gap-2 relative">
+                            <code className="font-mono text-xs text-gray-500 hover:text-black dark:hover:text-white transition-colors break-all">
+                                {txHash}
+                            </code>
+                            <button onClick={copyHash} className="shrink-0 p-1.5 hover:text-[#FF0000] transition-colors opacity-0 group-hover:opacity-100">
+                                {copiedHash ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                            </button>
+                        </div>
+                    </motion.div>
+
+                    <div className="grid grid-cols-1 gap-4 mt-auto">
+                        <div className="p-5 bg-white dark:bg-black border border-gray-200 dark:border-zinc-800 hover:border-black dark:hover:border-white transition-colors">
+                            <div className="flex items-center gap-2 mb-2 text-gray-500 uppercase text-[10px] font-bold tracking-widest">
+                                <Layers className="w-3.5 h-3.5" /> Block
                             </div>
+                            <div className="font-mono text-xl font-bold">{tx.block_number?.toLocaleString()}</div>
                         </div>
 
-                        {/* Summary Cards */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                            <div className="swiss-card">
-                                <div className="swiss-card-accent bg-black dark:bg-white" />
-                                <div className="pt-2">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Layers className="w-4 h-4 text-gray-400" />
-                                        <span className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase">Block</span>
-                                    </div>
-                                    <div className="font-bold tabular-nums text-lg text-black dark:text-white">{tx.block_number?.toLocaleString()}</div>
-                                </div>
+                        <div className="p-5 bg-white dark:bg-black border border-gray-200 dark:border-zinc-800 hover:border-black dark:hover:border-white transition-colors">
+                            <div className="flex items-center gap-2 mb-2 text-gray-500 uppercase text-[10px] font-bold tracking-widest">
+                                <Clock className="w-3.5 h-3.5" /> Time
                             </div>
-                            <div className="swiss-card">
-                                <div className="swiss-card-accent bg-[#0066CC]" />
-                                <div className="pt-2">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Clock className="w-4 h-4 text-gray-400" />
-                                        <span className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase">Time</span>
-                                    </div>
-                                    <div className="font-bold text-lg text-black dark:text-white">{timeAgo(tx.timestamp)}</div>
-                                    <div className="text-xs text-gray-500 mt-1">{new Date(tx.timestamp * 1000).toLocaleString()}</div>
-                                </div>
-                            </div>
-                            <div className="swiss-card">
-                                <div className="swiss-card-accent bg-[#FFCC00]" />
-                                <div className="pt-2">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Fuel className="w-4 h-4 text-gray-400" />
-                                        <span className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase">Gas Used</span>
-                                    </div>
-                                    <div className="font-bold text-lg text-black dark:text-white">{formatNumber(tx.gas_used)}</div>
-                                </div>
-                            </div>
-                            <div className="swiss-card">
-                                <div className="swiss-card-accent bg-[#FF0000]" />
-                                <div className="pt-2">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Wallet className="w-4 h-4 text-gray-400" />
-                                        <span className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase">Solver</span>
-                                    </div>
-                                    <button onClick={() => onSolverClick(tx.solver_address)} className="font-mono text-sm font-bold hover:text-[#0066CC] transition-colors text-black dark:text-white dark:hover:text-[#3399FF]">
-                                        {shortenAddress(tx.solver_address, 8, 6)}
-                                    </button>
-                                </div>
-                            </div>
+                            <div className="font-mono text-lg font-bold">{timeAgo(tx.timestamp)}</div>
+                            <div className="text-[10px] text-gray-400 mt-1">{new Date(tx.timestamp * 1000).toUTCString()}</div>
                         </div>
 
-                        {/* Token Transfers */}
-                        {hasTokenTransfers && (
-                            <div className="swiss-card mb-8">
-                                <div className="swiss-card-accent bg-[#0066CC]" />
-                                <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 mb-4 pt-2">
-                                    💰 Token Transfers ({tx.tokenTransfers.length})
-                                </h3>
-                                <div className="space-y-3">
-                                    {tx.tokenTransfers.map((t, i) => (
-                                        <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-                                            <div className="w-8 h-8 bg-[#0066CC] text-white flex items-center justify-center font-bold text-xs">
-                                                {t.token_symbol?.substring(0, 2) || '?'}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-2 text-sm">
-                                                    <code className="font-mono text-xs text-black dark:text-gray-300">{shortenAddress(t.from_address)}</code>
-                                                    <ArrowRight className="w-3 h-3 text-gray-400 flex-shrink-0" />
-                                                    <code className="font-mono text-xs text-black dark:text-gray-300">{shortenAddress(t.to_address)}</code>
+                        <div className="p-5 bg-white dark:bg-black border border-gray-200 dark:border-zinc-800 hover:border-black dark:hover:border-white transition-colors">
+                            <div className="flex items-center gap-2 mb-2 text-gray-500 uppercase text-[10px] font-bold tracking-widest">
+                                <Wallet className="w-3.5 h-3.5" /> Solver
+                            </div>
+                            <button onClick={() => onSolverClick(tx.solver_address)} className="font-mono text-sm underline decoration-gray-300 hover:decoration-[#FF0000] hover:text-[#FF0000] transition-all">
+                                {shortenAddress(tx.solver_address, 8, 8)}
+                            </button>
+                        </div>
+
+                        <div className="p-5 bg-white dark:bg-black border border-gray-200 dark:border-zinc-800 hover:border-black dark:hover:border-white transition-colors">
+                            <div className="flex items-center gap-2 mb-2 text-gray-500 uppercase text-[10px] font-bold tracking-widest">
+                                <Fuel className="w-3.5 h-3.5" /> Gas Used
+                            </div>
+                            <div className="font-mono text-sm">{formatNumber(tx.gas_used)} UNITS</div>
+                        </div>
+                    </div>
+
+                    {activeChain?.explorer_url && (
+                        <a
+                            href={`${activeChain.explorer_url}/tx/${txHash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-8 flex items-center justify-between text-xs font-bold uppercase tracking-widest border-t border-gray-200 dark:border-zinc-800 pt-6 hover:text-[#FF0000] transition-colors"
+                        >
+                            View on Block Explorer <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                    )}
+                </aside>
+
+                {/* Right Pane: Content (Scrollable) */}
+                <main className="lg:col-span-8 p-6 lg:p-12 space-y-12">
+
+                    {/* Token Transfers */}
+                    {hasTokenTransfers && (
+                        <section>
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="p-2 bg-black text-white dark:bg-white dark:text-black">
+                                    <Activity className="w-5 h-5" />
+                                </div>
+                                <h3 className="text-xl font-bold uppercase tracking-tight">Token Transfers</h3>
+                                <span className="ml-auto bg-gray-100 dark:bg-zinc-800 text-xs font-bold px-2 py-1 rounded-full">{tx.tokenTransfers.length}</span>
+                            </div>
+
+                            <div className="space-y-3">
+                                {tx.tokenTransfers.map((t, i) => (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: i * 0.1 }}
+                                        className="swiss-border p-5 bg-white dark:bg-black hover:shadow-lg transition-shadow"
+                                    >
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 flex items-center justify-center font-bold text-xs ring-1 ring-black/5">
+                                                    {t.token_symbol?.substring(0, 2) || '?'}
                                                 </div>
-                                                <div className="text-xs text-gray-500 mt-1">
-                                                    {t.token_symbol} • {t.token_address ? shortenAddress(t.token_address, 8, 6) : ''}
+                                                <div>
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className="font-mono text-xs text-gray-500">{shortenAddress(t.from_address)}</span>
+                                                        <ArrowRight className="w-3 h-3 text-gray-300" />
+                                                        <span className="font-mono text-xs text-gray-500">{shortenAddress(t.to_address)}</span>
+                                                    </div>
+                                                    <div className="font-bold text-lg">
+                                                        {t.amount_display?.toFixed(Math.min(t.token_decimals, 4))} {t.token_symbol}
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="text-right flex-shrink-0">
-                                                <div className="font-bold text-sm text-black dark:text-white">{t.amount_display?.toFixed(t.token_decimals <= 6 ? 2 : 6)} {t.token_symbol}</div>
-                                                {t.amount_usd > 0 && (
-                                                    <div className="text-xs text-gray-500">{formatCurrency(t.amount_usd)}</div>
+
+                                            <div className="text-right">
+                                                {t.amount_usd > 0 ? (
+                                                    <div className="text-sm font-mono font-bold text-gray-600 dark:text-gray-400">
+                                                        {formatCurrency(t.amount_usd)}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-[10px] uppercase text-gray-300 font-bold tracking-widest">Price Unknown</span>
                                                 )}
+                                                <div className="text-[10px] text-gray-400 mt-1 font-mono uppercase truncate max-w-[150px]">
+                                                    {t.token_address}
+                                                </div>
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
+                                    </motion.div>
+                                ))}
                             </div>
-                        )}
+                        </section>
+                    )}
 
-                        {/* Payloads */}
-                        {hasPayloads && (
-                            <div className="swiss-card mb-8">
-                                <div className="swiss-card-accent bg-[#FFCC00]" />
-                                <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 mb-4 pt-2">
-                                    📦 Payloads ({tx.payloads.length})
-                                </h3>
-                                <div className="space-y-3">
-                                    {tx.payloads.map((p, i) => (
-                                        <div key={i} className="p-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-                                            <div className="flex items-center justify-between mb-2">
-                                                <span className={`px-2 py-1 text-[10px] uppercase font-bold tracking-wider border border-black dark:border-white
-                                                ${p.payload_type === 'Resource' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' :
-                                                        p.payload_type === 'Discovery' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100' :
-                                                            p.payload_type === 'External' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100' :
-                                                                p.payload_type === 'Application' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100' :
-                                                                    'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'}`}>
-                                                    {p.payload_type} #{p.payload_index}
-                                                </span>
-                                            </div>
-                                            {p.blob && (
-                                                <HexDecoder hexData={p.blob} className="mt-2" />
-                                            )}
+                    {/* Payloads & Intents */}
+                    {hasPayloads && (
+                        <section>
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="p-2 bg-[#FFCC00] text-black">
+                                    <Box className="w-5 h-5" />
+                                </div>
+                                <h3 className="text-xl font-bold uppercase tracking-tight">Intents & Payloads</h3>
+                                <span className="ml-auto bg-gray-100 dark:bg-zinc-800 text-xs font-bold px-2 py-1 rounded-full">{tx.payloads.length}</span>
+                            </div>
+
+                            <div className="space-y-6">
+                                {tx.payloads.map((p, i) => (
+                                    <div key={i} className="swiss-border bg-white dark:bg-black overflow-hidden">
+                                        <div className="border-b border-black dark:border-white bg-gray-50 dark:bg-zinc-900 p-3 flex items-center justify-between">
+                                            <span className={`px-2 py-1 text-[10px] uppercase font-bold tracking-widest border border-black/10 dark:border-white/10
+                                                ${p.payload_type === 'Resource' ? 'bg-green-100/50 text-green-800' :
+                                                    p.payload_type === 'Discovery' ? 'bg-purple-100/50 text-purple-800' :
+                                                        'bg-blue-100/50 text-blue-800'}`}>
+                                                {p.payload_type} Payload #{p.payload_index}
+                                            </span>
+                                            <span className="font-mono text-[10px] text-gray-400">Decoded View</span>
                                         </div>
-                                    ))}
-                                </div>
+                                        {p.blob && <HexDecoder hexData={p.blob} className="border-0 border-t-0" />}
+                                    </div>
+                                ))}
                             </div>
-                        )}
+                        </section>
+                    )}
 
-                        {/* Privacy Root */}
-                        {tx.privacyRoot && (
-                            <div className="swiss-card mb-8">
-                                <div className="swiss-card-accent bg-[#FF0000]" />
-                                <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 mb-4 pt-2">
-                                    <Shield className="w-4 h-4 inline mr-1" /> Privacy Pool State
-                                </h3>
-                                <div className="grid grid-cols-2 gap-4 text-sm">
+                    {/* Privacy State */}
+                    {tx.privacyRoot && (
+                        <section>
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="p-2 bg-[#FF0000] text-white">
+                                    <Shield className="w-5 h-5" />
+                                </div>
+                                <h3 className="text-xl font-bold uppercase tracking-tight">Privacy State</h3>
+                            </div>
+                            <div className="swiss-border p-6 bg-white dark:bg-black">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <div>
-                                        <span className="text-gray-500 block text-xs uppercase mb-1">Commitment Root</span>
-                                        <code className="font-mono text-xs break-all text-black dark:text-gray-300">{tx.privacyRoot.root_hash}</code>
+                                        <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500 mb-2 block">Merkle Root</span>
+                                        <code className="font-mono text-xs break-all bg-gray-50 dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 p-2 block">
+                                            {tx.privacyRoot.root_hash}
+                                        </code>
                                     </div>
                                     <div>
-                                        <span className="text-gray-500 block text-xs uppercase mb-1">Pool Size</span>
-                                        <span className="font-bold text-black dark:text-white">{tx.privacyRoot.estimated_pool_size} commitments</span>
+                                        <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500 mb-2 block">Pool Details</span>
+                                        <div className="flex items-baseline gap-2">
+                                            <span className="text-3xl font-extrabold">{formatNumber(Number(tx.privacyRoot.estimated_pool_size || 0))}</span>
+                                            <span className="text-xs font-bold uppercase text-gray-400">Commitments</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        )}
+                        </section>
+                    )}
 
-                        {/* Raw Data */}
-                        <div className="swiss-card">
-                            <div className="swiss-card-accent bg-black dark:bg-white" />
-                            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 mb-4 pt-2">
-                                Raw Transaction Data
-                            </h3>
-                            <div className="bg-gray-900 text-green-400 p-4 font-mono text-xs overflow-x-auto max-h-64 overflow-y-auto">
-                                <pre>{JSON.stringify({
+                    {/* Raw JSON Data */}
+                    <section>
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="p-2 border border-black dark:border-white">
+                                <FileJson className="w-5 h-5" />
+                            </div>
+                            <h3 className="text-xl font-bold uppercase tracking-tight">Raw Data</h3>
+                        </div>
+                        <div className="swiss-border bg-black text-white p-6 overflow-x-auto">
+                            <pre className="font-mono text-[10px] leading-relaxed opacity-80">
+                                {JSON.stringify({
                                     tx_hash: tx.tx_hash,
                                     block_number: tx.block_number,
                                     event_type: tx.event_type,
@@ -237,12 +268,14 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
                                     gas_used: tx.gas_used,
                                     timestamp: tx.timestamp,
                                     decoded_input: (() => { try { return JSON.parse(tx.data_json || '{}') } catch { return {} } })()
-                                }, null, 2)}</pre>
-                            </div>
+                                }, null, 2)}
+                            </pre>
                         </div>
-                    </motion.div>
-                </div>
-            </section>
-        </>
+                    </section>
+
+                </main>
+            </div>
+        </div>
     )
 }
+

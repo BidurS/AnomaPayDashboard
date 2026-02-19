@@ -50,7 +50,7 @@ export function Header({ currentView, onNavigate, onSearch }: HeaderProps) {
                     </div>
 
                     {/* Desktop Navigation */}
-                    <nav className="hidden lg:flex items-center gap-0.5 shrink-0">
+                    <nav className="hidden lg:flex items-center gap-2 shrink-0">
                         {NAV_ITEMS.map((item) => {
                             const Icon = item.icon
                             const isActive = currentView === item.id ||
@@ -60,7 +60,7 @@ export function Header({ currentView, onNavigate, onSearch }: HeaderProps) {
                                     key={item.id}
                                     onClick={() => onNavigate(item.id)}
                                     className={cn(
-                                        "relative px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 group",
+                                        "relative px-6 py-3 text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2.5 group",
                                         isActive
                                             ? "text-[#FF0000]"
                                             : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white"

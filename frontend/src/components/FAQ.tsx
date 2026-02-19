@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Shield, Zap, Layers, ChevronDown, Activity, Database, Clock, Users, Lock, Code, BarChart3, Globe, Copy, Check, Link, RefreshCw, LayoutDashboard } from 'lucide-react'
+import { Shield, Zap, Layers, ChevronDown, Activity, Database, Clock, Users, Lock, Code, BarChart3, Globe, Copy, Check, Link, Search, ThumbsUp, ThumbsDown } from 'lucide-react'
 import { SEO } from './SEO'
 
 interface FAQItem {
@@ -8,76 +8,89 @@ interface FAQItem {
     a: string
     icon: any
     category: string
+    id: string
 }
 
 const FAQ_ITEMS: FAQItem[] = [
     {
+        id: "platform-intro",
         q: "What is Gnoma Explorer?",
         a: "Gnoma Explorer is a real-time analytics dashboard for the Anoma Protocol Adapter on Base. It provides deep visibility into intent resolution, solver performance, privacy pool activity, and token flows — all indexed directly from the blockchain and updated automatically every 5 minutes.",
         icon: Zap,
         category: "Platform"
     },
     {
+        id: "data-source",
         q: "Where does the data come from?",
         a: "All data is sourced from the Base blockchain via the Blockscout API. Our automated indexer fetches the latest transactions, event logs, and token transfers from the Anoma Protocol Adapter contract every 5 minutes. There is no centralized database or manual data entry — everything is derived directly from on-chain activity.",
         icon: Database,
         category: "Platform"
     },
     {
+        id: "update-frequency",
         q: "How often is data updated?",
         a: "The indexer runs on a 5-minute cron schedule. New transactions confirmed on Base appear in the dashboard within 5 minutes. The system also processes historical blocks, so if there's ever a brief outage, it automatically catches up on the next cycle.",
         icon: Clock,
         category: "Platform"
     },
     {
+        id: "intent-satisfaction",
         q: "What is 'Intent Satisfaction Index'?",
         a: "This is a composite score reflecting the total number of intents that have been fully resolved with user constraints met. Each TransactionExecuted event on-chain represents a successfully settled intent. The index serves as a heartbeat for the protocol's utility and grows as more intents are processed by solvers.",
         icon: Activity,
         category: "Metrics"
     },
     {
+        id: "settled-value",
         q: "How is 'Settled USD Value' calculated?",
         a: "Settled USD Value tracks the real economic value of all intents successfully settled by solvers. We calculate this by analyzing token transfers associated with each transaction and applying precise pricing: USDC at $1.00, WETH at current market price, DAI at $1.00, and USDbC at $1.00. This avoids inflation from counting raw ETH value and provides a true 'Settled Value' figure.",
         icon: Layers,
         category: "Metrics"
     },
     {
+        id: "total-value-shielded",
         q: "What is 'Total Value Shielded'?",
         a: "This represents the net flow (Inflows minus Outflows) of assets moving through the Anoma protocol. A positive number indicates accumulation of privacy-shielded liquidity. We track both inflows (tokens sent to the contract) and outflows (tokens sent from the contract) to compute the net shielded amount.",
         icon: Shield,
         category: "Metrics"
     },
     {
+        id: "privacy-pulse",
         q: "What does the 'Privacy Pulse' track?",
         a: "The Privacy Pulse section visualizes CommitmentTreeRootAdded events — each representing a new Merkle tree root committed to the privacy pool. The growing count shows the protocol's shielded set expanding over time, strengthening privacy guarantees for all participants.",
         icon: Lock,
         category: "Metrics"
     },
     {
+        id: "solver-definition",
         q: "What is a Solver?",
         a: "In the Anoma protocol, solvers are specialized actors who find optimal execution paths for user intents. When a user submits an intent (e.g., 'swap X for Y at the best rate'), solvers compete to fulfill it. The Solver Leaderboard ranks them by transaction count, gas efficiency, and total value processed.",
         icon: Users,
         category: "Solvers"
     },
     {
+        id: "intent-mastery",
         q: "What is 'Intent Mastery Score'?",
         a: "Intent Mastery is a composite ranking metric combining a solver's transaction volume weight with their activity count. It's calculated as: (Total Value Processed in ETH + Transaction Count × 2) / 10. This rewards both high-value and high-frequency solvers, giving a balanced view of solver effectiveness.",
         icon: BarChart3,
         category: "Solvers"
     },
     {
+        id: "indexed-events",
         q: "Which events does Gnoma index?",
         a: "Gnoma indexes all 8 event types emitted by the Anoma Protocol Adapter: TransactionExecuted (settled intents), CommitmentTreeRootAdded (privacy pool updates), ActionExecuted, DiscoveryPayload, ResourcePayload, ExternalPayload, ApplicationPayload, and ForwarderCallExecuted. All events are decoded and categorized for you.",
         icon: Code,
         category: "Technical"
     },
     {
+        id: "hex-decoder",
         q: "What is the Hex Decoder?",
         a: "The Hex Decoder is a built-in tool on each transaction detail page that lets you inspect raw payload data in three views: Raw Hex (the original on-chain bytes), UTF-8 Decoded (human-readable text), and JSON Parsed (structured data). This is essential for developers analyzing intent payloads.",
         icon: Code,
         category: "Technical"
     },
     {
+        id: "blockchain-support",
         q: "What blockchain does Gnoma support?",
         a: "Gnoma Explorer natively supports **Base**, **Ethereum Mainnet**, **Optimism**, and **Arbitrum One**. You can easily switch between networks using the chain selector in the top navigation bar. The architecture is designed to be chain-agnostic, allowing us to rapidly onboard new EVM-compatible networks as the Anoma ecosystem expands.",
         icon: Globe,
@@ -101,40 +114,35 @@ const CONTRACTS = [
 
 function AccordionItem({ item, isOpen, onToggle, index }: { item: FAQItem; isOpen: boolean; onToggle: () => void; index: number }) {
     const Icon = item.icon
+    const [feedback, setFeedback] = useState<'neutral' | 'helpful' | 'unhelpful'>('neutral')
 
     return (
         <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.04 }}
-            className={`rounded-xl transition-all duration-300 ${isOpen
-                ? 'bg-red-50/50 dark:bg-red-950/10 shadow-sm ring-1 ring-[#FF0000]/20'
-                : 'bg-white dark:bg-gray-900 shadow-sm ring-1 ring-gray-100 dark:ring-gray-800 hover:shadow-md hover:ring-gray-200 dark:hover:ring-gray-700'
-                }`}
+            className={`border-b border-gray-100 dark:border-gray-800 last:border-0 ${isOpen ? 'bg-gray-50 dark:bg-zinc-900/50' : ''}`}
         >
             <button
                 onClick={onToggle}
-                className="w-full flex items-start sm:items-center gap-4 sm:gap-6 px-4 py-4 sm:px-8 sm:py-6 text-left group"
+                className="w-full flex items-start sm:items-center gap-4 py-5 text-left group px-4"
             >
-                <div className={`p-2.5 sm:p-3 rounded-xl transition-all duration-300 shrink-0 mt-0.5 sm:mt-0 ${isOpen
-                    ? 'bg-[#FF0000] text-white shadow-md shadow-red-500/20'
+                <div className={`p-2 rounded-lg transition-all duration-300 shrink-0 mt-0.5 sm:mt-0 ${isOpen
+                    ? 'bg-[#FF0000] text-white'
                     : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 group-hover:bg-[#FF0000]/10 group-hover:text-[#FF0000]'
                     }`}>
-                    <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                    <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div className="flex-1 min-w-0 pr-2">
-                    <h3 className={`text-sm sm:text-lg font-bold leading-snug transition-colors duration-200 ${isOpen ? 'text-[#FF0000] dark:text-white' : 'text-gray-900 dark:text-white group-hover:text-[#FF0000] dark:group-hover:text-red-400'}`}>
+                    <h3 className={`text-sm sm:text-base font-bold leading-snug transition-colors duration-200 ${isOpen ? 'text-black dark:text-white' : 'text-gray-900 dark:text-gray-200 group-hover:text-[#FF0000]'}`}>
                         {item.q}
                     </h3>
-                    <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mt-1.5 block">
-                        {item.category}
-                    </span>
                 </div>
-                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-300 shrink-0 ${isOpen
-                    ? 'bg-[#FF0000]/10 text-[#FF0000] rotate-180'
-                    : 'bg-gray-50 dark:bg-gray-800/50 text-gray-400 group-hover:bg-gray-100 dark:group-hover:bg-gray-700'
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300 shrink-0 ${isOpen
+                    ? 'rotate-180 text-[#FF0000]'
+                    : 'text-gray-400 group-hover:text-[#FF0000]'
                     }`}>
-                    <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <ChevronDown className="w-4 h-4" />
                 </div>
             </button>
 
@@ -144,14 +152,29 @@ function AccordionItem({ item, isOpen, onToggle, index }: { item: FAQItem; isOpe
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                        transition={{ duration: 0.2 }}
                         className="overflow-hidden"
                     >
-                        <div className="px-4 pb-5 pt-0 sm:px-8 sm:pb-8">
-                            <div className="ml-[44px] sm:ml-[68px] pl-4 sm:pl-6 border-l-2 border-[#FF0000]/20">
-                                <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm sm:text-base">
-                                    {item.a}
-                                </p>
+                        <div className="px-4 pb-6 ml-14">
+                            <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm mb-4">
+                                {item.a}
+                            </p>
+
+                            {/* Feedback */}
+                            <div className="flex items-center gap-3 text-xs">
+                                <span className="text-gray-400 font-mono uppercase tracking-wider">Did this help?</span>
+                                <button
+                                    onClick={() => setFeedback('helpful')}
+                                    className={`flex items-center gap-1.5 px-2 py-1 rounded transition-colors ${feedback === 'helpful' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                                >
+                                    <ThumbsUp className="w-3 h-3" /> Yes
+                                </button>
+                                <button
+                                    onClick={() => setFeedback('unhelpful')}
+                                    className={`flex items-center gap-1.5 px-2 py-1 rounded transition-colors ${feedback === 'unhelpful' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                                >
+                                    <ThumbsDown className="w-3 h-3" /> No
+                                </button>
                             </div>
                         </div>
                     </motion.div>
@@ -162,8 +185,9 @@ function AccordionItem({ item, isOpen, onToggle, index }: { item: FAQItem; isOpe
 }
 
 export function FAQ() {
-    const [openIndex, setOpenIndex] = useState<number | null>(0)
+    const [openItem, setOpenItem] = useState<string | null>(null)
     const [activeCategory, setActiveCategory] = useState<string>('all')
+    const [searchQuery, setSearchQuery] = useState('')
     const [copiedAddress, setCopiedAddress] = useState<string | null>(null)
 
     const copyToClipboard = useCallback(async (text: string) => {
@@ -176,213 +200,179 @@ export function FAQ() {
         }
     }, [])
 
-    const filteredItems = activeCategory === 'all'
-        ? FAQ_ITEMS
-        : FAQ_ITEMS.filter(item => item.category === activeCategory)
+    const filteredItems = useMemo(() => {
+        return FAQ_ITEMS.filter(item => {
+            const matchesCategory = activeCategory === 'all' || item.category === activeCategory
+            const matchesSearch = item.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                item.a.toLowerCase().includes(searchQuery.toLowerCase())
+            return matchesCategory && matchesSearch
+        })
+    }, [activeCategory, searchQuery])
 
     return (
-        <section className="py-16 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto min-h-screen">
+        <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto min-h-screen bg-white dark:bg-black">
             <SEO title="FAQ" description="Frequently asked questions about Gnoma Explorer and the Anoma Protocol." />
 
-            {/* Header */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mb-10 sm:mb-20 text-center"
-            >
-                <div className="inline-flex items-center gap-2 sm:gap-3 px-3 py-1.5 sm:px-4 sm:py-2 bg-[#FF0000]/5 border border-[#FF0000]/10 rounded-full mb-5 sm:mb-6">
-                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#FF0000] animate-pulse" />
-                    <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-[#FF0000]">
-                        {FAQ_ITEMS.length} Questions Answered
-                    </span>
-                </div>
-                <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-black dark:text-white mb-4 sm:mb-6">
-                    Protocol FAQ
-                </h2>
-                <p className="text-sm sm:text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed px-2">
-                    Everything you need to know about Gnoma Explorer, how metrics are calculated, and how the protocol works.
-                </p>
-            </motion.div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                {/* Sidebar - Sticky on Desktop, Static on Mobile */}
+                <div className="lg:col-span-4 lg:sticky lg:top-32 lg:self-start space-y-8">
+                    <div>
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#FF0000]/5 border border-[#FF0000]/10 rounded-full mb-6">
+                            <span className="w-2 h-2 rounded-full bg-[#FF0000] animate-pulse" />
+                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#FF0000]">
+                                Knowledge Base
+                            </span>
+                        </div>
+                        <h2 className="text-4xl md:text-5xl font-extrabold tracking-tighter text-black dark:text-white mb-4 leading-[0.9]">
+                            Protocol<br />Dynamics
+                        </h2>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed max-w-sm">
+                            Deep dive into the mechanics of the Anoma Protocol Adapter. Search below or browse by category.
+                        </p>
+                    </div>
 
-            {/* Category Filter Tabs */}
-            <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="flex justify-start sm:justify-center mb-8 sm:mb-12 overflow-x-auto pb-4 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-            >
-                <div className="inline-flex p-1 sm:p-1.5 bg-gray-100/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl sm:rounded-full ring-1 ring-gray-200/50 dark:ring-gray-800/50 min-w-max mx-auto sm:mx-0">
-                    <button
-                        onClick={() => { setActiveCategory('all'); setOpenIndex(null) }}
-                        className={`relative px-4 py-2 sm:px-5 sm:py-2.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 rounded-lg sm:rounded-full z-10 ${activeCategory === 'all'
-                            ? 'text-[#FF0000] dark:text-white'
-                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                            }`}
-                    >
-                        {activeCategory === 'all' && (
-                            <motion.div
-                                layoutId="activeTab"
-                                className="absolute inset-0 bg-white dark:bg-gray-800 rounded-lg sm:rounded-full shadow-sm ring-1 ring-black/5 dark:ring-white/10"
-                                style={{ zIndex: -1 }}
-                            />
-                        )}
-                        All ({FAQ_ITEMS.length})
-                    </button>
-                    {CATEGORIES.map(cat => {
-                        const count = FAQ_ITEMS.filter(i => i.category === cat).length
-                        return (
+                    {/* Search Bar */}
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search questions..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-none focus:outline-none focus:border-[#FF0000] dark:focus:border-[#FF0000] focus:ring-1 focus:ring-[#FF0000] transition-colors text-sm font-medium"
+                        />
+                    </div>
+
+                    {/* Desktop Navigation */}
+                    <nav className="hidden lg:flex flex-col gap-1">
+                        <button
+                            onClick={() => { setActiveCategory('all'); setOpenItem(null) }}
+                            className={`text-left px-4 py-2 border-l-2 transition-all text-sm font-bold uppercase tracking-wider ${activeCategory === 'all'
+                                ? 'border-[#FF0000] text-black dark:text-white pl-6'
+                                : 'border-transparent text-gray-400 hover:text-black dark:hover:text-white pl-4'
+                                }`}
+                        >
+                            All Questions
+                        </button>
+                        {CATEGORIES.map(cat => (
                             <button
                                 key={cat}
-                                onClick={() => { setActiveCategory(cat); setOpenIndex(null) }}
-                                className={`relative px-4 py-2 sm:px-5 sm:py-2.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 rounded-lg sm:rounded-full z-10 ${activeCategory === cat
-                                    ? 'text-[#FF0000] dark:text-white'
-                                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                                onClick={() => { setActiveCategory(cat); setOpenItem(null) }}
+                                className={`text-left px-4 py-2 border-l-2 transition-all text-sm font-bold uppercase tracking-wider ${activeCategory === cat
+                                    ? 'border-[#FF0000] text-black dark:text-white pl-6'
+                                    : 'border-transparent text-gray-400 hover:text-black dark:hover:text-white pl-4'
                                     }`}
                             >
-                                {activeCategory === cat && (
-                                    <motion.div
-                                        layoutId="activeTab"
-                                        className="absolute inset-0 bg-white dark:bg-gray-800 rounded-lg sm:rounded-full shadow-sm ring-1 ring-black/5 dark:ring-white/10"
-                                        style={{ zIndex: -1 }}
-                                    />
-                                )}
-                                {cat} ({count})
+                                {cat}
                             </button>
-                        )
-                    })}
-                </div>
-            </motion.div>
+                        ))}
+                    </nav>
 
-            {/* Accordion Q&A */}
-            <div className="space-y-3 sm:space-y-5">
-                {filteredItems.map((item, i) => (
-                    <AccordionItem
-                        key={`${activeCategory}-${i}`}
-                        item={item}
-                        isOpen={openIndex === i}
-                        onToggle={() => setOpenIndex(openIndex === i ? null : i)}
-                        index={i}
-                    />
-                ))}
-            </div>
-
-            {/* Contract Addresses */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="mt-16 sm:mt-32"
-            >
-                <div className="text-center mb-8 sm:mb-10">
-                    <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black dark:text-white mb-3 sm:mb-4">
-                        Contract Addresses
-                    </h3>
-                    <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 py-1 sm:px-3 sm:py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                        <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-blue-500">Multi-Chain Protocol</span>
+                    {/* Mobile Navigation Tabs */}
+                    <div className="lg:hidden flex overflow-x-auto pb-4 gap-2 no-scrollbar">
+                        <button
+                            onClick={() => { setActiveCategory('all'); setOpenItem(null) }}
+                            className={`whitespace-nowrap px-4 py-2 text-xs font-bold uppercase tracking-wider border ${activeCategory === 'all'
+                                ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white'
+                                : 'text-gray-500 border-gray-200 dark:border-zinc-800'
+                                }`}
+                        >
+                            All
+                        </button>
+                        {CATEGORIES.map(cat => (
+                            <button
+                                key={cat}
+                                onClick={() => { setActiveCategory(cat); setOpenItem(null) }}
+                                className={`whitespace-nowrap px-4 py-2 text-xs font-bold uppercase tracking-wider border ${activeCategory === cat
+                                    ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white'
+                                    : 'text-gray-500 border-gray-200 dark:border-zinc-800'
+                                    }`}
+                            >
+                                {cat}
+                            </button>
+                        ))}
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6">
-                    {CONTRACTS.map((c, i) => (
-                        <div key={i} className="group relative bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-2xl shadow-sm ring-1 ring-gray-200 dark:ring-gray-800 hover:ring-[#FF0000]/30 dark:hover:ring-[#FF0000]/30 transition-all duration-300">
-                            <div className="flex items-start justify-between mb-3 sm:mb-4">
-                                <div>
-                                    <h4 className="font-bold text-sm sm:text-base text-gray-900 dark:text-white mb-1">{c.name}</h4>
-                                    <span className={`inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-wider ${c.type === 'Core'
-                                        ? 'bg-[#FF0000]/10 text-[#FF0000]'
-                                        : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
-                                        }`}>
-                                        {c.type}
-                                    </span>
-                                </div>
-                                <a
-                                    href={`${c.explorerUrl}${c.address}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="p-1.5 sm:p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-                                    title="View on Explorer"
-                                >
-                                    <Link className="w-4 h-4" />
-                                </a>
-                            </div>
-                            
-                            <div className="flex items-center gap-2">
-                                <div className="flex-1 bg-gray-50 dark:bg-gray-800/50 px-2.5 py-2 sm:px-3 sm:py-2.5 rounded-xl font-mono text-[10px] sm:text-sm text-gray-600 dark:text-gray-300 truncate ring-1 ring-inset ring-gray-200/50 dark:ring-gray-700/50">
-                                    {c.address}
-                                </div>
+                {/* Main Content Area */}
+                <div className="lg:col-span-8">
+                    <div className="swiss-border bg-white dark:bg-black p-0 min-h-[400px]">
+                        {filteredItems.length > 0 ? (
+                            filteredItems.map((item, i) => (
+                                <AccordionItem
+                                    key={item.id}
+                                    item={item}
+                                    isOpen={openItem === item.id}
+                                    onToggle={() => setOpenItem(openItem === item.id ? null : item.id)}
+                                    index={i}
+                                />
+                            ))
+                        ) : (
+                            <div className="py-20 text-center text-gray-400">
+                                <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                                <p className="uppercase text-sm tracking-widest">No results found for "{searchQuery}"</p>
                                 <button
-                                    onClick={() => copyToClipboard(c.address)}
-                                    className={`p-2 sm:p-2.5 rounded-xl border transition-all duration-200 shrink-0 ${
-                                        copiedAddress === c.address
-                                            ? 'bg-green-50 border-green-200 text-green-600 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400'
-                                            : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:border-gray-600'
-                                    }`}
-                                    title="Copy Address"
+                                    onClick={() => setSearchQuery('')}
+                                    className="mt-4 text-[#FF0000] text-xs font-bold uppercase hover:underline"
                                 >
-                                    {copiedAddress === c.address ? (
-                                        <Check className="w-4 h-4" />
-                                    ) : (
-                                        <Copy className="w-4 h-4" />
-                                    )}
+                                    Clear Search
                                 </button>
                             </div>
+                        )}
+                    </div>
+
+                    {/* Contract Addresses Section */}
+                    <div className="mt-20 border-t border-black dark:border-white pt-10">
+                        <div className="flex items-center justify-between mb-8">
+                            <h3 className="text-xl font-bold uppercase tracking-tight text-black dark:text-white">
+                                Smart Contracts
+                            </h3>
+                            <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-blue-50 border border-blue-200 rounded text-blue-700">
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                                <span className="text-[10px] font-bold uppercase tracking-wider">Verified</span>
+                            </div>
                         </div>
-                    ))}
-                </div>
-            </motion.div>
 
-            {/* How It Works */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="mt-16 sm:mt-32"
-            >
-                <div className="text-center mb-8 sm:mb-12">
-                    <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black dark:text-white mb-3 sm:mb-4">
-                        How It Works
-                    </h3>
-                    <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 max-w-xl mx-auto px-4">
-                        The journey from on-chain execution to real-time analytics on your dashboard.
-                    </p>
-                </div>
 
-                <div className="grid sm:grid-cols-3 gap-4 sm:gap-8">
-                    {[
-                        { icon: Link, title: "On-Chain Events", desc: "Anoma Protocol Adapter emits events on supported chains for every intent settled, payload submitted, and privacy pool update." },
-                        { icon: RefreshCw, title: "Automated Indexer", desc: "Our Blockscout-powered indexer fetches and processes new transactions every 5 minutes via automated cron jobs." },
-                        { icon: LayoutDashboard, title: "Real-time Dashboard", desc: "Data is stored globally and served via edge Workers for real-time analytics with sub-100ms latency." },
-                    ].map((step, i) => {
-                        const StepIcon = step.icon;
-                        return (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.5 + i * 0.1 }}
-                                className="relative text-center p-6 sm:p-10 rounded-3xl bg-white dark:bg-gray-900 shadow-sm ring-1 ring-gray-200 dark:ring-gray-800 group hover:ring-[#FF0000]/30 hover:shadow-xl hover:shadow-[#FF0000]/5 dark:hover:shadow-[#FF0000]/10 transition-all duration-500"
-                            >
-                                {i < 2 && (
-                                    <div className="hidden sm:block absolute -right-4 top-1/2 -translate-y-1/2 z-10 text-gray-200 dark:text-gray-800">
-                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="m9 18 6-6-6-6" /></svg>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {CONTRACTS.map((c, i) => (
+                                <div key={i} className="group p-4 border border-gray-200 dark:border-zinc-800 hover:border-black dark:hover:border-white transition-colors">
+                                    <div className="flex items-start justify-between mb-3">
+                                        <div>
+                                            <h4 className="font-bold text-sm text-gray-900 dark:text-white">{c.name}</h4>
+                                            <span className="text-[10px] font-mono text-gray-500 uppercase">{c.type}</span>
+                                        </div>
+                                        <a
+                                            href={`${c.explorerUrl}${c.address}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-gray-400 hover:text-blue-500 transition-colors"
+                                        >
+                                            <Link className="w-4 h-4" />
+                                        </a>
                                     </div>
-                                )}
-                                
-                                <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 bg-gray-50 dark:bg-gray-800 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-[#FF0000]/10 group-hover:text-[#FF0000] text-gray-600 dark:text-gray-300 transition-colors duration-300 ring-1 ring-inset ring-gray-200/50 dark:ring-gray-700/50">
-                                    <StepIcon className="w-6 h-6 sm:w-8 sm:h-8" strokeWidth={1.5} />
+
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex-1 font-mono text-xs text-gray-600 dark:text-gray-400 truncate bg-gray-50 dark:bg-zinc-900 p-2">
+                                            {c.address}
+                                        </div>
+                                        <button
+                                            onClick={() => copyToClipboard(c.address)}
+                                            className="p-2 hover:text-[#FF0000] transition-colors"
+                                        >
+                                            {copiedAddress === c.address ? (
+                                                <Check className="w-4 h-4 text-green-500" />
+                                            ) : (
+                                                <Copy className="w-4 h-4" />
+                                            )}
+                                        </button>
+                                    </div>
                                 </div>
-                                
-                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1 bg-gray-100 dark:bg-gray-800/80 rounded-full mb-3 sm:mb-4 ring-1 ring-black/5 dark:ring-white/5">
-                                    <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Step {i + 1}</span>
-                                </div>
-                                <h4 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3 group-hover:text-[#FF0000] dark:group-hover:text-red-400 transition-colors">{step.title}</h4>
-                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{step.desc}</p>
-                            </motion.div>
-                        )
-                    })}
+                            ))}
+                        </div>
+                    </div>
                 </div>
-            </motion.div>
+            </div>
         </section>
     )
 }

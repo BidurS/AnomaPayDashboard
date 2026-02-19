@@ -6,6 +6,7 @@
 import { DB } from '../db';
 import * as schema from '../db/schema';
 import { eq, sql, inArray, and } from 'drizzle-orm';
+import { rpcRequest } from '../utils/rpc';
 
 // Helper to get Blockscout API URL
 function getBlockscoutApiUrl(chainId: number): string {
@@ -42,6 +43,43 @@ const PAYLOAD_TYPE_MAP: Record<string, string> = {
     'ExternalPayload': 'External',
     'ApplicationPayload': 'Application',
 };
+
+const TOKEN_CACHE = new Map<string, { symbol: string; decimals: number; priceUsd: number }>();
+
+async function fetchTokenMetadata(chain: ChainConfig, tokenAddress: string): Promise<{ symbol: string; decimals: number; priceUsd: number }> {
+    if (KNOWN_TOKENS[tokenAddress]) return KNOWN_TOKENS[tokenAddress];
+    if (TOKEN_CACHE.has(tokenAddress)) return TOKEN_CACHE.get(tokenAddress)!;
+
+    try {
+        // Parallel fetch for symbol (0x95d89b41) and decimals (0x313ce567)
+        const [symbolHex, decimalsHex] = await Promise.all([
+            rpcRequest(chain.rpcUrl, 'eth_call', [{ to: tokenAddress, data: '0x95d89b41' }, 'latest']).catch(() => null),
+            rpcRequest(chain.rpcUrl, 'eth_call', [{ to: tokenAddress, data: '0x313ce567' }, 'latest']).catch(() => null)
+        ]);
+
+        let symbol = 'UNKNOWN';
+        if (symbolHex && symbolHex !== '0x') {
+            try {
+                // Remove '0x', decode hex to string, filter control chars
+                const hex = symbolHex.replace(/^0x/, '');
+                let str = '';
+                for (let i = 0; i < hex.length; i += 2) {
+                    const code = parseInt(hex.substr(i, 2), 16);
+                    if (code > 31 && code < 127) str += String.fromCharCode(code);
+                }
+                // Cleanup partial decoding if bytes32 padded
+                symbol = str.replace(/[^A-Za-z0-9]/g, '').slice(0, 10) || 'UNKNOWN';
+            } catch (e) { }
+        }
+
+        const decimals = decimalsHex ? parseInt(decimalsHex, 16) : 18;
+        const metadata = { symbol, decimals, priceUsd: 0 };
+        TOKEN_CACHE.set(tokenAddress, metadata);
+        return metadata;
+    } catch (e) {
+        return { symbol: 'UNKNOWN', decimals: 18, priceUsd: 0 };
+    }
+}
 
 interface IndexerResult {
     chainId: number;
@@ -294,10 +332,25 @@ async function fetchTokenTransfersForTxs(chain: ChainConfig, apiUrl: string, txs
             if (data.items) {
                 for (const t of data.items) {
                     const tokenAddr = t.token?.address?.toLowerCase() || '';
-                    const known = KNOWN_TOKENS[tokenAddr];
-                    const decimals = known?.decimals || parseInt(t.token?.decimals || '18');
-                    const symbol = known?.symbol || t.token?.symbol || 'UNKNOWN';
-                    const priceUsd = known?.priceUsd || 0;
+                    let decimals = 18;
+                    let symbol = 'UNKNOWN';
+                    let priceUsd = 0;
+
+                    if (KNOWN_TOKENS[tokenAddr]) {
+                        decimals = KNOWN_TOKENS[tokenAddr].decimals;
+                        symbol = KNOWN_TOKENS[tokenAddr].symbol;
+                        priceUsd = KNOWN_TOKENS[tokenAddr].priceUsd;
+                    } else if (t.token?.symbol && t.token?.decimals) {
+                        decimals = parseInt(t.token.decimals);
+                        symbol = t.token.symbol;
+                    } else {
+                        // Fallback to RPC fetch
+                        const metadata = await fetchTokenMetadata(chain, tokenAddr);
+                        decimals = metadata.decimals;
+                        symbol = metadata.symbol;
+                        priceUsd = metadata.priceUsd;
+                    }
+
                     const amountRaw = t.total?.value || '0';
                     const amountDisplay = parseFloat(amountRaw) / Math.pow(10, decimals);
 

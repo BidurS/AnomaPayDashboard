@@ -112,6 +112,14 @@ export interface AssetSummary {
     total_usd: number
 }
 
+export interface SystemStatus {
+    status: 'synced' | 'lagging' | 'error'
+    diff: number
+    lastSyncedBlock: number
+    currentBlock: number
+    timestamp: string
+}
+
 // =============================================================
 //  Hooks (TanStack Query)
 // =============================================================
@@ -291,4 +299,17 @@ export function useTokenTransfers(chainId: number) {
         loading: isLoading,
         refetch
     };
+}
+
+export function useSystemStatus(chainId: number) {
+    const { data: status, isLoading } = useQuery({
+        queryKey: ['systemStatus', chainId],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/health?chainId=${chainId}`);
+            return res.json() as Promise<SystemStatus>;
+        },
+        refetchInterval: 30000,
+    });
+
+    return { status: status || null, loading: isLoading };
 }

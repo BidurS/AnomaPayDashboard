@@ -54,11 +54,15 @@ export async function handleImportData(db: DB, data: any, headers: any) {
                 gasPriceWei: e.gas_price_wei,
                 dataJson: e.data_json,
                 decodedInput: e.decoded_input ? JSON.stringify(e.decoded_input) : null,
+                primaryPayloadType: e.primary_payload_type,
                 timestamp: e.timestamp
             }))
         ).onConflictDoUpdate({
             target: [schema.events.chainId, schema.events.txHash],
-            set: { decodedInput: sql`excluded.decoded_input` }
+            set: {
+                decodedInput: sql`excluded.decoded_input`,
+                primaryPayloadType: sql`excluded.primary_payload_type`
+            }
         }));
     }
 

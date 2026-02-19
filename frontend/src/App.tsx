@@ -60,6 +60,33 @@ function Layout() {
     }
   }
 
+  const handleSearch = (query: string) => {
+    const q = query.trim()
+    setSearchQuery(q)
+
+    // Smart Redirection Logic
+    if (q.startsWith('0x') && q.length === 66) {
+      // Transaction Hash
+      navigate(`/tx/${q}`)
+    } else if (q.startsWith('0x') && q.length === 42) {
+      // Solver/Address
+      navigate(`/solver/${q}`)
+    } else if (/^\d+$/.test(q)) {
+      // Block Number (via search param filter on transactions page)
+      navigate({ pathname: '/', search: `section=transactions&search=${q}` })
+      // Scroll to transaction table
+      setTimeout(() => {
+        document.getElementById('transaction-table')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+    } else {
+      // Default: Explorer Search
+      navigate('/')
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }, 100)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-transparent text-black dark:text-white flex flex-col transition-colors duration-200 relative">
       <BackgroundEffects />
@@ -70,7 +97,7 @@ function Layout() {
           <Header
             currentView={getView()}
             onNavigate={handleNavigate}
-            onSearch={setSearchQuery}
+            onSearch={handleSearch}
           />
         )}
 

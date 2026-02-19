@@ -1,6 +1,11 @@
-import { Github, Twitter, ExternalLink } from 'lucide-react'
+import { Github, Twitter, ExternalLink, Activity, CheckCircle2, AlertCircle } from 'lucide-react'
+import { useSystemStatus } from '../lib/api'
+import { useChainContext } from '../context/ChainContext'
 
 export function Footer() {
+    const { activeChain } = useChainContext()
+    const { status, loading } = useSystemStatus(activeChain?.id || 8453)
+
     return (
         <footer className="border-t-4 border-black dark:border-white bg-white dark:bg-black py-12 transition-colors duration-200">
             <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -13,6 +18,20 @@ export function Footer() {
                                 Powered by Anoma Protocol Adapter
                             </p>
                         </div>
+                    </div>
+
+                    {/* System Status Indicator */}
+                    <div className="flex items-center gap-2 px-3 py-1.5 border border-gray-200 dark:border-gray-800 rounded-full bg-gray-50 dark:bg-gray-900">
+                        {loading ? (
+                            <Activity className="w-3 h-3 text-gray-400 animate-pulse" />
+                        ) : status?.status === 'synced' ? (
+                            <CheckCircle2 className="w-3 h-3 text-green-500" />
+                        ) : (
+                            <AlertCircle className="w-3 h-3 text-orange-500" />
+                        )}
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300">
+                            {loading ? 'Checking Sync...' : status?.status === 'synced' ? 'System Operational' : `Syncing (${status?.diff || 0} blocks behind)`}
+                        </span>
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -45,8 +64,8 @@ export function Footer() {
 
                 <div className="swiss-divider dark:bg-white" />
 
-                <div className="text-center flex flex-col gap-2">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em]">
+                <div className="text-center flex flex-col gap-3 pb-8 md:pb-0">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em] font-medium">
                         Build with love — 2026
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.1em]">

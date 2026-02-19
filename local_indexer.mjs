@@ -184,6 +184,17 @@ async function processBatch(currentBlock, toBlock, attempts = 0) {
                         }
                     }
 
+                    // Determine Primary Payload Type
+                    let primaryType = null;
+                    for (const rLog of receipt.logs) {
+                        const t0 = rLog.topics[0];
+                        if (t0 === TOPICS.RESOURCE_PAYLOAD) primaryType = 'Resource';
+                        else if (t0 === TOPICS.DISCOVERY_PAYLOAD) primaryType = 'Discovery';
+                        else if (t0 === TOPICS.EXTERNAL_PAYLOAD) primaryType = 'External';
+                        else if (t0 === TOPICS.APPLICATION_PAYLOAD) primaryType = 'Application';
+                        if (primaryType) break;
+                    }
+
                     payload.events.push({
                         chain_id: CHAIN_ID, tx_hash: txHash, block_number: blockNumber,
                         event_type: 'TransactionExecuted', solver_address: solverAddress,
@@ -192,6 +203,7 @@ async function processBatch(currentBlock, toBlock, attempts = 0) {
                         gas_price_wei: receipt.effectiveGasPrice.toString(),
                         data_json: JSON.stringify(log.topics),
                         decoded_input: decodedInput, // New Field
+                        primary_payload_type: primaryType,
                         timestamp
                     });
 

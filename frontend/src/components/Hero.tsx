@@ -1,50 +1,70 @@
 import { motion } from 'framer-motion'
-import { Shield, Zap, Users, Layers, Coins, Fuel } from 'lucide-react'
 import { useStats, useNetworkHealth } from '../lib/api'
 import { useChainContext } from '../context/ChainContext'
 import { formatCurrency, formatNumber } from '../lib/utils'
 
-interface StatCardProps {
-    title: string
-    value: string
-    subValue?: string
-    icon: React.ElementType
-    delay?: number
-    accent?: 'red' | 'blue' | 'yellow' | 'black'
+// Pulse Visualization Component
+function PulseBackground() {
+    return (
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none opacity-20 dark:opacity-40">
+            <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="pulse-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="transparent" />
+                        <stop offset="50%" stopColor="#FF0000" />
+                        <stop offset="100%" stopColor="transparent" />
+                    </linearGradient>
+                </defs>
+                <motion.path
+                    d="M0,50 Q25,40 50,50 T100,50"
+                    fill="none"
+                    stroke="url(#pulse-gradient)"
+                    strokeWidth="0.5"
+                    vectorEffect="non-scaling-stroke"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: [0, 1, 0] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                />
+                <motion.path
+                    d="M0,60 Q35,30 70,60 T140,60"
+                    fill="none"
+                    stroke="url(#pulse-gradient)"
+                    strokeWidth="0.5"
+                    vectorEffect="non-scaling-stroke"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: [0, 1, 0] }}
+                    transition={{ duration: 5, repeat: Infinity, ease: "linear", delay: 1 }}
+                />
+            </svg>
+            <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-black to-transparent" />
+        </div>
+    )
 }
 
-function StatCard({ title, value, subValue, icon: Icon, delay = 0, accent = 'black' }: StatCardProps) {
-    const accentColors = {
-        red: 'bg-[#FF0000]',
-        blue: 'bg-[#0066CC]',
-        yellow: 'bg-[#FFCC00]',
-        black: 'bg-black'
-    }
+interface BigStatProps {
+    label: string
+    value: string
+    subValue?: string
+    delay?: number
+}
 
+function BigStat({ label, value, subValue, delay = 0 }: BigStatProps) {
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay, duration: 0.4 }}
-            className="swiss-card group"
+            transition={{ delay, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col items-start p-6 border-l border-black dark:border-white/20 first:border-l-0 md:first:border-l sm:border-l-0 sm:even:border-l lg:border-l relative group"
         >
-            <div className={`swiss-card-accent ${accentColors[accent]}`} />
-
-            <div className="pt-2">
-                <div className="flex items-start justify-between mb-4">
-                    <span className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase">
-                        {title}
-                    </span>
-                    <Icon className="w-5 h-5 text-gray-400" />
-                </div>
-
-                <div className="swiss-number text-black dark:text-white">
-                    {value}
-                </div>
-                {subValue && (
-                    <div className="text-xs text-gray-500 mt-2 uppercase tracking-wider">{subValue}</div>
-                )}
+            <span className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase mb-2">
+                {label}
+            </span>
+            <div className="text-swiss-lg md:text-5xl lg:text-6xl font-bold tracking-tighter text-black dark:text-white leading-none mb-1 group-hover:text-swiss-red transition-colors duration-300">
+                {value}
             </div>
+            {subValue && (
+                <div className="text-xs font-mono text-gray-400 mt-1 uppercase tracking-wider">{subValue}</div>
+            )}
         </motion.div>
     )
 }
@@ -55,81 +75,51 @@ export function Hero() {
     const { health } = useNetworkHealth(activeChain?.id || 8453)
 
     return (
-        <section className="relative py-16 md:py-24 swiss-grid">
-            <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
-                {/* Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-center mb-16"
-                >
-                    <p className="swiss-subtitle mb-4">Real-time Analytics</p>
-                    <h1 className="swiss-title text-black dark:text-white">
-                        <span className="text-[#FF0000]">Gnoma</span> Explorer
-                    </h1>
-                    <p className="text-gray-600 dark:text-gray-400 mt-6 max-w-xl mx-auto">
-                        Tracking intents settled via the Anoma Protocol Adapter
-                    </p>
-                    <div className="swiss-divider w-24 mx-auto mt-8" />
-                </motion.div>
+        <section className="relative w-full border-b border-black dark:border-white bg-white dark:bg-black overflow-hidden">
+            <PulseBackground />
 
-                {/* Stats Grid - 6 Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <StatCard
-                        title="Total Value Shielded"
+            <div className="relative z-10 max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 border-black dark:border-white">
+                    {/* Main Title/Brand Block */}
+                    <div className="col-span-1 md:col-span-2 lg:col-span-1 p-6 md:p-8 flex flex-col justify-center border-b md:border-b-0 lg:border-r border-black dark:border-white/20">
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="flex flex-col"
+                        >
+                            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-black dark:text-white uppercase leading-none">
+                                <span className="text-[#FF0000]">Gnoma</span><br />Explorer
+                            </h1>
+                            <p className="mt-4 text-xs font-mono text-gray-500 uppercase tracking-widest max-w-[200px]">
+                                Real-time Intent Settlement Layer Analytics
+                            </p>
+                        </motion.div>
+                    </div>
+
+                    {/* Big Stats */}
+                    <BigStat
+                        label="Total Value Shielded"
                         value={loading ? '—' : formatCurrency(health?.tvl || 0)}
-                        subValue="TVL in Protocol"
-                        icon={Shield}
+                        subValue="Protocol TVL"
                         delay={0.1}
-                        accent="red"
                     />
 
-                    <StatCard
-                        title="Assets Tracked"
-                        value={loading ? '—' : formatNumber(stats?.assetCount || 0)}
-                        subValue="Unique Tokens"
-                        icon={Coins}
-                        delay={0.1}
-                        accent="red"
-                    />
-
-                    <StatCard
-                        title="Settled USD Value"
+                    <BigStat
+                        label="24h Volume"
                         value={loading ? '—' : formatCurrency(stats?.totalVolume || 0)}
-                        subValue="All Protocol Assets"
-                        icon={Layers}
+                        subValue="Settled USD"
                         delay={0.2}
-                        accent="black"
                     />
 
-                    <StatCard
-                        title="Intent Satisfaction Index"
+                    <BigStat
+                        label="Intents Solved"
                         value={loading ? '—' : formatNumber(stats?.intentCount || 0)}
-                        subValue="Intents Fully Resolved"
-                        icon={Zap}
-                        delay={0.25}
-                        accent="yellow"
-                    />
-
-                    <StatCard
-                        title="Ecosystem Participants"
-                        value={loading ? '—' : formatNumber(stats?.uniqueSolvers || 0)}
-                        subValue="Solvers & Relay Teams"
-                        icon={Users}
+                        subValue="Total Executions"
                         delay={0.3}
-                        accent="blue"
-                    />
-
-                    <StatCard
-                        title="Gas Consumed"
-                        value={loading ? '—' : formatNumber(stats?.totalGasUsed || 0)}
-                        subValue="Total Gas Units"
-                        icon={Fuel}
-                        delay={0.35}
-                        accent="red"
                     />
                 </div>
             </div>
         </section>
     )
 }
+
