@@ -21,6 +21,7 @@ import { AdminLayout } from './components/admin/AdminLayout'
 import { AdminLogin } from './components/admin/AdminLogin'
 import { AdminDashboard } from './components/admin/AdminDashboard'
 import { CommandPalette } from './components/CommandPalette'
+import { ZKCircuitRegistry } from './components/ZKCircuitRegistry'
 import { SEO } from './components/SEO'
 import './index.css'
 
@@ -37,7 +38,7 @@ function Dashboard() {
         </div>
       </div>
       <div className="py-12 px-6 max-w-7xl mx-auto flex justify-center">
-        <button 
+        <button
           onClick={() => navigate('/live')}
           className="btn-swiss-primary text-lg px-12 py-6 group"
         >
@@ -167,7 +168,8 @@ function App() {
                   <Route path="/solvers" element={<SolversPage />} />
                   <Route path="/transactions" element={<TransactionsPage />} />
                   <Route path="/faq" element={<FAQ />} />
-                  
+                  <Route path="/circuits" element={<ZKCircuitRegistry />} />
+
                   <Route path="/tx/:hash" element={<TxDetailWrapper />} />
                   <Route path="/solver/:address" element={<SolverProfileWrapper />} />
 

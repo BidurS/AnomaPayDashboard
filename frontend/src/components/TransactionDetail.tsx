@@ -252,16 +252,26 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
                                                                 </span>
                                                                 <h4 className="font-bold text-base text-black dark:text-zinc-100">{program.name}</h4>
                                                             </div>
-                                                            <a
-                                                                href={program.sourceUrl}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                onClick={(e) => e.stopPropagation()}
-                                                                className="p-2 border border-black/10 hover:bg-black hover:text-white transition-colors"
-                                                                title="Verify Source on GitHub"
-                                                            >
-                                                                <Code className="w-4 h-4" />
-                                                            </a>
+                                                            <div className="flex gap-2">
+                                                                <a
+                                                                    href={`#/circuits?id=${ref}`}
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                    className="p-2 border border-black/10 dark:border-white/10 hover:bg-[#FF0000] hover:text-white transition-colors hover:border-[#FF0000] flex items-center justify-center uppercase font-bold text-[9px] tracking-widest whitespace-nowrap"
+                                                                    title="View in Circuit Registry"
+                                                                >
+                                                                    <Shield className="w-4 h-4 md:mr-2" /> <span className="hidden md:inline">View in Registry</span>
+                                                                </a>
+                                                                <a
+                                                                    href={program.sourceUrl}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                    className="p-2 border border-black/10 dark:border-white/10 hover:bg-black dark:hover:bg-white dark:hover:text-black hover:text-white transition-colors"
+                                                                    title="Verify Source on GitHub"
+                                                                >
+                                                                    <Code className="w-4 h-4" />
+                                                                </a>
+                                                            </div>
                                                         </div>
                                                         <p className="text-[11px] text-gray-500 dark:text-zinc-400 mb-3 leading-relaxed">
                                                             {program.description}
