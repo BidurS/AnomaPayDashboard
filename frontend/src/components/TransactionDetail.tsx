@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowLeft, Copy, Check, Shield, ArrowRight, Box, Network, ArrowRightLeft, Code } from 'lucide-react'
+import { ArrowLeft, Copy, Check, Shield, ArrowRight, Box, Network, ArrowRightLeft, Code, Eye, EyeOff } from 'lucide-react'
 import { SEO } from './SEO'
 import { HexDecoder } from './HexDecoder'
 import { ResourceScale } from './ResourceScale'
@@ -20,6 +20,7 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
     const { activeChain } = useChainContext()
     const { tx, loading, error } = useTxDetail(activeChain?.id || 8453, txHash)
     const [copiedHash, setCopiedHash] = useState(false)
+    const [xRayMode, setXRayMode] = useState(false)
 
     // Inspector State
     const [inspectorData, setInspectorData] = useState<{ title: string, data: string } | null>(null)
@@ -99,23 +100,35 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
                                 <h1 className="text-4xl font-extrabold uppercase tracking-tight mb-4 break-words leading-[0.9]">
                                     Transaction<br />Detail
                                 </h1>
-                                <div className="group flex items-center gap-2 relative">
-                                    <code className="font-mono text-xs text-gray-500 hover:text-black dark:hover:text-white transition-colors break-all">
-                                        {txHash}
-                                    </code>
-                                    <button onClick={copyHash} className="shrink-0 p-1.5 hover:text-[#FF0000] transition-colors opacity-0 group-hover:opacity-100">
-                                        {copiedHash ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="group flex items-center gap-2 relative">
+                                        <code className="font-mono text-xs text-gray-500 hover:text-black dark:hover:text-white transition-colors break-all">
+                                            {txHash}
+                                        </code>
+                                        <button onClick={copyHash} className="shrink-0 p-1.5 hover:text-[#FF0000] transition-colors opacity-0 group-hover:opacity-100">
+                                            {copiedHash ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                                        </button>
+                                    </div>
+                                    <button
+                                        onClick={() => setXRayMode(!xRayMode)}
+                                        className={`flex items-center gap-2 px-3 py-1.5 text-[10px] uppercase font-bold tracking-widest transition-all ${xRayMode ? 'bg-[#FF0000] text-white' : 'border border-black dark:border-white hover:bg-gray-100 dark:hover:bg-zinc-800'}`}
+                                    >
+                                        {xRayMode ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                                        X-Ray
                                     </button>
                                 </div>
                             </motion.div>
                         </div>
 
                         {/* ARM Visualizer */}
-                        <ResourceScale
-                            nullifierCount={nullifierCount}
-                            commitmentCount={commitmentCount}
-                            txHash={txHash}
-                        />
+                        <div className={`transition-all ${xRayMode ? 'p-4 border-2 border-[#FF0000] bg-red-50/20 dark:bg-[#FF0000]/5' : ''}`}>
+                            {xRayMode && <div className="text-[10px] font-bold text-[#FF0000] uppercase tracking-widest mb-2 flex items-center gap-1"><Shield className="w-3 h-3" /> Shielded Resource Logic</div>}
+                            <ResourceScale
+                                nullifierCount={nullifierCount}
+                                commitmentCount={commitmentCount}
+                                txHash={txHash}
+                            />
+                        </div>
 
                         {/* Metadata Grid */}
                         <div className="grid grid-cols-2 gap-4">
@@ -159,7 +172,7 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
                                                 title: `${p.payload_type} Payload #${p.payload_index}`,
                                                 data: p.blob || JSON.stringify(p, null, 2)
                                             })}
-                                            className="swiss-border p-3 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors flex items-center justify-between group"
+                                            className={`swiss-border p-3 cursor-pointer transition-colors flex items-center justify-between group ${xRayMode ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-zinc-900'}`}
                                         >
                                             <span className={`px-2 py-0.5 text-[10px] uppercase font-bold tracking-widest border border-black/5 dark:border-white/5
                                                 ${p.payload_type === 'Resource' ? 'bg-green-100/50 text-green-800' :
@@ -191,7 +204,7 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
                                                 title: `DeFi Call: ${shortenAddress(fc.untrusted_forwarder)}`,
                                                 data: JSON.stringify(fc, null, 2)
                                             })}
-                                            className="swiss-border p-4 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors group"
+                                            className={`swiss-border p-4 cursor-pointer transition-colors group ${xRayMode ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-zinc-900'}`}
                                         >
                                             <div className="flex justify-between items-start mb-2">
                                                 <div className="font-bold text-sm uppercase">
@@ -230,7 +243,7 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
                                                             title: program.name,
                                                             data: JSON.stringify({ program, logicRef: ref }, null, 2)
                                                         })}
-                                                        className="swiss-border p-4 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors group"
+                                                        className={`swiss-border p-4 cursor-pointer transition-colors group ${xRayMode ? 'border-[#FF0000] bg-red-50 dark:bg-[#FF0000]/10' : 'bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-zinc-900'}`}
                                                     >
                                                         <div className="flex justify-between items-start mb-2">
                                                             <div className="flex flex-col">
@@ -289,7 +302,7 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
                                                 title: `Action Tree Root`,
                                                 data: JSON.stringify(ae, null, 2)
                                             })}
-                                            className="swiss-border p-4 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors group"
+                                            className={`swiss-border p-4 cursor-pointer transition-colors group ${xRayMode ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-zinc-900'}`}
                                         >
                                             <div className="flex justify-between items-start mb-2">
                                                 <div className="font-bold text-sm">
@@ -318,7 +331,7 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
                                         title: 'Privacy Verification',
                                         data: JSON.stringify(tx.privacyRoot, null, 2)
                                     })}
-                                    className="swiss-border p-4 bg-white dark:bg-black cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-900"
+                                    className={`swiss-border p-4 cursor-pointer transition-colors ${xRayMode ? 'border-[#FF0000] bg-red-50 dark:bg-[#FF0000]/10' : 'bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-zinc-900'}`}
                                 >
                                     <div className="flex items-center justify-between">
                                         <div>
