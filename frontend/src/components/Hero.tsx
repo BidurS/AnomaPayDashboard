@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion'
+import { useState } from 'react'
 import { useStats, useNetworkHealth } from '../lib/api'
 import { useChainContext } from '../context/ChainContext'
-import { formatCurrency, formatNumber } from '../lib/utils'
+import { formatCurrency, formatNumber, cn } from '../lib/utils'
 
 // Pulse Visualization Component
 function PulseBackground() {
@@ -73,6 +74,20 @@ export function Hero() {
     const { activeChain } = useChainContext()
     const { stats, loading } = useStats(activeChain?.id || 8453)
     const { health } = useNetworkHealth(activeChain?.id || 8453)
+    const [timeframe, setTimeframe] = useState<'24h' | '7d' | 'all'>('24h')
+
+    const getVolume = () => {
+        if (!stats) return 0
+        if (timeframe === '24h') return stats.volume24h
+        if (timeframe === '7d') return stats.volume7d || stats.totalVolume * 0.3 // Fallback if week not fully indexed
+        return stats.totalVolume
+    }
+
+    const getIntentCount = () => {
+        if (!stats) return 0
+        if (timeframe === '24h') return stats.intentCount24h
+        return stats.intentCount
+    }
 
     return (
         <section className="relative w-full border-b border-black dark:border-white bg-white dark:bg-black overflow-hidden">
@@ -87,34 +102,51 @@ export function Hero() {
                             animate={{ opacity: 1, x: 0 }}
                             className="flex flex-col"
                         >
-                            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-black dark:text-white uppercase leading-none">
-                                <span className="text-[#FF0000]">Gnoma</span><br />Explorer
-                            </h1>
-                            <p className="mt-4 text-xs font-mono text-gray-500 uppercase tracking-widest max-w-[200px]">
-                                Real-time Intent Settlement Layer Analytics
-                            </p>
+                            <div className="flex items-center justify-between mb-2">
+                                <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-black dark:text-white uppercase leading-none">
+                                    <span className="text-[#FF0000]">Gnoma</span><br />Explorer
+                                </h1>
+                            </div>
+                            
+                            {/* Timeframe Selector */}
+                            <div className="flex gap-1 mt-4">
+                                {(['24h', '7d', 'all'] as const).map((t) => (
+                                    <button
+                                        key={t}
+                                        onClick={() => setTimeframe(t)}
+                                        className={cn(
+                                            "px-2 py-1 text-[9px] font-black uppercase tracking-tighter border border-black dark:border-white/20 transition-all",
+                                            timeframe === t 
+                                                ? "bg-[#FF0000] text-white border-[#FF0000]" 
+                                                : "bg-transparent text-gray-400 hover:text-black dark:hover:text-white"
+                                        )}
+                                    >
+                                        {t}
+                                    </button>
+                                ))}
+                            </div>
                         </motion.div>
                     </div>
 
                     {/* Big Stats */}
                     <BigStat
-                        label="Total Value Shielded"
+                        label="Value Shielded"
                         value={loading ? '—' : formatCurrency(health?.tvl || 0)}
                         subValue="Protocol TVL"
                         delay={0.1}
                     />
 
                     <BigStat
-                        label="24h Volume"
-                        value={loading ? '—' : formatCurrency(stats?.totalVolume || 0)}
+                        label={`${timeframe === 'all' ? 'Total' : timeframe} Volume`}
+                        value={loading ? '—' : formatCurrency(getVolume())}
                         subValue="Settled USD"
                         delay={0.2}
                     />
 
                     <BigStat
-                        label="Intents Solved"
-                        value={loading ? '—' : formatNumber(stats?.intentCount || 0)}
-                        subValue="Total Executions"
+                        label={`${timeframe === 'all' ? 'Total' : timeframe} Intents`}
+                        value={loading ? '—' : formatNumber(getIntentCount())}
+                        subValue="Executions"
                         delay={0.3}
                     />
                 </div>

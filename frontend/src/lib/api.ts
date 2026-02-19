@@ -14,10 +14,12 @@ export interface Chain {
 
 export interface Stats {
     totalVolume: number
+    volume24h: number
+    volume7d: number
     intentCount: number
+    intentCount24h: number
     uniqueSolvers: number
     totalGasUsed: number
-    assetCount: number
 }
 
 export interface Transaction {

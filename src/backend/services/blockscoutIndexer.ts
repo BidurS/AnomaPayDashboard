@@ -35,6 +35,8 @@ const KNOWN_TOKENS: Record<string, { symbol: string; decimals: number; priceUsd:
     '0x4200000000000000000000000000000000000006': { symbol: 'WETH', decimals: 18, priceUsd: 2600 },
     '0x50c5725949a6f0c72e6c4a641f24049a917db0cb': { symbol: 'DAI', decimals: 18, priceUsd: 1.0 },
     '0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca': { symbol: 'USDbC', decimals: 6, priceUsd: 1.0 },
+    '0xfde4c96c8593536e31f229ea8f37b2ada2699bb2': { symbol: 'USDT', decimals: 6, priceUsd: 1.0 },
+    '0x0b3e328455822223971387461073df58222bc358': { symbol: 'cbBTC', decimals: 8, priceUsd: 95000 },
 };
 
 const PAYLOAD_TYPE_MAP: Record<string, string> = {
