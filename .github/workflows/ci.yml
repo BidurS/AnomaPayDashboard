@@ -58,6 +58,8 @@ jobs:
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: 42c476d8a29ee057dcd5c410fc8300f7
           command: pages deploy frontend/dist --project-name anomapay-explorer
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 42c476d8a29ee057dcd5c410fc8300f7
