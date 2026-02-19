@@ -194,6 +194,14 @@ app.get('/api/payload-stats', (c) => {
   return withCache(c.req.raw, 300, () => statsController.handleGetPayloadStats(createDb(c.env.DB), cid.data, corsHeaders));
 });
 
+app.get('/api/resource-churn', (c) => {
+  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId') || null);
+  if (!cid.success) return cid.response;
+  const d = parseQueryParam(daysSchema, c.req.query('days') || null);
+  if (!d.success) return d.response;
+  return withCache(c.req.raw, 300, () => statsController.handleGetResourceChurn(createDb(c.env.DB), cid.data, d.data, corsHeaders));
+});
+
 app.get('/api/transactions', (c) => {
   const url = new URL(c.req.url);
   // Cache paginated searches for 15 seconds to prevent DB spam

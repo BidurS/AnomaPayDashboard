@@ -141,6 +141,12 @@ export interface SystemStatus {
     timestamp: string
 }
 
+export interface ResourceChurn {
+    date: string
+    commitments: number
+    pool_size: number
+}
+
 // =============================================================
 //  Hooks (TanStack Query)
 // =============================================================
@@ -235,6 +241,20 @@ export function useDailyStats(chainId: number, days = 7) {
     });
 
     return { dailyStats: dailyStats || [], loading: isLoading };
+}
+
+export function useResourceChurn(chainId: number, days = 7) {
+    const { data: churn, isLoading } = useQuery({
+        queryKey: ['resourceChurn', chainId, days],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/resource-churn?chainId=${chainId}&days=${days}`);
+            return res.json() as Promise<ResourceChurn[]>;
+        },
+        refetchInterval: 120000,
+        staleTime: 60000,
+    });
+
+    return { churn: churn || [], loading: isLoading };
 }
 
 export function useAssets(chainId: number) {

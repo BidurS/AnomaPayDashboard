@@ -7,16 +7,18 @@ export async function handleGetStats(db: DB, chainId: number, headers: any) {
     const dayAgo = now - 86400;
     const weekAgo = now - (86400 * 7);
 
-    // 1. All-Time Stats from Aggregated Table (Future Proof)
-    const [dailyAgg] = await db.select({
-        totalVolumeCents: sql<number>`SUM(CAST(${schema.dailyStats.totalVolume} AS NUMERIC))`,
-        totalIntents: sql<number>`SUM(${schema.dailyStats.intentCount})`,
-        avgSolvers: sql<number>`AVG(${schema.dailyStats.uniqueSolvers})`
-    }).from(schema.dailyStats).where(eq(schema.dailyStats.chainId, chainId));
+    // Helper for robust volume calculation
+    const volumeSql = sql<number>`SUM(
+        CASE 
+            WHEN ${schema.tokenTransfers.amountUsd} > 0 THEN ${schema.tokenTransfers.amountUsd}
+            WHEN ${schema.tokenTransfers.tokenSymbol} IN ('USDC', 'USDT', 'DAI', 'USDbC') THEN ${schema.tokenTransfers.amountDisplay}
+            ELSE 0 
+        END
+    )`;
 
-    // 2. Fresh All-Time Totals (for validation/testing phase)
+    // 1. All-Time Stats
     const [tokenVolAllTime] = await db.select({
-        total: sql<number>`COALESCE(SUM(${schema.tokenTransfers.amountUsd}), 0)`
+        total: sql<number>`COALESCE(${volumeSql}, 0)`
     }).from(schema.tokenTransfers).where(eq(schema.tokenTransfers.chainId, chainId));
 
     const [ethAllTime] = await db.select({
@@ -25,7 +27,7 @@ export async function handleGetStats(db: DB, chainId: number, headers: any) {
         uniqueSolvers: sql<number>`COUNT(DISTINCT ${schema.events.solverAddress})`
     }).from(schema.events).where(eq(schema.events.chainId, chainId));
 
-    // 3. 24h Fresh Stats
+    // 2. 24h Stats
     const [dayQuery] = await db.select({
         intentCount: sql<number>`COUNT(*)`,
         ethValueProcessed: sql<string>`COALESCE(SUM(CAST(${schema.events.valueWei} AS NUMERIC)), '0')`
@@ -35,15 +37,15 @@ export async function handleGetStats(db: DB, chainId: number, headers: any) {
     ));
 
     const [tokenVolDay] = await db.select({
-        total: sql<number>`COALESCE(SUM(${schema.tokenTransfers.amountUsd}), 0)`
+        total: sql<number>`COALESCE(${volumeSql}, 0)`
     }).from(schema.tokenTransfers).where(and(
         eq(schema.tokenTransfers.chainId, chainId),
         gte(schema.tokenTransfers.timestamp, dayAgo)
     ));
 
-    // 4. 7d Fresh Stats
+    // 3. 7d Stats
     const [tokenVolWeek] = await db.select({
-        total: sql<number>`COALESCE(SUM(${schema.tokenTransfers.amountUsd}), 0)`
+        total: sql<number>`COALESCE(${volumeSql}, 0)`
     }).from(schema.tokenTransfers).where(and(
         eq(schema.tokenTransfers.chainId, chainId),
         gte(schema.tokenTransfers.timestamp, weekAgo)
@@ -54,20 +56,14 @@ export async function handleGetStats(db: DB, chainId: number, headers: any) {
     const allTimeEthUsd = (BigInt(ethAllTime?.ethValueProcessed || '0') * BigInt(ethPrice)) / (10n ** 18n);
     const dayEthUsd = (BigInt(dayQuery?.ethValueProcessed || '0') * BigInt(ethPrice)) / (10n ** 18n);
 
-    // Final Volume Calculation
-    // We favor the direct SUM during early phases for accuracy, but dailyAgg is there for scale.
-    const totalVolume = (tokenVolAllTime?.total || 0) + Number(allTimeEthUsd);
-    const volume24h = (tokenVolDay?.total || 0) + Number(dayEthUsd);
-    const volume7d = (tokenVolWeek?.total || 0) + (totalVolume * 0.15); // Rough estimation for 7d ETH
-
     return new Response(JSON.stringify({
-        totalVolume,
-        volume24h,
-        volume7d,
+        totalVolume: (tokenVolAllTime?.total || 0) + Number(allTimeEthUsd),
+        volume24h: (tokenVolDay?.total || 0) + Number(dayEthUsd),
+        volume7d: (tokenVolWeek?.total || 0) + (Number(allTimeEthUsd) * 0.1), // Estimated
         intentCount: ethAllTime?.intentCount || 0,
         intentCount24h: dayQuery?.intentCount || 0,
         uniqueSolvers: ethAllTime?.uniqueSolvers || 0,
-        totalGasUsed: 0, // Simplified
+        totalGasUsed: 0,
     }), { headers });
 }
 
@@ -75,13 +71,27 @@ export async function handleGetDailyStats(db: DB, chainId: number, days: number,
     const results = await db.select({
         date: schema.dailyStats.date,
         count: schema.dailyStats.intentCount,
-        volume: schema.dailyStats.totalVolume,
+        // Convert cents back to dollars for the chart
+        volume: sql<number>`CAST(${schema.dailyStats.totalVolume} AS NUMERIC) / 100`,
         unique_solvers: schema.dailyStats.uniqueSolvers,
         total_gas_used: schema.dailyStats.totalGasUsed,
-        gas_saved: schema.dailyStats.gasSaved
     }).from(schema.dailyStats)
         .where(eq(schema.dailyStats.chainId, chainId))
         .orderBy(desc(schema.dailyStats.date))
+        .limit(days);
+
+    return new Response(JSON.stringify(results.reverse()), { headers });
+}
+
+export async function handleGetResourceChurn(db: DB, chainId: number, days: number, headers: any) {
+    const results = await db.select({
+        date: sql<string>`DATE(${schema.privacyStates.timestamp}, "unixepoch")`,
+        commitments: sql<number>`COUNT(*)`,
+        pool_size: sql<number>`MAX(${schema.privacyStates.estimatedPoolSize})`
+    }).from(schema.privacyStates)
+        .where(eq(schema.privacyStates.chainId, chainId))
+        .groupBy(sql`DATE(${schema.privacyStates.timestamp}, "unixepoch")`)
+        .orderBy(desc(sql`DATE(${schema.privacyStates.timestamp}, "unixepoch")`))
         .limit(days);
 
     return new Response(JSON.stringify(results.reverse()), { headers });

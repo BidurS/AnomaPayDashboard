@@ -53,7 +53,6 @@ async function fetchTokenMetadata(chain: ChainConfig, tokenAddress: string): Pro
     if (TOKEN_CACHE.has(tokenAddress)) return TOKEN_CACHE.get(tokenAddress)!;
 
     try {
-        // Parallel fetch for symbol (0x95d89b41) and decimals (0x313ce567)
         const [symbolHex, decimalsHex] = await Promise.all([
             rpcRequest(chain.rpcUrl, 'eth_call', [{ to: tokenAddress, data: '0x95d89b41' }, 'latest']).catch(() => null),
             rpcRequest(chain.rpcUrl, 'eth_call', [{ to: tokenAddress, data: '0x313ce567' }, 'latest']).catch(() => null)
@@ -62,20 +61,30 @@ async function fetchTokenMetadata(chain: ChainConfig, tokenAddress: string): Pro
         let symbol = 'UNKNOWN';
         if (symbolHex && symbolHex !== '0x') {
             try {
-                // Remove '0x', decode hex to string, filter control chars
                 const hex = symbolHex.replace(/^0x/, '');
                 let str = '';
                 for (let i = 0; i < hex.length; i += 2) {
                     const code = parseInt(hex.substr(i, 2), 16);
                     if (code > 31 && code < 127) str += String.fromCharCode(code);
                 }
-                // Cleanup partial decoding if bytes32 padded
                 symbol = str.replace(/[^A-Za-z0-9]/g, '').slice(0, 10) || 'UNKNOWN';
             } catch (e) { }
         }
 
         const decimals = decimalsHex ? parseInt(decimalsHex, 16) : 18;
-        const metadata = { symbol, decimals, priceUsd: 0 };
+        
+        // AUTOMATIC RECOGNITION LOGIC
+        let priceUsd = 0;
+        const s = symbol.toUpperCase();
+        if (s.includes('USD') || s.includes('DAI') || s.includes('USDT') || s.includes('USDC')) {
+            priceUsd = 1.0;
+        } else if (s.includes('ETH') || s.includes('WETH')) {
+            priceUsd = 2600.0; // Fallback ETH price
+        } else if (s.includes('BTC')) {
+            priceUsd = 95000.0; // Fallback BTC price
+        }
+
+        const metadata = { symbol, decimals, priceUsd };
         TOKEN_CACHE.set(tokenAddress, metadata);
         return metadata;
     } catch (e) {
