@@ -1,0 +1,379 @@
+import { useState, useCallback, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Shield, Zap, Layers, ChevronDown, Activity, Database, Clock, Users, Lock, Code, BarChart3, Globe, Copy, Check, Link, Search, ThumbsUp, ThumbsDown } from 'lucide-react'
+import { SEO } from './SEO'
+
+interface FAQItem {
+    q: string
+    a: string
+    icon: any
+    category: string
+    id: string
+}
+
+const FAQ_ITEMS: FAQItem[] = [
+    {
+        id: "platform-intro",
+        q: "What is Gnoma Explorer?",
+        a: "Gnoma Explorer is a real-time analytics dashboard for the Anoma Protocol Adapter on Base. It provides deep visibility into intent resolution, solver performance, privacy pool activity, and token flows — all indexed directly from the blockchain and updated automatically every 5 minutes.",
+        icon: Zap,
+        category: "Platform"
+    },
+    {
+        id: "data-source",
+        q: "Where does the data come from?",
+        a: "All data is sourced from the Base blockchain via the Blockscout API. Our automated indexer fetches the latest transactions, event logs, and token transfers from the Anoma Protocol Adapter contract every 5 minutes. There is no centralized database or manual data entry — everything is derived directly from on-chain activity.",
+        icon: Database,
+        category: "Platform"
+    },
+    {
+        id: "update-frequency",
+        q: "How often is data updated?",
+        a: "The indexer runs on a 5-minute cron schedule. New transactions confirmed on Base appear in the dashboard within 5 minutes. The system also processes historical blocks, so if there's ever a brief outage, it automatically catches up on the next cycle.",
+        icon: Clock,
+        category: "Platform"
+    },
+    {
+        id: "intent-satisfaction",
+        q: "What is 'Intent Satisfaction Index'?",
+        a: "This is a composite score reflecting the total number of intents that have been fully resolved with user constraints met. Each TransactionExecuted event on-chain represents a successfully settled intent. The index serves as a heartbeat for the protocol's utility and grows as more intents are processed by solvers.",
+        icon: Activity,
+        category: "Metrics"
+    },
+    {
+        id: "settled-value",
+        q: "How is 'Settled USD Value' calculated?",
+        a: "Settled USD Value tracks the real economic value of all intents successfully settled by solvers. We calculate this by analyzing token transfers associated with each transaction and applying precise pricing: USDC at $1.00, WETH at current market price, DAI at $1.00, and USDbC at $1.00. This avoids inflation from counting raw ETH value and provides a true 'Settled Value' figure.",
+        icon: Layers,
+        category: "Metrics"
+    },
+    {
+        id: "total-value-shielded",
+        q: "What is 'Total Value Shielded'?",
+        a: "This represents the net flow (Inflows minus Outflows) of assets moving through the Anoma protocol. A positive number indicates accumulation of privacy-shielded liquidity. We track both inflows (tokens sent to the contract) and outflows (tokens sent from the contract) to compute the net shielded amount.",
+        icon: Shield,
+        category: "Metrics"
+    },
+    {
+        id: "privacy-pulse",
+        q: "What does the 'Privacy Pulse' track?",
+        a: "The Privacy Pulse section visualizes CommitmentTreeRootAdded events — each representing a new Merkle tree root committed to the privacy pool. The growing count shows the protocol's shielded set expanding over time, strengthening privacy guarantees for all participants.",
+        icon: Lock,
+        category: "Metrics"
+    },
+    {
+        id: "solver-definition",
+        q: "What is a Solver?",
+        a: "In the Anoma protocol, solvers are specialized actors who find optimal execution paths for user intents. When a user submits an intent (e.g., 'swap X for Y at the best rate'), solvers compete to fulfill it. The Solver Leaderboard ranks them by transaction count, gas efficiency, and total value processed.",
+        icon: Users,
+        category: "Solvers"
+    },
+    {
+        id: "intent-mastery",
+        q: "What is 'Intent Mastery Score'?",
+        a: "Intent Mastery is a composite ranking metric combining a solver's transaction volume weight with their activity count. It's calculated as: (Total Value Processed in ETH + Transaction Count × 2) / 10. This rewards both high-value and high-frequency solvers, giving a balanced view of solver effectiveness.",
+        icon: BarChart3,
+        category: "Solvers"
+    },
+    {
+        id: "indexed-events",
+        q: "Which events does Gnoma index?",
+        a: "Gnoma indexes all 8 event types emitted by the Anoma Protocol Adapter: TransactionExecuted (settled intents), CommitmentTreeRootAdded (privacy pool updates), ActionExecuted, DiscoveryPayload, ResourcePayload, ExternalPayload, ApplicationPayload, and ForwarderCallExecuted. All events are decoded and categorized for you.",
+        icon: Code,
+        category: "Technical"
+    },
+    {
+        id: "hex-decoder",
+        q: "What is the Hex Decoder?",
+        a: "The Hex Decoder is a built-in tool on each transaction detail page that lets you inspect raw payload data in three views: Raw Hex (the original on-chain bytes), UTF-8 Decoded (human-readable text), and JSON Parsed (structured data). This is essential for developers analyzing intent payloads.",
+        icon: Code,
+        category: "Technical"
+    },
+    {
+        id: "blockchain-support",
+        q: "What blockchain does Gnoma support?",
+        a: "Gnoma Explorer natively supports **Base**, **Ethereum Mainnet**, **Optimism**, and **Arbitrum One**. You can easily switch between networks using the chain selector in the top navigation bar. The architecture is designed to be chain-agnostic, allowing us to rapidly onboard new EVM-compatible networks as the Anoma ecosystem expands.",
+        icon: Globe,
+        category: "Technical"
+    },
+]
+
+const CATEGORIES = ['Platform', 'Metrics', 'Solvers', 'Technical']
+
+const CONTRACTS = [
+    { name: "Anoma Adapter (Base)", address: "0x9ED43C229480659bF6B6607C46d7B96c6D760cBB", type: "Core", explorerUrl: "https://basescan.org/address/" },
+    { name: "Anoma Adapter (ETH)", address: "0x46E622226F93Ed52C584F3f66135CD06AF01c86c", type: "Core", explorerUrl: "https://etherscan.io/address/" },
+    { name: "Anoma Adapter (OP)", address: "0x094FCC095323080e71a037b2B1e3519c07dd84F8", type: "Core", explorerUrl: "https://optimistic.etherscan.io/address/" },
+    { name: "Anoma Adapter (ARB)", address: "0x6d0A05E3535bd4D2C32AaD37FFB28fd0E1e528c3", type: "Core", explorerUrl: "https://arbiscan.io/address/" },
+    { name: "Shielded Pool", address: "0x990c1773c28b985c2cf32c0a920192bd8717c871", type: "Core", explorerUrl: "https://basescan.org/address/" },
+    { name: "USDC", address: "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913", type: "Asset", explorerUrl: "https://basescan.org/address/" },
+    { name: "WETH", address: "0x4200000000000000000000000000000000000006", type: "Asset", explorerUrl: "https://basescan.org/address/" },
+    { name: "DAI", address: "0x50c5725949a6f0c72e6c4a641f24049a917db0cb", type: "Asset", explorerUrl: "https://basescan.org/address/" },
+    { name: "USDbC", address: "0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca", type: "Asset", explorerUrl: "https://basescan.org/address/" },
+]
+
+function AccordionItem({ item, isOpen, onToggle, index }: { item: FAQItem; isOpen: boolean; onToggle: () => void; index: number }) {
+    const Icon = item.icon
+    const [feedback, setFeedback] = useState<'neutral' | 'helpful' | 'unhelpful'>('neutral')
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.04 }}
+            className={`border-b border-gray-100 dark:border-gray-800 last:border-0 ${isOpen ? 'bg-gray-50 dark:bg-zinc-900/50' : ''}`}
+        >
+            <button
+                onClick={onToggle}
+                className="w-full flex items-start sm:items-center gap-4 py-5 text-left group px-4"
+            >
+                <div className={`p-2 rounded-lg transition-all duration-300 shrink-0 mt-0.5 sm:mt-0 ${isOpen
+                    ? 'bg-[#FF0000] text-white'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 group-hover:bg-[#FF0000]/10 group-hover:text-[#FF0000]'
+                    }`}>
+                    <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                </div>
+                <div className="flex-1 min-w-0 pr-2">
+                    <h3 className={`text-sm sm:text-base font-bold leading-snug transition-colors duration-200 ${isOpen ? 'text-black dark:text-white' : 'text-gray-900 dark:text-gray-200 group-hover:text-[#FF0000]'}`}>
+                        {item.q}
+                    </h3>
+                </div>
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300 shrink-0 ${isOpen
+                    ? 'rotate-180 text-[#FF0000]'
+                    : 'text-gray-400 group-hover:text-[#FF0000]'
+                    }`}>
+                    <ChevronDown className="w-4 h-4" />
+                </div>
+            </button>
+
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                    >
+                        <div className="px-4 pb-6 ml-14">
+                            <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm mb-4">
+                                {item.a}
+                            </p>
+
+                            {/* Feedback */}
+                            <div className="flex items-center gap-3 text-xs">
+                                <span className="text-gray-400 font-mono uppercase tracking-wider">Did this help?</span>
+                                <button
+                                    onClick={() => setFeedback('helpful')}
+                                    className={`flex items-center gap-1.5 px-2 py-1 rounded transition-colors ${feedback === 'helpful' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                                >
+                                    <ThumbsUp className="w-3 h-3" /> Yes
+                                </button>
+                                <button
+                                    onClick={() => setFeedback('unhelpful')}
+                                    className={`flex items-center gap-1.5 px-2 py-1 rounded transition-colors ${feedback === 'unhelpful' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                                >
+                                    <ThumbsDown className="w-3 h-3" /> No
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
+    )
+}
+
+export function FAQ() {
+    const [openItem, setOpenItem] = useState<string | null>(null)
+    const [activeCategory, setActiveCategory] = useState<string>('all')
+    const [searchQuery, setSearchQuery] = useState('')
+    const [copiedAddress, setCopiedAddress] = useState<string | null>(null)
+
+    const copyToClipboard = useCallback(async (text: string) => {
+        try {
+            await navigator.clipboard.writeText(text)
+            setCopiedAddress(text)
+            setTimeout(() => setCopiedAddress(null), 2000)
+        } catch (err) {
+            console.error('Failed to copy text: ', err)
+        }
+    }, [])
+
+    const filteredItems = useMemo(() => {
+        return FAQ_ITEMS.filter(item => {
+            const matchesCategory = activeCategory === 'all' || item.category === activeCategory
+            const matchesSearch = item.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                item.a.toLowerCase().includes(searchQuery.toLowerCase())
+            return matchesCategory && matchesSearch
+        })
+    }, [activeCategory, searchQuery])
+
+    return (
+        <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto min-h-screen bg-white dark:bg-black">
+            <SEO title="FAQ" description="Frequently asked questions about Gnoma Explorer and the Anoma Protocol." />
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                {/* Sidebar - Sticky on Desktop, Static on Mobile */}
+                <div className="lg:col-span-4 lg:sticky lg:top-32 lg:self-start space-y-8">
+                    <div>
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#FF0000]/5 border border-[#FF0000]/10 rounded-full mb-6">
+                            <span className="w-2 h-2 rounded-full bg-[#FF0000] animate-pulse" />
+                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#FF0000]">
+                                Knowledge Base
+                            </span>
+                        </div>
+                        <h2 className="text-4xl md:text-5xl font-extrabold tracking-tighter text-black dark:text-white mb-4 leading-[0.9]">
+                            Protocol<br />Dynamics
+                        </h2>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed max-w-sm">
+                            Deep dive into the mechanics of the Anoma Protocol Adapter. Search below or browse by category.
+                        </p>
+                    </div>
+
+                    {/* Search Bar */}
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search questions..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-none focus:outline-none focus:border-[#FF0000] dark:focus:border-[#FF0000] focus:ring-1 focus:ring-[#FF0000] transition-colors text-sm font-medium"
+                        />
+                    </div>
+
+                    {/* Desktop Navigation */}
+                    <nav className="hidden lg:flex flex-col gap-1">
+                        <button
+                            onClick={() => { setActiveCategory('all'); setOpenItem(null) }}
+                            className={`text-left px-4 py-2 border-l-2 transition-all text-sm font-bold uppercase tracking-wider ${activeCategory === 'all'
+                                ? 'border-[#FF0000] text-black dark:text-white pl-6'
+                                : 'border-transparent text-gray-400 hover:text-black dark:hover:text-white pl-4'
+                                }`}
+                        >
+                            All Questions
+                        </button>
+                        {CATEGORIES.map(cat => (
+                            <button
+                                key={cat}
+                                onClick={() => { setActiveCategory(cat); setOpenItem(null) }}
+                                className={`text-left px-4 py-2 border-l-2 transition-all text-sm font-bold uppercase tracking-wider ${activeCategory === cat
+                                    ? 'border-[#FF0000] text-black dark:text-white pl-6'
+                                    : 'border-transparent text-gray-400 hover:text-black dark:hover:text-white pl-4'
+                                    }`}
+                            >
+                                {cat}
+                            </button>
+                        ))}
+                    </nav>
+
+                    {/* Mobile Navigation Tabs */}
+                    <div className="lg:hidden flex overflow-x-auto pb-4 gap-2 no-scrollbar">
+                        <button
+                            onClick={() => { setActiveCategory('all'); setOpenItem(null) }}
+                            className={`whitespace-nowrap px-4 py-2 text-xs font-bold uppercase tracking-wider border ${activeCategory === 'all'
+                                ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white'
+                                : 'text-gray-500 border-gray-200 dark:border-zinc-800'
+                                }`}
+                        >
+                            All
+                        </button>
+                        {CATEGORIES.map(cat => (
+                            <button
+                                key={cat}
+                                onClick={() => { setActiveCategory(cat); setOpenItem(null) }}
+                                className={`whitespace-nowrap px-4 py-2 text-xs font-bold uppercase tracking-wider border ${activeCategory === cat
+                                    ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white'
+                                    : 'text-gray-500 border-gray-200 dark:border-zinc-800'
+                                    }`}
+                            >
+                                {cat}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Main Content Area */}
+                <div className="lg:col-span-8">
+                    <div className="swiss-border bg-white dark:bg-black p-0 min-h-[400px]">
+                        {filteredItems.length > 0 ? (
+                            filteredItems.map((item, i) => (
+                                <AccordionItem
+                                    key={item.id}
+                                    item={item}
+                                    isOpen={openItem === item.id}
+                                    onToggle={() => setOpenItem(openItem === item.id ? null : item.id)}
+                                    index={i}
+                                />
+                            ))
+                        ) : (
+                            <div className="py-20 text-center text-gray-400">
+                                <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                                <p className="uppercase text-sm tracking-widest">No results found for "{searchQuery}"</p>
+                                <button
+                                    onClick={() => setSearchQuery('')}
+                                    className="mt-4 text-[#FF0000] text-xs font-bold uppercase hover:underline"
+                                >
+                                    Clear Search
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Contract Addresses Section */}
+                    <div className="mt-20 border-t border-black dark:border-white pt-10">
+                        <div className="flex items-center justify-between mb-8">
+                            <h3 className="text-xl font-bold uppercase tracking-tight text-black dark:text-white">
+                                Smart Contracts
+                            </h3>
+                            <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-blue-50 border border-blue-200 rounded text-blue-700">
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                                <span className="text-[10px] font-bold uppercase tracking-wider">Verified</span>
+                            </div>
+                        </div>
+
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {CONTRACTS.map((c, i) => (
+                                <div key={i} className="group p-4 border border-gray-200 dark:border-zinc-800 hover:border-black dark:hover:border-white transition-colors">
+                                    <div className="flex items-start justify-between mb-3">
+                                        <div>
+                                            <h4 className="font-bold text-sm text-gray-900 dark:text-white">{c.name}</h4>
+                                            <span className="text-[10px] font-mono text-gray-500 uppercase">{c.type}</span>
+                                        </div>
+                                        <a
+                                            href={`${c.explorerUrl}${c.address}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-gray-400 hover:text-blue-500 transition-colors"
+                                        >
+                                            <Link className="w-4 h-4" />
+                                        </a>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex-1 font-mono text-xs text-gray-600 dark:text-gray-400 truncate bg-gray-50 dark:bg-zinc-900 p-2">
+                                            {c.address}
+                                        </div>
+                                        <button
+                                            onClick={() => copyToClipboard(c.address)}
+                                            className="p-2 hover:text-[#FF0000] transition-colors"
+                                        >
+                                            {copiedAddress === c.address ? (
+                                                <Check className="w-4 h-4 text-green-500" />
+                                            ) : (
+                                                <Copy className="w-4 h-4" />
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    )
+}
+// Updated: 2026-02-19 Mobile Responsiveness Polish

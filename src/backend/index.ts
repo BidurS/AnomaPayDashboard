@@ -22,8 +22,16 @@ export interface Env {
 
 const app = new Hono<{ Bindings: Env }>();
 
-// Middleware: CORS
-app.use('/*', cors());
+// Middleware: CORS - Restrict to prevent unauthorized API consumption
+app.use('/*', cors({
+  origin: (origin) => {
+    // Allow local development and the specific production domain
+    if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1') || origin === 'https://anomapay-explorer.pages.dev' || origin.endsWith('.anomapay-explorer.pages.dev')) {
+      return origin;
+    }
+    return 'https://anomapay-explorer.pages.dev';
+  },
+}));
 
 // Middleware: Global Error Handler
 app.onError(async (err, c) => {
@@ -145,7 +153,7 @@ app.get('/api/stats', (c) => {
 app.get('/api/latest-transactions', (c) => {
   const cid = parseQueryParam(chainIdSchema, c.req.query('chainId') || null);
   if (!cid.success) return cid.response;
-  return withCache(c.req.raw, 5, () => transactionController.handleGetLatestTransactions(createDb(c.env.DB), cid.data, corsHeaders));
+  return withCache(c.req.raw, 10, () => transactionController.handleGetLatestTransactions(createDb(c.env.DB), cid.data, corsHeaders));
 });
 
 app.get('/api/solvers', (c) => {
@@ -188,12 +196,13 @@ app.get('/api/payload-stats', (c) => {
 
 app.get('/api/transactions', (c) => {
   const url = new URL(c.req.url);
-  return transactionController.handleGetTransactions(createDb(c.env.DB), url.searchParams, corsHeaders);
+  // Cache paginated searches for 15 seconds to prevent DB spam
+  return withCache(c.req.raw, 15, () => transactionController.handleGetTransactions(createDb(c.env.DB), url.searchParams, corsHeaders));
 });
 
 app.get('/api/token-transfers', (c) => {
   const url = new URL(c.req.url);
-  return transactionController.handleGetTokenTransfers(createDb(c.env.DB), url.searchParams, corsHeaders);
+  return withCache(c.req.raw, 30, () => transactionController.handleGetTokenTransfers(createDb(c.env.DB), url.searchParams, corsHeaders));
 });
 
 app.get('/api/tx/:hash', (c) => {
@@ -201,7 +210,8 @@ app.get('/api/tx/:hash', (c) => {
   if (!cid.success) return cid.response;
   const h = parseQueryParam(txHashSchema, c.req.param('hash') || null);
   if (!h.success) return h.response;
-  return transactionController.handleGetTxDetail(createDb(c.env.DB), cid.data, h.data, corsHeaders);
+  // Cache individual transaction details for a long time (immutable)
+  return withCache(c.req.raw, 300, () => transactionController.handleGetTxDetail(createDb(c.env.DB), cid.data, h.data, corsHeaders));
 });
 
 app.get('/api/solver/:address', (c) => {
@@ -209,7 +219,8 @@ app.get('/api/solver/:address', (c) => {
   if (!cid.success) return cid.response;
   const a = parseQueryParam(addressSchema, c.req.param('address') || null);
   if (!a.success) return a.response;
-  return solverController.handleGetSolverDetail(createDb(c.env.DB), cid.data, a.data, corsHeaders);
+  // Cache solver details for 60 seconds
+  return withCache(c.req.raw, 60, () => solverController.handleGetSolverDetail(createDb(c.env.DB), cid.data, a.data, corsHeaders));
 });
 
 export default {

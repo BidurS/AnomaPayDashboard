@@ -151,7 +151,7 @@ export function useChains() {
             if (!res.ok) throw new Error('Failed to fetch chains');
             return res.json() as Promise<Chain[]>;
         },
-        staleTime: 1000 * 60 * 5, // 5 minutes
+        staleTime: 1000 * 60 * 60, // 1 hour (Chains rarely change)
     });
 
     // Fallback if API fails (optional, based on previous logic)
@@ -167,7 +167,8 @@ export function useStats(chainId: number) {
             const res = await fetch(`${API_URL}/api/stats?chainId=${chainId}`);
             return res.json() as Promise<Stats>;
         },
-        refetchInterval: 10000, // Poll every 10s
+        refetchInterval: 15000, // Poll every 15s (was 10s)
+        staleTime: 10000,
     });
 
     return { stats: stats || null, loading: isLoading, refetch };
@@ -194,7 +195,8 @@ export function useTransactions(chainId: number, searchQuery?: string, page = 1,
             return res.json();
         },
         placeholderData: keepPreviousData,
-        refetchInterval: 10000, // Poll every 10s
+        refetchInterval: 15000, // Poll every 15s (was 10s)
+        staleTime: 10000,
     });
 
     const transactions = data?.data || (Array.isArray(data) ? data : []) || [];
@@ -212,7 +214,8 @@ export function useSolvers(chainId: number) {
             const res = await fetch(`${API_URL}/api/solvers?chainId=${chainId}`);
             return res.json() as Promise<Solver[]>;
         },
-        refetchInterval: 30000,
+        refetchInterval: 60000, // Poll every 60s (was 30s)
+        staleTime: 30000,
     });
 
     return { solvers: solvers || [], loading: isLoading, refetch };
@@ -225,7 +228,8 @@ export function useDailyStats(chainId: number, days = 7) {
             const res = await fetch(`${API_URL}/api/daily-stats?chainId=${chainId}&days=${days}`);
             return res.json() as Promise<DailyStat[]>;
         },
-        refetchInterval: 60000,
+        refetchInterval: 120000, // Poll every 2 mins (was 60s)
+        staleTime: 60000,
     });
 
     return { dailyStats: dailyStats || [], loading: isLoading };
@@ -238,7 +242,8 @@ export function useAssets(chainId: number) {
             const res = await fetch(`${API_URL}/api/assets?chainId=${chainId}`);
             return res.json() as Promise<Asset[]>;
         },
-        refetchInterval: 60000,
+        refetchInterval: 120000, // Poll every 2 mins (was 60s)
+        staleTime: 60000,
     });
 
     return { assets: assets || [], loading: isLoading };
@@ -251,7 +256,8 @@ export function useNetworkHealth(chainId: number) {
             const res = await fetch(`${API_URL}/api/network-health?chainId=${chainId}`);
             return res.json() as Promise<NetworkHealth>;
         },
-        refetchInterval: 15000,
+        refetchInterval: 30000, // Poll every 30s (was 15s)
+        staleTime: 15000,
     });
 
     return { health: health || null, loading: isLoading };
@@ -264,7 +270,8 @@ export function usePayloadStats(chainId: number) {
             const res = await fetch(`${API_URL}/api/payload-stats?chainId=${chainId}`);
             return res.json() as Promise<PayloadStat[]>;
         },
-        refetchInterval: 60000,
+        refetchInterval: 120000, // Poll every 2 mins (was 60s)
+        staleTime: 60000,
     });
 
     return { stats: stats || [], loading: isLoading };
@@ -281,6 +288,7 @@ export function useTxDetail(chainId: number, txHash: string | null) {
         },
         enabled: !!txHash,
         retry: 1,
+        staleTime: 60000 * 5, // 5 minutes (Tx detail rarely changes once mined)
     });
 
     return { tx: tx || null, loading: isLoading, error: error ? error.message : null };
@@ -297,6 +305,8 @@ export function useSolverDetail(chainId: number, address: string | null) {
         },
         enabled: !!address,
         retry: 1,
+        staleTime: 30000,
+        refetchInterval: 60000, // Poll every 60s
     });
 
     return { solver: solver || null, loading: isLoading, error: error ? error.message : null };
@@ -309,7 +319,8 @@ export function useTokenTransfers(chainId: number) {
             const res = await fetch(`${API_URL}/api/token-transfers?chainId=${chainId}&limit=50`);
             return res.json() as Promise<{ data: TokenTransfer[], assetSummary: AssetSummary[] }>;
         },
-        refetchInterval: 15000,
+        refetchInterval: 30000, // Poll every 30s (was 15s)
+        staleTime: 15000,
     });
 
     return {
@@ -327,7 +338,8 @@ export function useSystemStatus(chainId: number) {
             const res = await fetch(`${API_URL}/api/health?chainId=${chainId}`);
             return res.json() as Promise<SystemStatus>;
         },
-        refetchInterval: 30000,
+        refetchInterval: 60000, // Poll every 60s (was 30s)
+        staleTime: 30000,
     });
 
     return { status: status || null, loading: isLoading };

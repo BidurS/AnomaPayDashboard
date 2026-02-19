@@ -42,7 +42,13 @@ export async function handleGetTransactions(db: DB, params: URLSearchParams, hea
         .from(schema.events)
         .where(and(...conditions));
 
-    const total = countResult?.total || 0;
+    // BROWSING CAP: If this is a general listing (no address/hash filter), 
+    // cap the browsable total to 2000. This saves DB resources.
+    // However, direct searches still query the full history.
+    let total = countResult?.total || 0;
+    if (!address && !hash && total > 2000) {
+        total = 2000;
+    }
 
     const results = await db.select({
         tx_hash: schema.events.txHash,
