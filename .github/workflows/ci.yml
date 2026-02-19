@@ -52,7 +52,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
       - name: Build Frontend
-        run: cd frontend && npm run build
+        run: cd frontend && npm ci && npm run build
 
       - name: Deploy Frontend to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
