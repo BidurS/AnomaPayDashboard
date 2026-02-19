@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion'
-import { ArrowLeft, Copy, Check, Shield, ArrowRight, Box, Activity, Network, ArrowRightLeft, Code } from 'lucide-react'
+import { ArrowLeft, Copy, Check, Shield, ArrowRight, Box, Network, ArrowRightLeft, Code } from 'lucide-react'
 import { SEO } from './SEO'
 import { HexDecoder } from './HexDecoder'
 import { ResourceScale } from './ResourceScale'
+import { RingTradeVisualizer } from './RingTradeVisualizer'
 import { useTxDetail } from '../lib/api'
 import { useChainContext } from '../context/ChainContext'
 import { shortenAddress, formatNumber, timeAgo } from '../lib/utils'
@@ -110,9 +111,9 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
                         </div>
 
                         {/* ARM Visualizer */}
-                        <ResourceScale 
-                            nullifierCount={nullifierCount} 
-                            commitmentCount={commitmentCount} 
+                        <ResourceScale
+                            nullifierCount={nullifierCount}
+                            commitmentCount={commitmentCount}
                             txHash={txHash}
                         />
 
@@ -138,38 +139,9 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
                             </div>
                         </div>
 
-                        {/* Token Transfers */}
+                        {/* Token Transfers (Ring Trade Visualizer) */}
                         {hasTokenTransfers && (
-                            <section>
-                                <div className="flex items-center gap-2 mb-4">
-                                    <Activity className="w-4 h-4" />
-                                    <h3 className="text-sm font-bold uppercase tracking-wider">Token Transfers</h3>
-                                </div>
-                                <div className="space-y-3">
-                                    {tx.tokenTransfers.map((t, i) => (
-                                        <div
-                                            key={i}
-                                            onClick={() => setInspectorData({
-                                                title: `Transfer: ${t.token_symbol || 'Unknown'}`,
-                                                data: JSON.stringify(t, null, 2)
-                                            })}
-                                            className="swiss-border p-4 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors group"
-                                        >
-                                            <div className="flex justify-between items-start mb-2">
-                                                <div className="font-bold">
-                                                    {t.amount_display?.toFixed(4)} {t.token_symbol}
-                                                </div>
-                                                <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#FF0000] transition-colors" />
-                                            </div>
-                                            <div className="flex items-center gap-2 text-[10px] font-mono text-gray-500">
-                                                <span>{shortenAddress(t.from_address)}</span>
-                                                <ArrowRight className="w-3 h-3" />
-                                                <span>{shortenAddress(t.to_address)}</span>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </section>
+                            <RingTradeVisualizer transfers={tx.tokenTransfers} />
                         )}
 
                         {/* Payloads */}
@@ -267,9 +239,9 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
                                                                 </span>
                                                                 <h4 className="font-bold text-base text-black dark:text-zinc-100">{program.name}</h4>
                                                             </div>
-                                                            <a 
-                                                                href={program.sourceUrl} 
-                                                                target="_blank" 
+                                                            <a
+                                                                href={program.sourceUrl}
+                                                                target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 onClick={(e) => e.stopPropagation()}
                                                                 className="p-2 border border-black/10 hover:bg-black hover:text-white transition-colors"

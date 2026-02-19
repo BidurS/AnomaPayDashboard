@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fetchTokenMetadata } from '../services/pricing';
 
 // Mock global fetch
+// @ts-ignore
 global.fetch = vi.fn();
 
 describe('Pricing Service', () => {
@@ -18,6 +19,7 @@ describe('Pricing Service', () => {
 
     it('should return UNKNOWN for failed RPC calls', async () => {
         // Mock fetch failure
+        // @ts-ignore
         (global.fetch as any).mockRejectedValue(new Error('RPC Error'));
 
         const meta = await fetchTokenMetadata('0x1234567890123456789012345678901234567890', 'https://dummy.rpc');
