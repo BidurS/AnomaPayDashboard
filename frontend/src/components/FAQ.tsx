@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Shield, Zap, Layers, ChevronDown, Activity, Database, Clock, Users, Lock, Code, BarChart3, Globe } from 'lucide-react'
+import { Shield, Zap, Layers, ChevronDown, Activity, Database, Clock, Users, Lock, Code, BarChart3, Globe, Copy, Check, Link, RefreshCw, LayoutDashboard } from 'lucide-react'
 import { SEO } from './SEO'
 
 interface FAQItem {
@@ -88,15 +88,15 @@ const FAQ_ITEMS: FAQItem[] = [
 const CATEGORIES = ['Platform', 'Metrics', 'Solvers', 'Technical']
 
 const CONTRACTS = [
-    { name: "Anoma Adapter (Base)", address: "0x9ED43C229480659bF6B6607C46d7B96c6D760cBB", type: "Core" },
-    { name: "Anoma Adapter (ETH)", address: "0x46E622226F93Ed52C584F3f66135CD06AF01c86c", type: "Core" },
-    { name: "Anoma Adapter (OP)", address: "0x094 FCC095323080e71a037b2B1e3519c07dd84F8", type: "Core" },
-    { name: "Anoma Adapter (ARB)", address: "0x6d0A05E3535bd4D2C32AaD37FFB28fd0E1e528c3", type: "Core" },
-    { name: "Shielded Pool", address: "0x990c1773c28b985c2cf32c0a920192bd8717c871", type: "Core" },
-    { name: "USDC", address: "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913", type: "Asset" },
-    { name: "WETH", address: "0x4200000000000000000000000000000000000006", type: "Asset" },
-    { name: "DAI", address: "0x50c5725949a6f0c72e6c4a641f24049a917db0cb", type: "Asset" },
-    { name: "USDbC", address: "0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca", type: "Asset" },
+    { name: "Anoma Adapter (Base)", address: "0x9ED43C229480659bF6B6607C46d7B96c6D760cBB", type: "Core", explorerUrl: "https://basescan.org/address/" },
+    { name: "Anoma Adapter (ETH)", address: "0x46E622226F93Ed52C584F3f66135CD06AF01c86c", type: "Core", explorerUrl: "https://etherscan.io/address/" },
+    { name: "Anoma Adapter (OP)", address: "0x094FCC095323080e71a037b2B1e3519c07dd84F8", type: "Core", explorerUrl: "https://optimistic.etherscan.io/address/" },
+    { name: "Anoma Adapter (ARB)", address: "0x6d0A05E3535bd4D2C32AaD37FFB28fd0E1e528c3", type: "Core", explorerUrl: "https://arbiscan.io/address/" },
+    { name: "Shielded Pool", address: "0x990c1773c28b985c2cf32c0a920192bd8717c871", type: "Core", explorerUrl: "https://basescan.org/address/" },
+    { name: "USDC", address: "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913", type: "Asset", explorerUrl: "https://basescan.org/address/" },
+    { name: "WETH", address: "0x4200000000000000000000000000000000000006", type: "Asset", explorerUrl: "https://basescan.org/address/" },
+    { name: "DAI", address: "0x50c5725949a6f0c72e6c4a641f24049a917db0cb", type: "Asset", explorerUrl: "https://basescan.org/address/" },
+    { name: "USDbC", address: "0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca", type: "Asset", explorerUrl: "https://basescan.org/address/" },
 ]
 
 function AccordionItem({ item, isOpen, onToggle, index }: { item: FAQItem; isOpen: boolean; onToggle: () => void; index: number }) {
@@ -107,30 +107,34 @@ function AccordionItem({ item, isOpen, onToggle, index }: { item: FAQItem; isOpe
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.04 }}
-            className={`rounded-lg transition-all duration-200 ${isOpen
-                ? 'bg-white dark:bg-gray-900 shadow-lg shadow-black/5 dark:shadow-white/5 ring-2 ring-[#FF0000]/20'
-                : 'bg-gray-50 dark:bg-gray-900/50 hover:bg-white dark:hover:bg-gray-900 hover:shadow-md'
+            className={`rounded-xl transition-all duration-300 ${isOpen
+                ? 'bg-red-50/50 dark:bg-red-950/10 shadow-sm ring-1 ring-[#FF0000]/20'
+                : 'bg-white dark:bg-gray-900 shadow-sm ring-1 ring-gray-100 dark:ring-gray-800 hover:shadow-md hover:ring-gray-200 dark:hover:ring-gray-700'
                 }`}
         >
             <button
                 onClick={onToggle}
-                className="w-full flex items-center gap-5 px-6 py-5 text-left group"
+                className="w-full flex items-center gap-5 sm:gap-6 px-6 py-5 sm:px-8 sm:py-6 text-left group"
             >
-                <div className={`p-2.5 rounded-lg transition-all duration-200 shrink-0 ${isOpen
-                    ? 'bg-[#FF0000] text-white shadow-md shadow-red-500/25'
-                    : 'bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-400 group-hover:bg-[#FF0000]/10 group-hover:text-[#FF0000]'
+                <div className={`p-3 rounded-xl transition-all duration-300 shrink-0 ${isOpen
+                    ? 'bg-[#FF0000] text-white shadow-md shadow-red-500/20'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 group-hover:bg-[#FF0000]/10 group-hover:text-[#FF0000]'
                     }`}>
-                    <Icon className="w-5 h-5" />
+                    <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-bold text-black dark:text-white leading-snug">{item.q}</h3>
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mt-0.5 block">{item.category}</span>
+                    <h3 className={`text-base sm:text-lg font-bold leading-snug transition-colors duration-200 ${isOpen ? 'text-[#FF0000] dark:text-white' : 'text-gray-900 dark:text-white group-hover:text-[#FF0000] dark:group-hover:text-red-400'}`}>
+                        {item.q}
+                    </h3>
+                    <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mt-1 block">
+                        {item.category}
+                    </span>
                 </div>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${isOpen
-                    ? 'bg-[#FF0000]/10 text-[#FF0000]'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-400'
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-300 shrink-0 ${isOpen
+                    ? 'bg-[#FF0000]/10 text-[#FF0000] rotate-180'
+                    : 'bg-gray-50 dark:bg-gray-800/50 text-gray-400 group-hover:bg-gray-100 dark:group-hover:bg-gray-700'
                     }`}>
-                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
             </button>
 
@@ -140,12 +144,14 @@ function AccordionItem({ item, isOpen, onToggle, index }: { item: FAQItem; isOpe
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25, ease: 'easeInOut' }}
+                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                         className="overflow-hidden"
                     >
-                        <div className="px-6 pb-6 pt-0">
-                            <div className="ml-[52px] pl-5 border-l-2 border-[#FF0000]/30">
-                                <p className="text-gray-600 dark:text-gray-300 leading-[1.8] text-[15px]">{item.a}</p>
+                        <div className="px-6 pb-6 pt-0 sm:px-8 sm:pb-8">
+                            <div className="ml-[52px] sm:ml-[68px] pl-5 sm:pl-6 border-l-2 border-[#FF0000]/20">
+                                <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm sm:text-base">
+                                    {item.a}
+                                </p>
                             </div>
                         </div>
                     </motion.div>
@@ -158,28 +164,39 @@ function AccordionItem({ item, isOpen, onToggle, index }: { item: FAQItem; isOpe
 export function FAQ() {
     const [openIndex, setOpenIndex] = useState<number | null>(0)
     const [activeCategory, setActiveCategory] = useState<string>('all')
+    const [copiedAddress, setCopiedAddress] = useState<string | null>(null)
+
+    const copyToClipboard = useCallback(async (text: string) => {
+        try {
+            await navigator.clipboard.writeText(text)
+            setCopiedAddress(text)
+            setTimeout(() => setCopiedAddress(null), 2000)
+        } catch (err) {
+            console.error('Failed to copy text: ', err)
+        }
+    }, [])
 
     const filteredItems = activeCategory === 'all'
         ? FAQ_ITEMS
         : FAQ_ITEMS.filter(item => item.category === activeCategory)
 
     return (
-        <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto min-h-screen">
+        <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto min-h-screen">
             <SEO title="FAQ" description="Frequently asked questions about Gnoma Explorer and the Anoma Protocol." />
 
             {/* Header */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-12 sm:mb-16 text-center"
+                className="mb-14 sm:mb-20 text-center"
             >
-                <div className="inline-flex items-center gap-3 px-4 py-2 bg-[#FF0000]/10 rounded-full mb-6">
+                <div className="inline-flex items-center gap-3 px-4 py-2 bg-[#FF0000]/5 border border-[#FF0000]/10 rounded-full mb-6">
                     <div className="w-2 h-2 rounded-full bg-[#FF0000] animate-pulse" />
                     <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#FF0000]">
                         {FAQ_ITEMS.length} Questions Answered
                     </span>
                 </div>
-                <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-black dark:text-white mb-4">
+                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-black dark:text-white mb-6">
                     Protocol FAQ
                 </h2>
                 <p className="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
@@ -187,41 +204,57 @@ export function FAQ() {
                 </p>
             </motion.div>
 
-            {/* Category Filter Pills */}
+            {/* Category Filter Tabs */}
             <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="flex flex-wrap justify-center gap-3 mb-12"
+                className="flex justify-center mb-12"
             >
-                <button
-                    onClick={() => { setActiveCategory('all'); setOpenIndex(null) }}
-                    className={`px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all rounded-full ${activeCategory === 'all'
-                        ? 'bg-black dark:bg-white text-white dark:text-black shadow-lg'
-                        : 'bg-gray-100 dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 hover:text-black dark:hover:text-white'
-                        }`}
-                >
-                    All ({FAQ_ITEMS.length})
-                </button>
-                {CATEGORIES.map(cat => {
-                    const count = FAQ_ITEMS.filter(i => i.category === cat).length
-                    return (
-                        <button
-                            key={cat}
-                            onClick={() => { setActiveCategory(cat); setOpenIndex(null) }}
-                            className={`px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all rounded-full ${activeCategory === cat
-                                ? 'bg-[#FF0000] text-white shadow-lg shadow-red-500/20'
-                                : 'bg-gray-100 dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 hover:text-black dark:hover:text-white'
-                                }`}
-                        >
-                            {cat} ({count})
-                        </button>
-                    )
-                })}
+                <div className="inline-flex flex-wrap justify-center p-1.5 bg-gray-100/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl sm:rounded-full ring-1 ring-gray-200/50 dark:ring-gray-800/50">
+                    <button
+                        onClick={() => { setActiveCategory('all'); setOpenIndex(null) }}
+                        className={`relative px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all duration-300 rounded-xl sm:rounded-full z-10 ${activeCategory === 'all'
+                            ? 'text-[#FF0000] dark:text-white'
+                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                            }`}
+                    >
+                        {activeCategory === 'all' && (
+                            <motion.div
+                                layoutId="activeTab"
+                                className="absolute inset-0 bg-white dark:bg-gray-800 rounded-xl sm:rounded-full shadow-sm ring-1 ring-black/5 dark:ring-white/10"
+                                style={{ zIndex: -1 }}
+                            />
+                        )}
+                        All ({FAQ_ITEMS.length})
+                    </button>
+                    {CATEGORIES.map(cat => {
+                        const count = FAQ_ITEMS.filter(i => i.category === cat).length
+                        return (
+                            <button
+                                key={cat}
+                                onClick={() => { setActiveCategory(cat); setOpenIndex(null) }}
+                                className={`relative px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all duration-300 rounded-xl sm:rounded-full z-10 ${activeCategory === cat
+                                    ? 'text-[#FF0000] dark:text-white'
+                                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                                    }`}
+                            >
+                                {activeCategory === cat && (
+                                    <motion.div
+                                        layoutId="activeTab"
+                                        className="absolute inset-0 bg-white dark:bg-gray-800 rounded-xl sm:rounded-full shadow-sm ring-1 ring-black/5 dark:ring-white/10"
+                                        style={{ zIndex: -1 }}
+                                    />
+                                )}
+                                {cat} ({count})
+                            </button>
+                        )
+                    })}
+                </div>
             </motion.div>
 
             {/* Accordion Q&A */}
-            <div className="space-y-3">
+            <div className="space-y-4 sm:space-y-5">
                 {filteredItems.map((item, i) => (
                     <AccordionItem
                         key={`${activeCategory}-${i}`}
@@ -238,54 +271,64 @@ export function FAQ() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="mt-20 sm:mt-24"
+                className="mt-24 sm:mt-32"
             >
-                <div className="text-center mb-8">
-                    <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black dark:text-white mb-2">
+                <div className="text-center mb-10">
+                    <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black dark:text-white mb-4">
                         Contract Addresses
                     </h3>
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 rounded-full">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-500">Multi-Chain</span>
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full">
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-500">Multi-Chain Protocol</span>
                     </div>
                 </div>
 
-                <div className="rounded-xl overflow-hidden bg-white dark:bg-gray-900 shadow-xl shadow-black/5 dark:shadow-white/5 ring-1 ring-gray-200 dark:ring-gray-800">
-                    <table className="w-full">
-                        <thead>
-                            <tr className="bg-gray-50 dark:bg-gray-800/50">
-                                <th className="px-6 py-4 text-left text-[11px] font-bold uppercase tracking-[0.15em] text-gray-500 dark:text-gray-400">Contract</th>
-                                <th className="px-6 py-4 text-left text-[11px] font-bold uppercase tracking-[0.15em] text-gray-500 dark:text-gray-400">Address</th>
-                                <th className="px-6 py-4 text-right text-[11px] font-bold uppercase tracking-[0.15em] text-gray-500 dark:text-gray-400">Type</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                            {CONTRACTS.map((c, i) => (
-                                <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
-                                    <td className="px-6 py-4 font-bold text-sm text-black dark:text-white whitespace-nowrap">{c.name}</td>
-                                    <td className="px-6 py-4">
-                                        <a
-                                            href={`https://basescan.org/address/${c.address}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="font-mono text-xs hover:text-[#FF0000] transition-colors text-gray-500 dark:text-gray-400"
-                                        >
-                                            <span className="hidden md:inline">{c.address}</span>
-                                            <span className="md:hidden">{c.address.slice(0, 8)}...{c.address.slice(-6)}</span>
-                                        </a>
-                                    </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <span className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full ${c.type === 'Core'
-                                            ? 'bg-[#FF0000]/10 text-[#FF0000]'
-                                            : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
-                                            }`}>
-                                            {c.type}
-                                        </span>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                    {CONTRACTS.map((c, i) => (
+                        <div key={i} className="group relative bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl shadow-sm ring-1 ring-gray-200 dark:ring-gray-800 hover:ring-[#FF0000]/30 dark:hover:ring-[#FF0000]/30 transition-all duration-300">
+                            <div className="flex items-start justify-between mb-4">
+                                <div>
+                                    <h4 className="font-bold text-gray-900 dark:text-white mb-1">{c.name}</h4>
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${c.type === 'Core'
+                                        ? 'bg-[#FF0000]/10 text-[#FF0000]'
+                                        : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
+                                        }`}>
+                                        {c.type}
+                                    </span>
+                                </div>
+                                <a
+                                    href={`${c.explorerUrl}${c.address}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                                    title="View on Explorer"
+                                >
+                                    <Link className="w-4 h-4" />
+                                </a>
+                            </div>
+                            
+                            <div className="flex items-center gap-2">
+                                <div className="flex-1 bg-gray-50 dark:bg-gray-800/50 px-3 py-2.5 rounded-xl font-mono text-xs sm:text-sm text-gray-600 dark:text-gray-300 truncate ring-1 ring-inset ring-gray-200/50 dark:ring-gray-700/50">
+                                    {c.address}
+                                </div>
+                                <button
+                                    onClick={() => copyToClipboard(c.address)}
+                                    className={`p-2.5 rounded-xl border transition-all duration-200 ${
+                                        copiedAddress === c.address
+                                            ? 'bg-green-50 border-green-200 text-green-600 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400'
+                                            : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:border-gray-600'
+                                    }`}
+                                    title="Copy Address"
+                                >
+                                    {copiedAddress === c.address ? (
+                                        <Check className="w-4 h-4" />
+                                    ) : (
+                                        <Copy className="w-4 h-4" />
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </motion.div>
 
@@ -294,44 +337,53 @@ export function FAQ() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="mt-16 sm:mt-20"
+                className="mt-24 sm:mt-32"
             >
-                <div className="text-center mb-10">
-                    <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black dark:text-white mb-2">
+                <div className="text-center mb-12">
+                    <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black dark:text-white mb-4">
                         How It Works
                     </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">From on-chain events to your dashboard</p>
+                    <p className="text-base text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
+                        The journey from on-chain execution to real-time analytics on your dashboard.
+                    </p>
                 </div>
 
-                <div className="grid sm:grid-cols-3 gap-6">
+                <div className="grid sm:grid-cols-3 gap-6 sm:gap-8">
                     {[
-                        { emoji: "⛓️", title: "On-Chain", desc: "Anoma Protocol Adapter emits events on supported chains for every intent settled, payload submitted, and privacy pool update." },
-                        { emoji: "🔄", title: "Indexer", desc: "Our Blockscout-powered indexer fetches and processes new transactions every 5 minutes via automated cron jobs." },
-                        { emoji: "📊", title: "Dashboard", desc: "Data is stored in Cloudflare D1 and served via edge Workers for real-time analytics with sub-100ms latency." },
-                    ].map((step, i) => (
-                        <motion.div
-                            key={i}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.5 + i * 0.1 }}
-                            className="relative text-center p-8 rounded-xl bg-white dark:bg-gray-900 shadow-lg shadow-black/5 dark:shadow-white/5 ring-1 ring-gray-200 dark:ring-gray-800 group hover:ring-[#FF0000]/30 transition-all"
-                        >
-                            {i < 2 && (
-                                <div className="hidden sm:block absolute -right-3 top-1/2 -translate-y-1/2 z-10 text-gray-300 dark:text-gray-700">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6" /></svg>
+                        { icon: Link, title: "On-Chain Events", desc: "Anoma Protocol Adapter emits events on supported chains for every intent settled, payload submitted, and privacy pool update." },
+                        { icon: RefreshCw, title: "Automated Indexer", desc: "Our Blockscout-powered indexer fetches and processes new transactions every 5 minutes via automated cron jobs." },
+                        { icon: LayoutDashboard, title: "Real-time Dashboard", desc: "Data is stored globally and served via edge Workers for real-time analytics with sub-100ms latency." },
+                    ].map((step, i) => {
+                        const StepIcon = step.icon;
+                        return (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.5 + i * 0.1 }}
+                                className="relative text-center p-8 sm:p-10 rounded-3xl bg-white dark:bg-gray-900 shadow-sm ring-1 ring-gray-200 dark:ring-gray-800 group hover:ring-[#FF0000]/30 hover:shadow-xl hover:shadow-[#FF0000]/5 dark:hover:shadow-[#FF0000]/10 transition-all duration-500"
+                            >
+                                {i < 2 && (
+                                    <div className="hidden sm:block absolute -right-4 top-1/2 -translate-y-1/2 z-10 text-gray-200 dark:text-gray-800">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="m9 18 6-6-6-6" /></svg>
+                                    </div>
+                                )}
+                                
+                                <div className="mx-auto w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-[#FF0000]/10 group-hover:text-[#FF0000] text-gray-600 dark:text-gray-300 transition-colors duration-300 ring-1 ring-inset ring-gray-200/50 dark:ring-gray-700/50">
+                                    <StepIcon className="w-8 h-8" strokeWidth={1.5} />
                                 </div>
-                            )}
-                            <div className="text-4xl mb-4">{step.emoji}</div>
-                            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full mb-3">
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Step {i + 1}</span>
-                            </div>
-                            <h4 className="text-lg font-bold text-black dark:text-white mb-2">{step.title}</h4>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{step.desc}</p>
-                        </motion.div>
-                    ))}
+                                
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100 dark:bg-gray-800/80 rounded-full mb-4 ring-1 ring-black/5 dark:ring-white/5">
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Step {i + 1}</span>
+                                </div>
+                                <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-[#FF0000] dark:group-hover:text-red-400 transition-colors">{step.title}</h4>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{step.desc}</p>
+                            </motion.div>
+                        )
+                    })}
                 </div>
             </motion.div>
         </section>
     )
 }
-// Updated: 2026-02-13 Multi-chain FAQ
+// Updated: 2026-02-19 UI Modernization & UX Polish
