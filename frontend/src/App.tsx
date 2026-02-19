@@ -22,6 +22,7 @@ import { AdminLogin } from './components/admin/AdminLogin'
 import { AdminDashboard } from './components/admin/AdminDashboard'
 import { CommandPalette } from './components/CommandPalette'
 import { ZKCircuitRegistry } from './components/ZKCircuitRegistry'
+import { MempoolPage } from './pages/MempoolPage'
 import { SEO } from './components/SEO'
 import './index.css'
 
@@ -167,6 +168,7 @@ function App() {
                   <Route path="/live" element={<LiveFeedPage />} />
                   <Route path="/solvers" element={<SolversPage />} />
                   <Route path="/transactions" element={<TransactionsPage />} />
+                  <Route path="/mempool" element={<MempoolPage />} />
                   <Route path="/faq" element={<FAQ />} />
                   <Route path="/circuits" element={<ZKCircuitRegistry />} />
 

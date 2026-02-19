@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Menu, X, Users, ArrowRightLeft, HelpCircle, Home as HomeIcon, Activity, Shield } from 'lucide-react'
+import { ChevronDown, Menu, X, Users, ArrowRightLeft, HelpCircle, Home as HomeIcon, Activity, Shield, Zap } from 'lucide-react'
 import { ThemeToggle } from './ThemeToggle'
 import { useChainContext } from '../context/ChainContext'
 import { useNavigate } from 'react-router-dom'
@@ -15,6 +15,7 @@ interface HeaderProps {
 const NAV_ITEMS = [
     { id: 'dashboard', label: 'Dashboard', icon: HomeIcon, path: '/' },
     { id: 'live', label: 'Live Feed', icon: Activity, path: '/live', isLive: true },
+    { id: 'mempool', label: 'Mempool', icon: Zap, path: '/mempool' },
     { id: 'solvers', label: 'Solvers', icon: Users, path: '/solvers' },
     { id: 'transactions', label: 'Transactions', icon: ArrowRightLeft, path: '/transactions' },
     { id: 'circuits', label: 'ZK Registry', icon: Shield, path: '/circuits' },
