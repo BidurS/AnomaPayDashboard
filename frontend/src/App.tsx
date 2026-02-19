@@ -94,8 +94,10 @@ function Layout() {
   const getView = () => {
     if (location.pathname === '/') return 'dashboard'
     if (location.pathname === '/live') return 'live'
+    if (location.pathname === '/mempool') return 'mempool'
     if (location.pathname === '/solvers' || location.pathname.startsWith('/solver/')) return 'solvers'
     if (location.pathname === '/transactions' || location.pathname.startsWith('/tx/')) return 'transactions'
+    if (location.pathname === '/circuits') return 'circuits'
     if (location.pathname === '/faq') return 'faq'
     return 'dashboard'
   }

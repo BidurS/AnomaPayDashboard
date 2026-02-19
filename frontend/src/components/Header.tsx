@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Menu, X, Users, ArrowRightLeft, HelpCircle, Home as HomeIcon, Activity, Shield, Zap } from 'lucide-react'
+import { ChevronDown, Menu, X, Users, ArrowRightLeft, HelpCircle, Home as HomeIcon, Activity, Shield, Zap, MoreHorizontal } from 'lucide-react'
 import { ThemeToggle } from './ThemeToggle'
 import { useChainContext } from '../context/ChainContext'
 import { useNavigate } from 'react-router-dom'
@@ -12,12 +12,15 @@ interface HeaderProps {
     onOpenPalette?: () => void
 }
 
-const NAV_ITEMS = [
+const MAIN_NAV = [
     { id: 'dashboard', label: 'Dashboard', icon: HomeIcon, path: '/' },
-    { id: 'live', label: 'Live Feed', icon: Activity, path: '/live', isLive: true },
-    { id: 'mempool', label: 'Mempool', icon: Zap, path: '/mempool' },
+    { id: 'mempool', label: 'Mempool', icon: Zap, path: '/mempool', isLive: true },
     { id: 'solvers', label: 'Solvers', icon: Users, path: '/solvers' },
     { id: 'transactions', label: 'Transactions', icon: ArrowRightLeft, path: '/transactions' },
+]
+
+const MORE_NAV = [
+    { id: 'live', label: 'Topology', icon: Activity, path: '/live', isLive: true },
     { id: 'circuits', label: 'ZK Registry', icon: Shield, path: '/circuits' },
     { id: 'faq', label: 'FAQ', icon: HelpCircle, path: '/faq' },
 ]
@@ -27,6 +30,7 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
     const navigate = useNavigate()
     const [isChainOpen, setIsChainOpen] = useState(false)
     const [isMobileOpen, setIsMobileOpen] = useState(false)
+    const [isMoreOpen, setIsMoreOpen] = useState(false)
     const [searchValue, setSearchValue] = useState('')
     const hasMultipleChains = chains.length > 1
 
@@ -60,8 +64,8 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
                     </div>
 
                     {/* Desktop Navigation */}
-                    <nav className="hidden lg:flex items-center gap-2 shrink-0">
-                        {NAV_ITEMS.map((item) => {
+                    <nav className="hidden xl:flex items-center gap-2 shrink-0">
+                        {MAIN_NAV.map((item) => {
                             const Icon = item.icon
                             const isActive = currentView === item.id
                             return (
@@ -69,7 +73,7 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
                                     key={item.id}
                                     onClick={() => handleNavigate(item.path)}
                                     className={cn(
-                                        "relative px-6 py-3 text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2.5 group",
+                                        "relative px-4 py-3 text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 group",
                                         isActive
                                             ? "text-[#FF0000]"
                                             : "text-gray-500 dark:text-zinc-500 hover:text-black dark:hover:text-zinc-200"
@@ -90,6 +94,65 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
                                 </button>
                             )
                         })}
+
+                        {/* More Dropdown */}
+                        <div className="relative" onMouseLeave={() => setIsMoreOpen(false)}>
+                            <button
+                                onMouseEnter={() => setIsMoreOpen(true)}
+                                onClick={() => setIsMoreOpen(!isMoreOpen)}
+                                className={cn(
+                                    "relative px-4 py-3 text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 group",
+                                    MORE_NAV.some(i => i.id === currentView) ? "text-[#FF0000]" : "text-gray-500 dark:text-zinc-500 hover:text-black dark:hover:text-zinc-200"
+                                )}
+                            >
+                                <MoreHorizontal className="w-3.5 h-3.5" />
+                                <span>More</span>
+                                {MORE_NAV.some(i => i.id === currentView) && (
+                                    <motion.div
+                                        layoutId="nav-underline"
+                                        className="absolute bottom-0 left-2 right-2 h-[3px] bg-[#FF0000]"
+                                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                                    />
+                                )}
+                            </button>
+
+                            <AnimatePresence>
+                                {isMoreOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 8 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 8 }}
+                                        transition={{ duration: 0.15 }}
+                                        className="absolute right-0 mt-0 w-48 bg-white dark:bg-black border-2 border-black dark:border-white/20 shadow-[4px_4px_0_#000] dark:shadow-[4px_4px_0_#fff] z-50 py-1"
+                                    >
+                                        {MORE_NAV.map((item) => {
+                                            const Icon = item.icon
+                                            const isActive = currentView === item.id
+                                            return (
+                                                <button
+                                                    key={item.id}
+                                                    onClick={() => { handleNavigate(item.path); setIsMoreOpen(false) }}
+                                                    className={cn(
+                                                        "w-full px-4 py-3 flex items-center justify-between text-left text-xs font-bold uppercase tracking-wider transition-colors",
+                                                        isActive
+                                                            ? "bg-red-50 dark:bg-[#FF0000]/10 text-[#FF0000]"
+                                                            : "text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-900 hover:text-black dark:hover:text-white"
+                                                    )}
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <Icon className="w-3.5 h-3.5" />
+                                                        <span>{item.label}</span>
+                                                    </div>
+                                                    {item.isLive && (
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-[#FF0000] animate-pulse" />
+                                                    )}
+                                                </button>
+                                            )
+                                        })}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
                     </nav>
 
                     {/* Search Bar / Command Palette Trigger */}
@@ -198,7 +261,7 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
                                 </button>
                             </form>
 
-                            {NAV_ITEMS.map((item) => {
+                            {[...MAIN_NAV, ...MORE_NAV].map((item) => {
                                 const Icon = item.icon
                                 const isActive = currentView === item.id
                                 return (
@@ -206,14 +269,19 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
                                         key={item.id}
                                         onClick={() => handleNavigate(item.path)}
                                         className={cn(
-                                            "w-full flex items-center gap-3 px-4 py-3 text-sm font-bold uppercase tracking-wider transition-all",
+                                            "w-full flex items-center justify-between px-4 py-3 text-sm font-bold uppercase tracking-wider transition-all",
                                             isActive
                                                 ? "bg-[#FF0000] text-white border-l-4 border-[#FF0000]"
                                                 : "text-gray-600 dark:text-zinc-500 hover:bg-gray-100 dark:hover:bg-white/5 border-l-4 border-transparent"
                                         )}
                                     >
-                                        <Icon className="w-4 h-4" />
-                                        <span>{item.label}</span>
+                                        <div className="flex items-center gap-3">
+                                            <Icon className="w-4 h-4" />
+                                            <span>{item.label}</span>
+                                        </div>
+                                        {item.isLive && (
+                                            <span className="w-1.5 h-1.5 rounded-full bg-[#FF0000] animate-pulse" />
+                                        )}
                                     </button>
                                 )
                             })}

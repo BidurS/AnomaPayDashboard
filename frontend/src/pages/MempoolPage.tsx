@@ -100,6 +100,9 @@ export function MempoolPage() {
                     <p className="text-gray-500 uppercase tracking-widest text-sm max-w-xl leading-relaxed">
                         Live visualization of the Anoma P2P Gossip Network. Unsettled user intents stream in as "Wants vs Offers" before Solvers batch and settle them on-chain.
                     </p>
+                    <div className="mt-4 inline-block bg-[#FF0000]/10 border border-[#FF0000]/20 px-3 py-1.5 text-xs text-[#FF0000] font-bold uppercase tracking-widest">
+                        Demo Mode: Displaying Simulated Mock Data
+                    </div>
                 </div>
 
                 <div className="flex gap-4">

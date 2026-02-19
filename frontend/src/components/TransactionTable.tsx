@@ -20,7 +20,8 @@ export function TransactionTable({ searchQuery, onTxClick, onSolverClick, hideHe
     const [copiedHash, setCopiedHash] = useState<string | null>(null)
     const [hoveredRow, setHoveredRow] = useState<string | null>(null)
     // Sticky note hint to educate users that they can click elements
-    const [showClickHints, setShowClickHints] = useState(true)
+    const [showTxHint, setShowTxHint] = useState(true)
+    const [showSolverHint, setShowSolverHint] = useState(true)
 
     // Derived state for pagination/data
     const hasData = transactions.length > 0
@@ -175,7 +176,7 @@ export function TransactionTable({ searchQuery, onTxClick, onSolverClick, hideHe
                                                                 className="inline-flex items-center gap-1 font-mono-swiss text-sm font-bold text-black dark:text-zinc-200 border-b-2 border-transparent hover:border-[#FF0000] hover:text-[#FF0000] transition-colors group/link relative"
                                                                 title="View Transaction Details"
                                                             >
-                                                                {i === 0 && showClickHints && (
+                                                                {i === 0 && showTxHint && (
                                                                     <motion.div
                                                                         initial={{ opacity: 0, y: -10 }}
                                                                         animate={{ opacity: 1, y: 0 }}
@@ -183,7 +184,7 @@ export function TransactionTable({ searchQuery, onTxClick, onSolverClick, hideHe
                                                                         onClick={(e) => e.stopPropagation()}
                                                                     >
                                                                         Click to view tx
-                                                                        <button onClick={() => setShowClickHints(false)} className="hover:text-black transition-colors" title="Dismiss">
+                                                                        <button onClick={() => setShowTxHint(false)} className="hover:text-black transition-colors" title="Dismiss">
                                                                             <X className="w-3 h-3" />
                                                                         </button>
                                                                         <div className="absolute -bottom-1 left-4 w-2 h-2 bg-[#FF0000] rotate-45" />
@@ -220,7 +221,7 @@ export function TransactionTable({ searchQuery, onTxClick, onSolverClick, hideHe
                                                     className="inline-flex items-center gap-1 font-mono-swiss text-xs font-bold text-[#666] dark:text-zinc-400 bg-gray-100 dark:bg-white/5 px-2 py-1 rounded hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all group/solver relative"
                                                     title="View Solver Profile"
                                                 >
-                                                    {i === 0 && showClickHints && (
+                                                    {i === 0 && showSolverHint && (
                                                         <motion.div
                                                             initial={{ opacity: 0, y: -10 }}
                                                             animate={{ opacity: 1, y: 0 }}
@@ -229,7 +230,7 @@ export function TransactionTable({ searchQuery, onTxClick, onSolverClick, hideHe
                                                             onClick={(e) => e.stopPropagation()}
                                                         >
                                                             Click for Solver
-                                                            <button onClick={() => setShowClickHints(false)} className="hover:text-black transition-colors" title="Dismiss">
+                                                            <button onClick={() => setShowSolverHint(false)} className="hover:text-black transition-colors" title="Dismiss">
                                                                 <X className="w-3 h-3" />
                                                             </button>
                                                             <div className="absolute -bottom-1 left-4 w-2 h-2 bg-blue-500 rotate-45" />
