@@ -111,18 +111,35 @@ export async function handleGetTxDetail(db: DB, chainId: number, txHash: string,
         .where(and(eq(schema.tokenTransfers.chainId, chainId), eq(schema.tokenTransfers.txHash, txHash)));
 
     const privacyRoot = await db.select({
-        root_hash: schema.privacyPoolStats.rootHash,
-        estimated_pool_size: schema.privacyPoolStats.estimatedPoolSize
-    }).from(schema.privacyPoolStats)
+        root_hash: schema.privacyStates.rootHash,
+        estimated_pool_size: schema.privacyStates.estimatedPoolSize
+    }).from(schema.privacyStates)
         .where(and(
-            eq(schema.privacyPoolStats.chainId, chainId),
-            eq(schema.privacyPoolStats.blockNumber, event.block_number)
+            eq(schema.privacyStates.chainId, chainId),
+            eq(schema.privacyStates.blockNumber, event.block_number)
         )).get();
+
+    const forwarderCalls = await db.select({
+        untrusted_forwarder: schema.forwarderCalls.untrustedForwarder,
+        input: schema.forwarderCalls.input,
+        output: schema.forwarderCalls.output,
+        timestamp: schema.forwarderCalls.timestamp
+    }).from(schema.forwarderCalls)
+        .where(and(eq(schema.forwarderCalls.chainId, chainId), eq(schema.forwarderCalls.txHash, txHash)));
+
+    const actionEvents = await db.select({
+        action_tree_root: schema.actionEvents.actionTreeRoot,
+        action_tag_count: schema.actionEvents.actionTagCount,
+        timestamp: schema.actionEvents.timestamp
+    }).from(schema.actionEvents)
+        .where(and(eq(schema.actionEvents.chainId, chainId), eq(schema.actionEvents.txHash, txHash)));
 
     return new Response(JSON.stringify({
         ...event,
         payloads: payloads || [],
         tokenTransfers: tokenTransfers || [],
+        forwarderCalls: forwarderCalls || [],
+        actionEvents: actionEvents || [],
         privacyRoot: privacyRoot || null
     }), { headers });
 }

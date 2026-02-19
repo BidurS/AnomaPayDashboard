@@ -87,6 +87,7 @@ interface IndexerResult {
     newPayloads: number;
     newPrivacyRoots: number;
     newTokenTransfers: number;
+    newForwarderCalls: number;
     errors: string[];
     pages: number;
 }
@@ -106,7 +107,7 @@ export async function runBlockscoutIndexer(db: DB, chain: ChainConfig): Promise<
     const result: IndexerResult = {
         chainId: chain.id,
         newTransactions: 0, newPayloads: 0, newPrivacyRoots: 0,
-        newTokenTransfers: 0, errors: [], pages: 0,
+        newTokenTransfers: 0, newForwarderCalls: 0, errors: [], pages: 0,
     };
 
     const apiUrl = getBlockscoutApiUrl(chain.id);
@@ -117,14 +118,14 @@ export async function runBlockscoutIndexer(db: DB, chain: ChainConfig): Promise<
         if (newTxs.length === 0) return result;
 
         // Step 2: Fetch logs for these transactions
-        const { payloads, privacyStats } = await fetchAndProcessLogs(db, chain, apiUrl, newTxs, result);
+        const { payloads, privacyStats, forwarderCalls } = await fetchAndProcessLogs(db, chain, apiUrl, newTxs, result);
 
         // Step 3: Fetch token transfers
         const tokenTransfers = await fetchTokenTransfersForTxs(chain, apiUrl, newTxs, result);
 
         // Step 4: Insert everything into DB
         const maxBlock = Math.max(...newTxs.map(t => t.blockNumber), 0);
-        await insertData(db, chain.id, newTxs, payloads, privacyStats, tokenTransfers, result, maxBlock);
+        await insertData(db, chain.id, newTxs, payloads, privacyStats, tokenTransfers, forwarderCalls, result, maxBlock);
 
     } catch (e: any) {
         result.errors.push(`Top-level: ${e.message}`);
@@ -219,12 +220,17 @@ interface PrivacyRecord {
     chainId: number; blockNumber: number; rootHash: string;
     timestamp: number; estimatedPoolSize: number;
 }
+interface ForwarderCallRecord {
+    chainId: number; txHash: string; blockNumber: number;
+    untrustedForwarder: string; input: string; output: string; timestamp: number;
+}
 
 async function fetchAndProcessLogs(
     db: DB, chain: ChainConfig, apiUrl: string, txs: TxRecord[], result: IndexerResult
-): Promise<{ payloads: PayloadRecord[]; privacyStats: PrivacyRecord[] }> {
+): Promise<{ payloads: PayloadRecord[]; privacyStats: PrivacyRecord[]; forwarderCalls: ForwarderCallRecord[] }> {
     const payloads: PayloadRecord[] = [];
     const privacyStats: PrivacyRecord[] = [];
+    const forwarderCalls: ForwarderCallRecord[] = [];
     const txHashSet = new Set(txs.map(t => t.txHash.toLowerCase()));
     const txMap = new Map(txs.map(t => [t.txHash.toLowerCase(), t]));
 
@@ -292,6 +298,23 @@ async function fetchAndProcessLogs(
                     const logicRefs = log.decoded?.parameters?.[1]?.value || [];
                     txData.dataJson = JSON.stringify({ ...JSON.parse(txData.dataJson || '{}'), tags, logicRefs });
                 }
+
+                // Process ForwarderCallExecuted events
+                if (eventType === 'ForwarderCallExecuted') {
+                    const params = log.decoded?.parameters || [];
+                    const untrustedForwarder = params[0]?.value || '';
+                    const input = params[1]?.value || '';
+                    const outputStr = params[2]?.value || '';
+                    forwarderCalls.push({
+                        chainId: chain.id,
+                        txHash: log.transaction_hash,
+                        blockNumber,
+                        untrustedForwarder,
+                        input,
+                        output: outputStr,
+                        timestamp,
+                    });
+                }
             }
 
             nextPageParams = data.next_page_params;
@@ -304,7 +327,8 @@ async function fetchAndProcessLogs(
 
     result.newPayloads = payloads.length;
     result.newPrivacyRoots = privacyStats.length;
-    return { payloads, privacyStats };
+    result.newForwarderCalls = forwarderCalls.length;
+    return { payloads, privacyStats, forwarderCalls };
 }
 
 // ─────────────────────────────────────────────────────────
@@ -413,6 +437,7 @@ async function insertData(
     payloads: PayloadRecord[],
     privacyStats: PrivacyRecord[],
     tokenTransfers: TransferRecord[],
+    forwarderCalls: ForwarderCallRecord[],
     result: IndexerResult,
     maxBlock: number
 ) {
@@ -462,8 +487,8 @@ async function insertData(
     // 3. Privacy Stats
     if (privacyStats.length > 0) {
         const [poolQuery] = await db.select({
-            poolSize: sql<number>`MAX(${schema.privacyPoolStats.estimatedPoolSize})`
-        }).from(schema.privacyPoolStats).where(eq(schema.privacyPoolStats.chainId, chainId));
+            poolSize: sql<number>`MAX(${schema.privacyStates.estimatedPoolSize})`
+        }).from(schema.privacyStates).where(eq(schema.privacyStates.chainId, chainId));
         let poolSize = poolQuery?.poolSize || 0;
 
         privacyStats.sort((a, b) => a.blockNumber - b.blockNumber);
@@ -472,12 +497,29 @@ async function insertData(
             p.estimatedPoolSize = poolSize;
         }
 
-        batch.push(db.insert(schema.privacyPoolStats).values(privacyStats).onConflictDoNothing());
+        batch.push(db.insert(schema.privacyStates).values(privacyStats).onConflictDoNothing());
     }
 
     // 4. Token Transfers
     if (tokenTransfers.length > 0) {
         batch.push(db.insert(schema.tokenTransfers).values(tokenTransfers).onConflictDoNothing());
+    }
+
+    // 5. Forwarder Calls
+    if (forwarderCalls.length > 0) {
+        batch.push(
+            db.insert(schema.forwarderCalls).values(
+                forwarderCalls.map(f => ({
+                    chainId: f.chainId,
+                    txHash: f.txHash,
+                    blockNumber: f.blockNumber,
+                    untrustedForwarder: f.untrustedForwarder,
+                    input: f.input,
+                    output: f.output,
+                    timestamp: f.timestamp,
+                }))
+            ).onConflictDoNothing()
+        );
     }
 
     // 5. Solvers (Upsert with BigInt Safety)

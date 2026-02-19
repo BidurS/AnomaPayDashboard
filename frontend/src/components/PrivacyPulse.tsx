@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion'
 import { Shield, TrendingUp } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot } from 'recharts'
+import { AnonymitySimulator } from './AnonymitySimulator'
 import { useChainContext } from '../context/ChainContext'
 import { formatNumber } from '../lib/utils'
 
@@ -50,15 +51,15 @@ interface PrivacyPoolStat {
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (!active || !payload) return null
     return (
-        <div className="bg-white border-2 border-black p-3 shadow-[4px_4px_0_#000]">
-            <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">{label}</p>
+        <div className="bg-white dark:bg-zinc-950 border-2 border-black dark:border-white/20 p-3 shadow-[4px_4px_0_#000] dark:shadow-none transition-colors">
+            <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-500 mb-2">{label}</p>
             {payload.map((entry: any, i: number) => (
                 <p key={i} className="text-sm font-bold" style={{ color: entry.color }}>
                     {entry.name}: {entry.value.toLocaleString()}
                 </p>
             ))}
             {payload[0]?.payload?.root_hash && (
-                <p className="text-[10px] text-gray-500 font-mono mt-2 pt-2 border-t border-gray-100">
+                <p className="text-[10px] text-gray-500 dark:text-zinc-500 font-mono mt-2 pt-2 border-t border-gray-100 dark:border-white/10">
                     Root: {payload[0].payload.root_hash.slice(0, 10)}...
                 </p>
             )}
@@ -112,7 +113,7 @@ export function PrivacyPulse() {
     }
 
     return (
-        <section className="py-16 bg-gray-50 swiss-grid">
+        <section className="py-16 bg-gray-50 dark:bg-black/40 swiss-grid transition-colors">
             <div className="max-w-7xl mx-auto px-6 lg:px-8">
                 <motion.div
                     variants={stagger}
@@ -120,7 +121,7 @@ export function PrivacyPulse() {
                     whileInView="show"
                     viewport={{ once: true, margin: '-50px' }}
                 >
-                    <motion.div className="swiss-card" variants={fadeUp}>
+                    <motion.div className="swiss-card mb-8" variants={fadeUp}>
                         <div className="swiss-card-accent bg-[#FF0000]" />
 
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8 pt-2">
@@ -129,21 +130,21 @@ export function PrivacyPulse() {
                                     <Shield className="w-6 h-6 text-white" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-extrabold uppercase tracking-tight">Privacy Pulse</h2>
-                                    <p className="text-xs text-gray-500 uppercase tracking-wider">Commitment Tree State</p>
+                                    <h2 className="text-xl font-extrabold uppercase tracking-tight text-black dark:text-white">Privacy Pulse</h2>
+                                    <p className="text-xs text-gray-500 dark:text-zinc-500 uppercase tracking-wider">Commitment Tree State</p>
                                 </div>
                             </div>
 
                             <div className="flex items-center gap-6">
                                 <div className="text-right">
-                                    <div className="swiss-number">
+                                    <div className="swiss-number text-black dark:text-white">
                                         {loading ? '—' : <AnimatedNumber value={displayPoolSize} />}
                                     </div>
-                                    <div className="text-[10px] text-gray-500 uppercase tracking-[0.2em]">
+                                    <div className="text-[10px] text-gray-500 dark:text-zinc-500 uppercase tracking-[0.2em]">
                                         Commitments
                                     </div>
                                     {latestRoot && (
-                                        <div className="text-[10px] font-mono text-gray-400 mt-1">
+                                        <div className="text-[10px] font-mono text-gray-400 dark:text-zinc-600 mt-1">
                                             Root: {latestRoot.slice(0, 6)}...{latestRoot.slice(-4)}
                                         </div>
                                     )}
@@ -165,7 +166,7 @@ export function PrivacyPulse() {
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
-                                        className="h-full flex items-center justify-center text-gray-400 uppercase text-sm tracking-wider"
+                                        className="h-full flex items-center justify-center text-gray-400 dark:text-zinc-600 uppercase text-sm tracking-wider"
                                     >
                                         Loading privacy data...
                                     </motion.div>
@@ -185,9 +186,9 @@ export function PrivacyPulse() {
                                                         <stop offset="100%" stopColor="#FF0000" stopOpacity={0} />
                                                     </linearGradient>
                                                 </defs>
-                                                <CartesianGrid strokeDasharray="3 3" stroke="#E5E5E5" vertical={false} />
-                                                <XAxis dataKey="date" stroke="#999" fontSize={11} tickLine={false} axisLine={{ stroke: '#000', strokeWidth: 2 }} />
-                                                <YAxis stroke="#999" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => formatNumber(v)} />
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#E5E5E5" opacity={0.1} vertical={false} />
+                                                <XAxis dataKey="date" stroke="#666" fontSize={11} tickLine={false} axisLine={{ stroke: '#666', strokeWidth: 1, opacity: 0.3 }} />
+                                                <YAxis stroke="#666" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => formatNumber(v)} />
                                                 <Tooltip content={<CustomTooltip />} />
                                                 <Area
                                                     type="monotone"
@@ -216,7 +217,7 @@ export function PrivacyPulse() {
                                         key="empty"
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
-                                        className="h-full flex items-center justify-center text-gray-400 uppercase text-sm tracking-wider"
+                                        className="h-full flex items-center justify-center text-gray-400 dark:text-zinc-600 uppercase text-sm tracking-wider"
                                     >
                                         No privacy data yet — indexer syncing
                                     </motion.div>
@@ -224,16 +225,20 @@ export function PrivacyPulse() {
                             </AnimatePresence>
                         </motion.div>
 
-                        <div className="mt-6 pt-6 border-t-2 border-black flex flex-wrap gap-8 text-xs">
+                        <div className="mt-6 pt-6 border-t border-black/10 dark:border-white/10 flex flex-wrap gap-8 text-xs">
                             <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 bg-[#FF0000] border-2 border-black" />
-                                <span className="text-gray-600 uppercase tracking-wider">Cumulative shielded transactions</span>
+                                <div className="w-4 h-4 bg-[#FF0000] border border-black/20 dark:border-white/20" />
+                                <span className="text-gray-600 dark:text-zinc-500 uppercase tracking-wider">Cumulative shielded transactions</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 bg-[#0066CC] border-2 border-black" />
-                                <span className="text-gray-600 uppercase tracking-wider">Growing anonymity = stronger privacy</span>
+                                <div className="w-4 h-4 bg-[#0066CC] border border-black/20 dark:border-white/20" />
+                                <span className="text-gray-600 dark:text-zinc-500 uppercase tracking-wider">Growing anonymity = stronger privacy</span>
                             </div>
                         </div>
+                    </motion.div>
+
+                    <motion.div variants={fadeUp}>
+                        <AnonymitySimulator poolSize={currentPoolSize || 1200} />
                     </motion.div>
                 </motion.div>
             </div>

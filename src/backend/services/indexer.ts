@@ -118,9 +118,9 @@ export async function syncBlockRange(chain: ChainConfig, db: DB, fromBlock: numb
     }
 
     // Pre-fetch pool size
-    const [poolQuery] = await db.select({ poolSize: sql<number>`MAX(${schema.privacyPoolStats.estimatedPoolSize})` })
-        .from(schema.privacyPoolStats)
-        .where(eq(schema.privacyPoolStats.chainId, chain.id));
+    const [poolQuery] = await db.select({ poolSize: sql<number>`MAX(${schema.privacyStates.estimatedPoolSize})` })
+        .from(schema.privacyStates)
+        .where(eq(schema.privacyStates.chainId, chain.id));
     let cumulativePoolSize = poolQuery?.poolSize || 0;
 
     const solverUpdates = new Map<string, { count: number, gas: bigint, val: bigint }>();
@@ -131,7 +131,7 @@ export async function syncBlockRange(chain: ChainConfig, db: DB, fromBlock: numb
     // Arrays for batch insertion
     const eventsToInsert: typeof schema.events.$inferInsert[] = [];
     const payloadsToInsert: typeof schema.payloads.$inferInsert[] = [];
-    const poolStatsToInsert: typeof schema.privacyPoolStats.$inferInsert[] = [];
+    const poolStatsToInsert: typeof schema.privacyStates.$inferInsert[] = [];
     // Asset flows need special handling due to read-modify-write on conflict, 
     // but we can aggregate in memory first.
 
@@ -241,7 +241,7 @@ export async function syncBlockRange(chain: ChainConfig, db: DB, fromBlock: numb
     }
 
     if (poolStatsToInsert.length) {
-        await db.insert(schema.privacyPoolStats).values(poolStatsToInsert).onConflictDoNothing();
+        await db.insert(schema.privacyStates).values(poolStatsToInsert).onConflictDoNothing();
     }
 
     // Solvers

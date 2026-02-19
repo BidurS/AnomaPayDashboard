@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion'
-import { Trophy, Zap, ArrowRight, Users } from 'lucide-react'
+import { Trophy, Zap, ArrowRight, Users, DollarSign } from 'lucide-react'
 import { useSolvers } from '../lib/api'
 import { useChainContext } from '../context/ChainContext'
-import { formatNumber, shortenAddress, cn } from '../lib/utils'
+import { formatNumber, shortenAddress, cn, formatCurrency } from '../lib/utils'
 import { LineChart, Line, ResponsiveContainer } from 'recharts'
 
 // Deterministic Swiss Identicon
@@ -37,11 +37,14 @@ export function SolverLeaderboard() {
     const { activeChain } = useChainContext()
     const { solvers, loading } = useSolvers(activeChain?.id || 8453)
 
-    // Calculate Intent Mastery (Volume Weight + Activity)
+    // Calculate Intent Mastery (USD Volume Weight + Activity)
     const solversWithMastery = solvers.map(s => {
-        const volume = parseFloat(s.total_value_processed || '0') / 1e18
-        const txWeight = s.tx_count * 2
-        const masteryScore = (volume + txWeight) / 10
+        const usdVolume = s.total_volume_usd || 0
+        const ethVolume = parseFloat(s.total_value_processed || '0') / 1e18
+        const txWeight = s.tx_count * 5
+        // Economic value (USD) is the primary driver of mastery score
+        const masteryScore = (usdVolume / 10) + (ethVolume * 250) + txWeight
+        
         return {
             ...s,
             masteryScore,
@@ -53,7 +56,7 @@ export function SolverLeaderboard() {
     const hasData = solversWithMastery.length > 0
 
     return (
-        <section id="solver-leaderboard" className="py-24 bg-gray-50 dark:bg-zinc-900/20">
+        <section id="solver-leaderboard" className="py-24 bg-gray-50 dark:bg-zinc-900/20 transition-colors duration-300">
             <div className="max-w-7xl mx-auto px-6 lg:px-8">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -68,7 +71,7 @@ export function SolverLeaderboard() {
                                     Solver<br />Leaderboard
                                 </h2>
                                 <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mt-2">
-                                    Top performers by Volume & Efficiency
+                                    Top performers by Economic Volume (USD) & Efficiency
                                 </p>
                             </div>
                         </div>
@@ -89,21 +92,21 @@ export function SolverLeaderboard() {
                                             <SwissIdenticon address={topThree[1].address} size={64} />
                                             <div className="absolute -bottom-3 -right-3 bg-gray-200 text-black w-8 h-8 flex items-center justify-center font-bold text-sm border-2 border-white">2</div>
                                         </div>
-                                        <div className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-zinc-700 p-6 relative top-0 group-hover:-top-2 transition-all duration-300">
+                                        <div className="w-full bg-white dark:bg-zinc-900 border border-black dark:border-white/10 p-6 relative top-0 group-hover:-top-2 transition-all duration-300">
                                             <div className="h-1 w-full bg-gray-200 absolute top-0 left-0" />
-                                            <a href={`#/solver/${topThree[1].address}`} className="font-mono font-bold text-lg text-black dark:text-white hover:text-[#FF0000] hover:underline mb-1 block truncate text-center">
+                                            <a href={`#/solver/${topThree[1].address}`} className="font-mono font-bold text-lg text-black dark:text-zinc-100 hover:text-[#FF0000] hover:underline mb-1 block truncate text-center">
                                                 {shortenAddress(topThree[1].address)}
                                             </a>
                                             <div className="text-center text-xs uppercase text-gray-500 font-bold tracking-wider mb-4">Silver Tier</div>
 
-                                            <div className="grid grid-cols-2 gap-2 text-center border-t border-gray-100 dark:border-zinc-700 pt-4">
+                                            <div className="grid grid-cols-2 gap-2 text-center border-t border-gray-100 dark:border-white/10 pt-4">
                                                 <div>
-                                                    <div className="text-[10px] uppercase text-gray-400">Score</div>
-                                                    <div className="font-bold text-lg">{topThree[1].masteryScore.toFixed(0)}</div>
+                                                    <div className="text-[10px] uppercase text-gray-400">Mastery</div>
+                                                    <div className="font-bold text-lg text-black dark:text-zinc-200">{formatNumber(topThree[1].masteryScore)}</div>
                                                 </div>
                                                 <div>
-                                                    <div className="text-[10px] uppercase text-gray-400">Volume</div>
-                                                    <div className="font-bold text-sm">{formatNumber(parseFloat(topThree[1].total_value_processed || '0') / 1e18)}Ξ</div>
+                                                    <div className="text-[10px] uppercase text-gray-400">USD Volume</div>
+                                                    <div className="font-bold text-sm text-black dark:text-zinc-200">{formatCurrency(topThree[1].total_volume_usd || 0)}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -128,12 +131,12 @@ export function SolverLeaderboard() {
 
                                             <div className="grid grid-cols-2 gap-4 text-center border-t border-gray-800 dark:border-gray-200 pt-6">
                                                 <div>
-                                                    <div className="text-[10px] uppercase text-gray-400 dark:text-gray-500">Score</div>
-                                                    <div className="font-bold text-2xl text-[#FFCC00]">{topThree[0].masteryScore.toFixed(0)}</div>
+                                                    <div className="text-[10px] uppercase text-gray-400 dark:text-gray-500">Mastery</div>
+                                                    <div className="font-bold text-2xl text-[#FFCC00]">{formatNumber(topThree[0].masteryScore)}</div>
                                                 </div>
                                                 <div>
-                                                    <div className="text-[10px] uppercase text-gray-400 dark:text-gray-500">Volume</div>
-                                                    <div className="font-bold text-lg">{formatNumber(parseFloat(topThree[0].total_value_processed || '0') / 1e18)}Ξ</div>
+                                                    <div className="text-[10px] uppercase text-gray-400 dark:text-gray-500">USD Volume</div>
+                                                    <div className="font-bold text-lg">{formatCurrency(topThree[0].total_volume_usd || 0)}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -146,21 +149,21 @@ export function SolverLeaderboard() {
                                             <SwissIdenticon address={topThree[2].address} size={64} />
                                             <div className="absolute -bottom-3 -right-3 bg-orange-300 text-black w-8 h-8 flex items-center justify-center font-bold text-sm border-2 border-white">3</div>
                                         </div>
-                                        <div className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-zinc-700 p-6 relative top-0 group-hover:-top-2 transition-all duration-300">
+                                        <div className="w-full bg-white dark:bg-zinc-900 border border-black dark:border-white/10 p-6 relative top-0 group-hover:-top-2 transition-all duration-300">
                                             <div className="h-1 w-full bg-orange-300 absolute top-0 left-0" />
-                                            <a href={`#/solver/${topThree[2].address}`} className="font-mono font-bold text-lg text-black dark:text-white hover:text-[#FF0000] hover:underline mb-1 block truncate text-center">
+                                            <a href={`#/solver/${topThree[2].address}`} className="font-mono font-bold text-lg text-black dark:text-zinc-100 hover:text-[#FF0000] hover:underline mb-1 block truncate text-center">
                                                 {shortenAddress(topThree[2].address)}
                                             </a>
                                             <div className="text-center text-xs uppercase text-gray-500 font-bold tracking-wider mb-4">Bronze Tier</div>
 
-                                            <div className="grid grid-cols-2 gap-2 text-center border-t border-gray-100 dark:border-zinc-700 pt-4">
+                                            <div className="grid grid-cols-2 gap-2 text-center border-t border-gray-100 dark:border-white/10 pt-4">
                                                 <div>
-                                                    <div className="text-[10px] uppercase text-gray-400">Score</div>
-                                                    <div className="font-bold text-lg">{topThree[2].masteryScore.toFixed(0)}</div>
+                                                    <div className="text-[10px] uppercase text-gray-400">Mastery</div>
+                                                    <div className="font-bold text-lg text-black dark:text-zinc-200">{formatNumber(topThree[2].masteryScore)}</div>
                                                 </div>
                                                 <div>
-                                                    <div className="text-[10px] uppercase text-gray-400">Volume</div>
-                                                    <div className="font-bold text-sm">{formatNumber(parseFloat(topThree[2].total_value_processed || '0') / 1e18)}Ξ</div>
+                                                    <div className="text-[10px] uppercase text-gray-400">USD Volume</div>
+                                                    <div className="font-bold text-sm text-black dark:text-zinc-200">{formatCurrency(topThree[2].total_volume_usd || 0)}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -169,16 +172,16 @@ export function SolverLeaderboard() {
                             </div>
 
                             {/* Main List */}
-                            <div className="swiss-border bg-white dark:bg-black overflow-hidden relative">
+                            <div className="swiss-border bg-white dark:bg-zinc-950 overflow-hidden relative transition-colors duration-300">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="border-b-2 border-black dark:border-white text-[10px] uppercase tracking-[0.2em] text-gray-500 bg-gray-50 dark:bg-zinc-900/50">
+                                        <tr className="border-b-2 border-black dark:border-white/10 text-[10px] uppercase tracking-[0.2em] text-gray-500 bg-gray-50 dark:bg-white/5">
                                             <th className="p-4 w-16 text-center">#</th>
                                             <th className="p-4">Solver</th>
                                             <th className="p-4 w-32 hidden sm:table-cell">Trend</th>
                                             <th className="p-4 text-right">Txs</th>
-                                            <th className="p-4 text-right">Volume</th>
-                                            <th className="p-4 text-right text-black dark:text-white font-bold">Score</th>
+                                            <th className="p-4 text-right">USD Volume</th>
+                                            <th className="p-4 text-right text-black dark:text-zinc-100 font-bold">Mastery</th>
                                             <th className="p-4 w-12"></th>
                                         </tr>
                                     </thead>
@@ -189,18 +192,27 @@ export function SolverLeaderboard() {
                                                 initial={{ opacity: 0, x: -20 }}
                                                 animate={{ opacity: 1, x: 0 }}
                                                 transition={{ delay: 0.1 + i * 0.03 }}
-                                                className="group border-b border-gray-100 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors"
+                                                className="group border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
                                             >
-                                                <td className="p-4 text-center font-bold text-gray-400">
+                                                <td className="p-4 text-center font-bold text-gray-400 dark:text-zinc-600">
                                                     {i + 1}
                                                 </td>
                                                 <td className="p-4">
-                                                    <div className="flex items-center gap-3">
-                                                        <SwissIdenticon address={solver.address} size={28} />
-                                                        <a href={`#/solver/${solver.address}`} className="font-mono-swiss text-sm font-bold text-black dark:text-white hover:text-[#0066CC] transition-colors">
-                                                            {shortenAddress(solver.address)}
-                                                        </a>
-                                                        {i < 3 && <Zap className="w-3 h-3 text-[#FFCC00] fill-current hidden sm:block" />}
+                                                    <div className="flex flex-col gap-1">
+                                                        <div className="flex items-center gap-3">
+                                                            <SwissIdenticon address={solver.address} size={28} />
+                                                            <a href={`#/solver/${solver.address}`} className="font-mono-swiss text-sm font-bold text-black dark:text-zinc-200 hover:text-[#0066CC] dark:hover:text-[#0066CC] transition-colors">
+                                                                {shortenAddress(solver.address)}
+                                                            </a>
+                                                            {i < 3 && <Zap className="w-3 h-3 text-[#FFCC00] fill-current hidden sm:block" />}
+                                                        </div>
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {solver.badges?.map(badge => (
+                                                                <span key={badge} className="px-1.5 py-0.5 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-[8px] font-black uppercase tracking-tighter text-gray-500 dark:text-zinc-500">
+                                                                    {badge}
+                                                                </span>
+                                                            ))}
+                                                        </div>
                                                     </div>
                                                 </td>
                                                 <td className="p-4 hidden sm:table-cell">
@@ -218,18 +230,21 @@ export function SolverLeaderboard() {
                                                         </ResponsiveContainer>
                                                     </div>
                                                 </td>
-                                                <td className="p-4 text-right font-mono-swiss text-sm text-gray-600 dark:text-gray-400">
+                                                <td className="p-4 text-right font-mono-swiss text-sm text-gray-600 dark:text-zinc-400">
                                                     {formatNumber(solver.tx_count)}
                                                 </td>
-                                                <td className="p-4 text-right font-mono-swiss text-sm text-gray-600 dark:text-gray-400">
-                                                    {formatNumber(parseFloat(solver.total_value_processed || '0') / 1e18)}
+                                                <td className="p-4 text-right font-mono-swiss text-sm text-gray-600 dark:text-zinc-400">
+                                                    <div className="flex items-center justify-end gap-1">
+                                                        <DollarSign className="w-3 h-3 text-green-500" />
+                                                        {formatNumber(solver.total_volume_usd || 0)}
+                                                    </div>
                                                 </td>
                                                 <td className="p-4 text-right">
                                                     <span className={cn(
-                                                        "font-bold font-mono-swiss px-2 py-1 bg-gray-100 dark:bg-zinc-800 rounded-md",
-                                                        i < 3 && "bg-[#FF0000]/10 text-[#FF0000]"
+                                                        "font-bold font-mono-swiss px-2 py-1 bg-gray-100 dark:bg-white/5 rounded-md text-black dark:text-zinc-300",
+                                                        i < 3 && "bg-[#FF0000]/10 text-[#FF0000] dark:bg-[#FF0000]/20 dark:text-[#FF0000]"
                                                     )}>
-                                                        {solver.masteryScore.toFixed(0)}
+                                                        {formatNumber(solver.masteryScore)}
                                                     </span>
                                                 </td>
                                                 <td className="p-4 text-right">
@@ -252,4 +267,5 @@ export function SolverLeaderboard() {
         </section>
     )
 }
+
 

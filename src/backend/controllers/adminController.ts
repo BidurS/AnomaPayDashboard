@@ -81,7 +81,7 @@ export async function handleImportData(db: DB, data: any, headers: any) {
     }
 
     if (data.privacy_stats && data.privacy_stats.length > 0) {
-        batch.push(db.insert(schema.privacyPoolStats).values(
+        batch.push(db.insert(schema.privacyStates).values(
             data.privacy_stats.map((p: any) => ({
                 chainId: p.chain_id,
                 blockNumber: p.block_number,
@@ -90,7 +90,7 @@ export async function handleImportData(db: DB, data: any, headers: any) {
                 estimatedPoolSize: p.estimated_pool_size
             }))
         ).onConflictDoUpdate({
-            target: [schema.privacyPoolStats.chainId, schema.privacyPoolStats.rootHash],
+            target: [schema.privacyStates.chainId, schema.privacyStates.rootHash],
             set: { estimatedPoolSize: sql`excluded.estimated_pool_size` }
         }));
     }

@@ -91,13 +91,13 @@ export async function handleGetNetworkHealth(db: DB, chainId: number, headers: a
 
 export async function handleGetPrivacyStats(db: DB, chainId: number, headers: any) {
     const results = await db.select({
-        block_number: schema.privacyPoolStats.blockNumber,
-        timestamp: schema.privacyPoolStats.timestamp,
-        estimated_pool_size: schema.privacyPoolStats.estimatedPoolSize,
-        root_hash: schema.privacyPoolStats.rootHash
-    }).from(schema.privacyPoolStats)
-        .where(eq(schema.privacyPoolStats.chainId, chainId))
-        .orderBy(desc(schema.privacyPoolStats.blockNumber))
+        block_number: schema.privacyStates.blockNumber,
+        timestamp: schema.privacyStates.timestamp,
+        estimated_pool_size: schema.privacyStates.estimatedPoolSize,
+        root_hash: schema.privacyStates.rootHash
+    }).from(schema.privacyStates)
+        .where(eq(schema.privacyStates.chainId, chainId))
+        .orderBy(desc(schema.privacyStates.blockNumber))
         .limit(50);
 
     return new Response(JSON.stringify(results.reverse()), { headers });

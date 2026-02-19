@@ -88,25 +88,42 @@ export const assetFlows = sqliteTable('asset_flows', {
     idxChainTxCount: index('idx_asset_flows_chain').on(table.chainId, table.txCount),
 }));
 
-// Privacy Pool Stats Table
-export const privacyPoolStats = sqliteTable('privacy_pool_stats', {
+// Privacy Pool Stats Table (Extended for Phase 3)
+export const privacyStates = sqliteTable('privacy_pool_stats', {
     id: integer('id').primaryKey({ autoIncrement: true }),
     chainId: integer('chain_id').notNull(),
     blockNumber: integer('block_number').notNull(),
     rootHash: text('root_hash').notNull(),
+    commitmentCount: text('commitment_count').default('0'), // Exact on-chain count
+    nullifierCount: text('nullifier_count').default('0'),   // Exact on-chain count
     timestamp: integer('timestamp').notNull(),
-    estimatedPoolSize: integer('estimated_pool_size').default(0),
+    estimatedPoolSize: integer('estimated_pool_size').default(0), // Kept for backward compat/estimation
 }, (table) => ({
     uniqChainRoot: unique('uniq_chain_root').on(table.chainId, table.rootHash),
-    idxChainBlock: index('idx_privacy_pool_chain_block').on(table.chainId, table.blockNumber),
+    idxChainBlock: index('idx_privacy_states_chain_block').on(table.chainId, table.blockNumber),
 }));
 
-// Payloads Table
+// Action Events Table (New for Phase 3)
+export const actionEvents = sqliteTable('action_events', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    chainId: integer('chain_id').notNull(),
+    txHash: text('tx_hash').notNull(),
+    blockNumber: integer('block_number').notNull(),
+    actionTreeRoot: text('action_tree_root').notNull(),
+    actionTagCount: integer('action_tag_count').default(0),
+    timestamp: integer('timestamp').default(sql`(strftime('%s', 'now'))`),
+}, (table) => ({
+    uniqChainTxAction: unique('uniq_chain_tx_action').on(table.chainId, table.txHash),
+    idxChainTime: index('idx_action_events_chain_time').on(table.chainId, table.timestamp),
+}));
+
+// Payloads Table (Updated for Phase 3)
 export const payloads = sqliteTable('payloads', {
     id: integer('id').primaryKey({ autoIncrement: true }),
     chainId: integer('chain_id').notNull(),
     txHash: text('tx_hash').notNull(),
     blockNumber: integer('block_number').notNull(),
+    tag: text('tag'), // New: Action Tag association
     payloadType: text('payload_type').notNull(), // Resource, Discovery, External, Application
     payloadIndex: integer('payload_index').notNull(),
     blob: text('blob'), // The actual data blob (hex)
@@ -115,6 +132,22 @@ export const payloads = sqliteTable('payloads', {
     uniqChainTxIndex: unique('uniq_chain_tx_index').on(table.chainId, table.txHash, table.payloadType, table.payloadIndex),
     idxChainType: index('idx_payloads_chain_type').on(table.chainId, table.payloadType),
     idxChainTime: index('idx_payloads_chain_time').on(table.chainId, table.timestamp),
+    idxTag: index('idx_payloads_tag').on(table.chainId, table.tag),
+}));
+
+// Forwarder Calls Table (New for Phase 12)
+export const forwarderCalls = sqliteTable('forwarder_calls', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    chainId: integer('chain_id').notNull(),
+    txHash: text('tx_hash').notNull(),
+    blockNumber: integer('block_number').notNull(),
+    untrustedForwarder: text('untrusted_forwarder').notNull(),
+    input: text('input').notNull(),
+    output: text('output').notNull(),
+    timestamp: integer('timestamp').default(sql`(strftime('%s', 'now'))`),
+}, (table) => ({
+    uniqChainTxForwarder: unique('uniq_chain_tx_forwarder').on(table.chainId, table.txHash, table.untrustedForwarder),
+    idxChainTime: index('idx_forwarder_calls_chain_time').on(table.chainId, table.timestamp),
 }));
 
 // Token Transfers Table

@@ -37,7 +37,22 @@ export interface TransactionDetail extends Transaction {
     decoded_input: string
     payloads: PayloadDetail[]
     tokenTransfers: TokenTransfer[]
+    forwarderCalls: ForwarderCall[]
+    actionEvents: ActionEvent[]
     privacyRoot: { root_hash: string; estimated_pool_size: number } | null
+}
+
+export interface ForwarderCall {
+    untrusted_forwarder: string
+    input: string
+    output: string
+    timestamp: number
+}
+
+export interface ActionEvent {
+    action_tree_root: string
+    action_tag_count: number
+    timestamp: number
 }
 
 export interface PayloadDetail {
@@ -66,12 +81,16 @@ export interface Solver {
     tx_count: number
     total_gas_spent: string
     total_value_processed: string
+    total_volume_usd: number
+    forwarder_calls?: number
+    badges?: string[]
     first_seen: number
     last_seen: number
 }
 
 export interface SolverDetail extends Solver {
     totalVolumeUsd: number
+    forwarderCallsCount?: number
     recentTransactions: Transaction[]
     dailyActivity: { date: string; count: number }[]
 }
