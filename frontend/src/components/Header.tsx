@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Menu, X, Users, ArrowRightLeft, HelpCircle, Home as HomeIcon, Activity } from 'lucide-react'
+import { ChevronDown, Menu, X, Users, ArrowRightLeft, HelpCircle, Home as HomeIcon, Activity, Shield } from 'lucide-react'
 import { ThemeToggle } from './ThemeToggle'
 import { useChainContext } from '../context/ChainContext'
 import { useNavigate } from 'react-router-dom'
@@ -17,6 +17,7 @@ const NAV_ITEMS = [
     { id: 'live', label: 'Live Feed', icon: Activity, path: '/live', isLive: true },
     { id: 'solvers', label: 'Solvers', icon: Users, path: '/solvers' },
     { id: 'transactions', label: 'Transactions', icon: ArrowRightLeft, path: '/transactions' },
+    { id: 'circuits', label: 'ZK Registry', icon: Shield, path: '/circuits' },
     { id: 'faq', label: 'FAQ', icon: HelpCircle, path: '/faq' },
 ]
 

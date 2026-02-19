@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowUpRight, Copy, Check, Layers, Download, RefreshCw, ArrowRight } from 'lucide-react'
+import { ArrowUpRight, Copy, Check, Layers, Download, RefreshCw, ArrowRight, X } from 'lucide-react'
 import { useLatestTransactions, type Transaction } from '../lib/api'
 import { useChainContext } from '../context/ChainContext'
 import { shortenAddress, cn, formatWei } from '../lib/utils'
@@ -19,6 +19,8 @@ export function TransactionTable({ searchQuery, onTxClick, onSolverClick, hideHe
     const { transactions, pagination, loading, refetch } = useLatestTransactions(activeChain?.id || 8453, searchQuery, page)
     const [copiedHash, setCopiedHash] = useState<string | null>(null)
     const [hoveredRow, setHoveredRow] = useState<string | null>(null)
+    // Sticky note hint to educate users that they can click elements
+    const [showClickHints, setShowClickHints] = useState(true)
 
     // Derived state for pagination/data
     const hasData = transactions.length > 0
@@ -170,25 +172,40 @@ export function TransactionTable({ searchQuery, onTxClick, onSolverClick, hideHe
                                                         <div className="flex items-center gap-2">
                                                             <button
                                                                 onClick={(e) => { e.stopPropagation(); onTxClick?.(tx.tx_hash) }}
-                                                                className="inline-flex items-center gap-1 font-mono-swiss text-sm font-bold text-black dark:text-zinc-200 border-b-2 border-transparent hover:border-[#FF0000] hover:text-[#FF0000] transition-colors group/link"
+                                                                className="inline-flex items-center gap-1 font-mono-swiss text-sm font-bold text-black dark:text-zinc-200 border-b-2 border-transparent hover:border-[#FF0000] hover:text-[#FF0000] transition-colors group/link relative"
                                                                 title="View Transaction Details"
                                                             >
+                                                                {i === 0 && showClickHints && (
+                                                                    <motion.div
+                                                                        initial={{ opacity: 0, y: -10 }}
+                                                                        animate={{ opacity: 1, y: 0 }}
+                                                                        className="absolute z-20 -top-8 left-0 bg-[#FF0000] text-white text-[9px] font-bold px-2 py-1 flex items-center gap-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] uppercase tracking-wider whitespace-nowrap cursor-default"
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                    >
+                                                                        Click to view tx
+                                                                        <button onClick={() => setShowClickHints(false)} className="hover:text-black transition-colors" title="Dismiss">
+                                                                            <X className="w-3 h-3" />
+                                                                        </button>
+                                                                        <div className="absolute -bottom-1 left-4 w-2 h-2 bg-[#FF0000] rotate-45" />
+                                                                    </motion.div>
+                                                                )}
+
                                                                 {shortenAddress(tx.tx_hash, 6, 6)}
                                                                 <ArrowUpRight className="w-3 h-3 opacity-0 -ml-2 group-hover/link:opacity-100 group-hover/link:ml-0 transition-all text-[#FF0000]" />
                                                             </button>
-                                                                                                                            <button
-                                                                                                                                onClick={(e) => { e.stopPropagation(); copyHash(tx.tx_hash) }}
-                                                                                                                                className="text-gray-400 hover:text-black dark:hover:text-zinc-200 transition-colors"
-                                                                                                                            >
-                                                                                                                                {copiedHash === tx.tx_hash ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
-                                                                                                                            </button>
-                                                                                                                        </div>
-                                                                                                                        {tx.primary_type && tx.primary_type !== 'Unknown' && (
-                                                                                                                            <span className="text-[10px] text-gray-400 dark:text-zinc-600 uppercase tracking-wider">{tx.primary_type}</span>
-                                                                                                                        )}
-                                                                                                                    </div>
-                                                                                                                </div>
-                                                                                                            </td>                                            <td className="p-4">
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); copyHash(tx.tx_hash) }}
+                                                                className="text-gray-400 hover:text-black dark:hover:text-zinc-200 transition-colors"
+                                                            >
+                                                                {copiedHash === tx.tx_hash ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+                                                            </button>
+                                                        </div>
+                                                        {tx.primary_type && tx.primary_type !== 'Unknown' && (
+                                                            <span className="text-[10px] text-gray-400 dark:text-zinc-600 uppercase tracking-wider">{tx.primary_type}</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </td>                                            <td className="p-4">
                                                 <div className="flex items-center gap-2 text-sm font-medium text-black dark:text-zinc-200">
                                                     <ArrowRight className="w-3 h-3 text-gray-400 dark:text-zinc-600" />
                                                     {getHumanReadableDescription(tx)}
@@ -200,9 +217,25 @@ export function TransactionTable({ searchQuery, onTxClick, onSolverClick, hideHe
                                             <td className="p-4">
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); onSolverClick?.(tx.solver_address); }}
-                                                    className="inline-flex items-center gap-1 font-mono-swiss text-xs font-bold text-[#666] dark:text-zinc-400 bg-gray-100 dark:bg-white/5 px-2 py-1 rounded hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all group/solver"
+                                                    className="inline-flex items-center gap-1 font-mono-swiss text-xs font-bold text-[#666] dark:text-zinc-400 bg-gray-100 dark:bg-white/5 px-2 py-1 rounded hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all group/solver relative"
                                                     title="View Solver Profile"
                                                 >
+                                                    {i === 0 && showClickHints && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, y: -10 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            transition={{ delay: 0.1 }}
+                                                            className="absolute z-20 -top-8 left-0 bg-blue-500 text-white text-[9px] font-bold px-2 py-1 flex items-center gap-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] uppercase tracking-wider whitespace-nowrap cursor-default"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        >
+                                                            Click for Solver
+                                                            <button onClick={() => setShowClickHints(false)} className="hover:text-black transition-colors" title="Dismiss">
+                                                                <X className="w-3 h-3" />
+                                                            </button>
+                                                            <div className="absolute -bottom-1 left-4 w-2 h-2 bg-blue-500 rotate-45" />
+                                                        </motion.div>
+                                                    )}
+
                                                     {shortenAddress(tx.solver_address)}
                                                     <ArrowRight className="w-3 h-3 opacity-0 -ml-2 group-hover/solver:opacity-100 group-hover/solver:ml-0 transition-all" />
                                                 </button>
