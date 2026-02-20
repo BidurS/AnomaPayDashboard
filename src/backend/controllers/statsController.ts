@@ -131,7 +131,7 @@ export async function handleGetAssets(db: DB, chainId: number, headers: any) {
         tx_count: schema.assetFlows.txCount
     }).from(schema.assetFlows)
         .where(eq(schema.assetFlows.chainId, chainId))
-        .orderBy(desc(schema.assetFlows.tx_count));
+        .orderBy(desc(schema.assetFlows.txCount));
 
     return new Response(JSON.stringify(results), { headers });
 }
