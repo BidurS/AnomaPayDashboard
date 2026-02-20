@@ -48,7 +48,7 @@ export function Footer() {
                     </div>
 
                     {/* Navigation Columns */}
-                    <div className="md:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-8">
+                    <div className="md:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
                         <div className="space-y-4">
                             <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Network</h4>
                             <div className="flex flex-col gap-2">
@@ -56,26 +56,42 @@ export function Footer() {
                                 <Link to="/live" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors flex items-center gap-2">Live Data <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" /></Link>
                                 <Link to="/mempool" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors">Mempool</Link>
                                 <Link to="/domains" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors">Topology</Link>
-                            </div>
-                        </div>
-                        <div className="space-y-4">
-                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Technical</h4>
-                            <div className="flex flex-col gap-2">
-                                <Link to="/debug" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors">Intent Debugger</Link>
-                                <Link to="/circuits" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors">ZK Registry</Link>
-                                <Link to="/transactions" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors">Explorer</Link>
                                 <Link to="/solvers" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors">Solvers</Link>
+                                <Link to="/vision" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors">Vision</Link>
                             </div>
                         </div>
                         <div className="space-y-4">
-                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Resources</h4>
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Build</h4>
                             <div className="flex flex-col gap-2">
-                                <Link to="/faq" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors">Documentation</Link>
-                                <a href="https://specs.anoma.net" target="_blank" rel="noopener noreferrer" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors flex items-center gap-1.5">Protocol Specs <ExternalLink className="w-3 h-3" /></a>
-                                <a href="https://github.com/anoma/whitepaper" target="_blank" rel="noopener noreferrer" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors flex items-center gap-1.5">Whitepaper <ExternalLink className="w-3 h-3" /></a>
+                                <a href="https://docs.anoma.net" target="_blank" rel="noopener noreferrer" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors flex items-center gap-1.5">Docs <ExternalLink className="w-3 h-3" /></a>
+                                <a href="https://anoma.net/build" target="_blank" rel="noopener noreferrer" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors flex items-center gap-1.5">Build with Anoma <ExternalLink className="w-3 h-3" /></a>
+                                <a href="https://anoma.net/builders-program" target="_blank" rel="noopener noreferrer" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors flex items-center gap-1.5">Builders Program <ExternalLink className="w-3 h-3" /></a>
+                                <a href="https://specs.anoma.net/latest/" target="_blank" rel="noopener noreferrer" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors flex items-center gap-1.5">Protocol Specs <ExternalLink className="w-3 h-3" /></a>
+                                <a href="https://explorer.anoma.net" target="_blank" rel="noopener noreferrer" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors flex items-center gap-1.5">Anoma Explorer <ExternalLink className="w-3 h-3" /></a>
+                            </div>
+                        </div>
+                        <div className="space-y-4">
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Research</h4>
+                            <div className="flex flex-col gap-2">
+                                <a href="https://anoma.net/blog" target="_blank" rel="noopener noreferrer" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors flex items-center gap-1.5">Blog <ExternalLink className="w-3 h-3" /></a>
+                                <a href="https://research.anoma.net/" target="_blank" rel="noopener noreferrer" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors flex items-center gap-1.5">Research Forum <ExternalLink className="w-3 h-3" /></a>
+                                <a href="https://art.anoma.net" target="_blank" rel="noopener noreferrer" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors flex items-center gap-1.5">ART Reports <ExternalLink className="w-3 h-3" /></a>
+                                <a href="https://anoma.net/vision-paper.pdf" target="_blank" rel="noopener noreferrer" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors flex items-center gap-1.5">Vision Paper <ExternalLink className="w-3 h-3" /></a>
+                                <a href="https://github.com/anoma/whitepaper/blob/main/whitepaper.pdf" target="_blank" rel="noopener noreferrer" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors flex items-center gap-1.5">Whitepaper <ExternalLink className="w-3 h-3" /></a>
+                            </div>
+                        </div>
+                        <div className="space-y-4">
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Community</h4>
+                            <div className="flex flex-col gap-2">
+                                <a href="https://anoma.net/community" target="_blank" rel="noopener noreferrer" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors flex items-center gap-1.5">Join Community <ExternalLink className="w-3 h-3" /></a>
+                                <a href="https://anoma.net/ecosystem" target="_blank" rel="noopener noreferrer" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors flex items-center gap-1.5">Ecosystem <ExternalLink className="w-3 h-3" /></a>
+                                <a href="https://anoma.net/roadmap" target="_blank" rel="noopener noreferrer" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors flex items-center gap-1.5">Official Roadmap <ExternalLink className="w-3 h-3" /></a>
+                                <a href="https://portal.anoma.net" target="_blank" rel="noopener noreferrer" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors flex items-center gap-1.5">Anoma Portal <ExternalLink className="w-3 h-3" /></a>
+                                <a href="https://anoma.foundation" target="_blank" rel="noopener noreferrer" className="text-xs font-bold uppercase hover:text-[#FF0000] transition-colors flex items-center gap-1.5">Foundation <ExternalLink className="w-3 h-3" /></a>
                             </div>
                         </div>
                     </div>
+
                 </div>
 
                 {/* Bottom Bar */}
