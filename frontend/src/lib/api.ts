@@ -152,22 +152,53 @@ export interface ResourceChurn {
 // =============================================================
 
 export const MOCK_DOMAINS: Chain[] = [
-    { id: 8453, name: 'Global Hub', explorer_url: 'https://basescan.org', icon: '🌐' },
-    { id: 1, name: 'DeFi Fractal', explorer_url: '#', icon: '🏦' },
-    { id: 2, name: 'Social Realm', explorer_url: '#', icon: '🗣️' },
-    { id: 3, name: 'Gaming Subnet', explorer_url: '#', icon: '🎮' },
-    { id: 4, name: 'Privacy Mixnode', explorer_url: '#', icon: '🛡️' },
+    { id: 9000, name: 'Global Hub', explorer_url: '#', icon: '🌐' },
+    { id: 9001, name: 'DeFi Fractal', explorer_url: '#', icon: '🏦' },
+    { id: 9002, name: 'Social Realm', explorer_url: '#', icon: '🗣️' },
+    { id: 9003, name: 'Gaming Subnet', explorer_url: '#', icon: '🎮' },
+    { id: 9004, name: 'Privacy Mixnode', explorer_url: '#', icon: '🛡️' },
 ]
 
+const isMockChain = (id?: number) => id ? [9000, 9001, 9002, 9003, 9004].includes(id) : false;
+
+const DEFAULT_REAL_CHAINS: Chain[] = [
+    { id: 1, name: 'Ethereum', explorer_url: 'https://etherscan.io', icon: '🔹' },
+    { id: 10, name: 'Optimism', explorer_url: 'https://optimistic.etherscan.io', icon: '🔴' },
+    { id: 8453, name: 'Base', explorer_url: 'https://basescan.org', icon: '🔵' },
+    { id: 42161, name: 'Arbitrum One', explorer_url: 'https://arbiscan.io', icon: '🔵' }
+];
+
 export function useChains() {
-    // Mock Domains to illustrate Anoma's fractal scaling properties
-    return { chains: MOCK_DOMAINS, loading: false };
+    const { data: apiChains, isLoading } = useQuery({
+        queryKey: ['chains'],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/chains`);
+            if (!res.ok) throw new Error('Failed to fetch chains');
+            return res.json() as Promise<Chain[]>;
+        },
+        staleTime: 1000 * 60 * 60, // 1 hour (Chains rarely change)
+    });
+
+    const chainsList = apiChains && apiChains.length > 1 ? apiChains : DEFAULT_REAL_CHAINS;
+
+    return { chains: chainsList, loading: isLoading };
 }
 
 export function useStats(chainId: number) {
     const { data: stats, isLoading, refetch } = useQuery({
         queryKey: ['stats', chainId],
         queryFn: async () => {
+            if (isMockChain(chainId)) {
+                return {
+                    totalVolume: chainId * 850000 + 100000,
+                    volume24h: chainId * 45000,
+                    volume7d: chainId * 320000,
+                    intentCount: chainId * 25000 + 1500,
+                    intentCount24h: chainId * 1500 + 200,
+                    uniqueSolvers: 12 + chainId * 3,
+                    totalGasUsed: chainId * 400000
+                } as Stats;
+            }
             const res = await fetch(`${API_URL}/api/stats?chainId=${chainId}`);
             return res.json() as Promise<Stats>;
         },
@@ -182,6 +213,10 @@ export function useTransactions(chainId: number, searchQuery?: string, page = 1,
     const { data, isLoading, refetch } = useQuery({
         queryKey: ['transactions', chainId, searchQuery, page, limit],
         queryFn: async () => {
+            if (isMockChain(chainId)) {
+                return { data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+            }
+
             let url = `${API_URL}/api/transactions?chainId=${chainId}&page=${page}&limit=${limit}`;
 
             if (searchQuery) {
@@ -215,6 +250,17 @@ export function useSolvers(chainId: number) {
     const { data: solvers, isLoading, refetch } = useQuery({
         queryKey: ['solvers', chainId],
         queryFn: async () => {
+            if (isMockChain(chainId)) {
+                return Array.from({ length: 5 }).map((_, i) => ({
+                    address: `0xMockSolver${chainId}${i}`,
+                    tx_count: 100 + i * 10,
+                    total_gas_spent: (1000000000000000000n * BigInt(i + 1)).toString(),
+                    total_value_processed: (50000000000000000000n * BigInt(i + 1)).toString(),
+                    total_volume_usd: 100000 + i * 50000,
+                    first_seen: Date.now() - (i * 86400000),
+                    last_seen: Date.now(),
+                })) as Solver[];
+            }
             const res = await fetch(`${API_URL}/api/solvers?chainId=${chainId}`);
             return res.json() as Promise<Solver[]>;
         },

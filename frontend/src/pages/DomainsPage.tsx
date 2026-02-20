@@ -8,7 +8,7 @@ import { MOCK_DOMAINS } from '../lib/api'
 const randPercent = () => Math.floor(Math.random() * 100)
 
 export function DomainsPage() {
-    const [activeNode, setActiveNode] = useState<number | null>(8453) // Default to global hub
+    const [activeNode, setActiveNode] = useState<number | null>(MOCK_DOMAINS[0]?.id || 9000) // Default to global hub
     const [traffic, setTraffic] = useState<{ from: number, to: number }[]>([])
 
     // Simulate cross-domain intent gossip
