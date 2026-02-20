@@ -105,7 +105,36 @@ export async function handleGetDailyStats(db: DB, chainId: number, days: number,
         .orderBy(desc(schema.dailyStats.date))
         .limit(days);
 
-    return new Response(JSON.stringify(results.reverse()), { headers });
+    // Dynamic Volume from Token Transfers
+    const volumeSql = sql<number>`SUM(
+        CASE 
+            WHEN ${schema.tokenTransfers.amountUsd} > 0 THEN ${schema.tokenTransfers.amountUsd}
+            WHEN ${schema.tokenTransfers.tokenSymbol} IN ('USDC', 'USDT', 'DAI', 'USDbC') THEN ${schema.tokenTransfers.amountDisplay}
+            ELSE 0 
+        END
+    )`;
+
+    const now = Math.floor(Date.now() / 1000);
+    const timeAgo = now - (86400 * days);
+
+    const volumes = await db.select({
+        date: sql<string>`DATE(${schema.tokenTransfers.timestamp}, "unixepoch")`,
+        volume: sql<number>`COALESCE(${volumeSql}, 0)`
+    }).from(schema.tokenTransfers)
+        .where(and(
+            eq(schema.tokenTransfers.chainId, chainId),
+            gte(schema.tokenTransfers.timestamp, timeAgo)
+        ))
+        .groupBy(sql`DATE(${schema.tokenTransfers.timestamp}, "unixepoch")`);
+
+    // Merge volumes into results
+    const volMap = new Map(volumes.map(v => [v.date, v.volume]));
+    const mergedResults = results.map(r => ({
+        ...r,
+        volume: volMap.get(r.date) || 0 // Use dynamic token volume instead of DB daily_stats fallback
+    }));
+
+    return new Response(JSON.stringify(mergedResults.reverse()), { headers });
 }
 
 export async function handleGetResourceChurn(db: DB, chainId: number, days: number, headers: any) {
@@ -137,8 +166,16 @@ export async function handleGetAssets(db: DB, chainId: number, headers: any) {
 }
 
 export async function handleGetNetworkHealth(db: DB, chainId: number, headers: any) {
+    const volumeSql = sql<number>`SUM(
+        CASE 
+            WHEN ${schema.tokenTransfers.amountUsd} > 0 THEN ${schema.tokenTransfers.amountUsd}
+            WHEN ${schema.tokenTransfers.tokenSymbol} IN ('USDC', 'USDT', 'DAI', 'USDbC') THEN ${schema.tokenTransfers.amountDisplay}
+            ELSE 0 
+        END
+    )`;
+
     const [tvlQuery] = await db.select({
-        tvl: sql<number>`COALESCE(SUM(${schema.tokenTransfers.amountUsd}), 0)`
+        tvl: sql<number>`COALESCE(${volumeSql}, 0)`
     }).from(schema.tokenTransfers)
         .where(eq(schema.tokenTransfers.chainId, chainId));
 
