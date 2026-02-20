@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Shield, Zap, Layers, ChevronDown, Activity, Database, Clock, Users, Lock, Code, BarChart3, Globe, Copy, Check, Link, Search, ThumbsUp, ThumbsDown } from 'lucide-react'
+import { Shield, Zap, Layers, ChevronDown, Activity, Clock, Users, Lock, Code, BarChart3, Globe, Copy, Check, Link, Search, ThumbsUp, ThumbsDown } from 'lucide-react'
 import { SEO } from './SEO'
 
 interface FAQItem {
@@ -15,90 +15,76 @@ const FAQ_ITEMS: FAQItem[] = [
     {
         id: "platform-intro",
         q: "What is Gnoma Explorer?",
-        a: "Gnoma Explorer is a real-time analytics dashboard for the Anoma Protocol Adapter on Base. It provides deep visibility into intent resolution, solver performance, privacy pool activity, and token flows — all indexed directly from the blockchain and updated automatically every 5 minutes.",
+        a: "Gnoma Explorer is a world-class analytics engine for the Anoma Protocol. It visualizes the full lifecycle of an intent—from P2P gossip to solver matchmaking and final ZK-settlement. It currently supports indexing for Base, Ethereum, and other EVM-compatible protocol adapters.",
         icon: Zap,
         category: "Platform"
     },
     {
-        id: "data-source",
-        q: "Where does the data come from?",
-        a: "All data is sourced from the Base blockchain via the Blockscout API. Our automated indexer fetches the latest transactions, event logs, and token transfers from the Anoma Protocol Adapter contract every 5 minutes. There is no centralized database or manual data entry — everything is derived directly from on-chain activity.",
-        icon: Database,
-        category: "Platform"
-    },
-    {
-        id: "update-frequency",
-        q: "How often is data updated?",
-        a: "The indexer runs on a 5-minute cron schedule. New transactions confirmed on Base appear in the dashboard within 5 minutes. The system also processes historical blocks, so if there's ever a brief outage, it automatically catches up on the next cycle.",
-        icon: Clock,
-        category: "Platform"
-    },
-    {
-        id: "intent-satisfaction",
-        q: "What is 'Intent Satisfaction Index'?",
-        a: "This is a composite score reflecting the total number of intents that have been fully resolved with user constraints met. Each TransactionExecuted event on-chain represents a successfully settled intent. The index serves as a heartbeat for the protocol's utility and grows as more intents are processed by solvers.",
+        id: "live-vs-mock",
+        q: "Is the data real-time or simulated?",
+        a: "The dashboard uses a high-fidelity hybrid model. Settlement data (Transactions, Solvers, Volumes) is indexed in real-time directly from the blockchain every 5 minutes. The Intent Mempool and P2P Topology currently use a functional simulation (Mock Data) to demonstrate future Anoma mainnet capabilities while the gossip network is in private devnet.",
         icon: Activity,
-        category: "Metrics"
+        category: "Platform"
     },
     {
-        id: "settled-value",
-        q: "How is 'Settled USD Value' calculated?",
-        a: "Settled USD Value tracks the real economic value of all intents successfully settled by solvers. We calculate this by analyzing token transfers associated with each transaction and applying precise pricing: USDC at $1.00, WETH at current market price, DAI at $1.00, and USDbC at $1.00. This avoids inflation from counting raw ETH value and provides a true 'Settled Value' figure.",
+        id: "arm-scale",
+        q: "What is the ARM Balance Scale?",
+        a: "Anoma uses an Abstract Resource Machine (ARM) where state changes are represented by consuming old resources (Nullifiers) and creating new ones (Commitments). Every transaction detail page features a literal scale that proves the transaction is 'balanced'—ensuring no resources were created or destroyed illegally.",
         icon: Layers,
-        category: "Metrics"
+        category: "Architecture"
     },
     {
-        id: "total-value-shielded",
-        q: "What is 'Total Value Shielded'?",
-        a: "This represents the net flow (Inflows minus Outflows) of assets moving through the Anoma protocol. A positive number indicates accumulation of privacy-shielded liquidity. We track both inflows (tokens sent to the contract) and outflows (tokens sent from the contract) to compute the net shielded amount.",
-        icon: Shield,
-        category: "Metrics"
+        id: "multi-domain",
+        q: "How does Multi-Domain Topology work?",
+        a: "Anoma is designed as a unified operating system for all blockchains. The Topology map visualizes user intents originating on various domains (Optimism, Arbitrum, ETH) and being solved by a central Anoma P2P layer before settling on a specific execution domain like Base.",
+        icon: Globe,
+        category: "Architecture"
     },
     {
-        id: "privacy-pulse",
-        q: "What does the 'Privacy Pulse' track?",
-        a: "The Privacy Pulse section visualizes CommitmentTreeRootAdded events — each representing a new Merkle tree root committed to the privacy pool. The growing count shows the protocol's shielded set expanding over time, strengthening privacy guarantees for all participants.",
-        icon: Lock,
-        category: "Metrics"
-    },
-    {
-        id: "solver-definition",
-        q: "What is a Solver?",
-        a: "In the Anoma protocol, solvers are specialized actors who find optimal execution paths for user intents. When a user submits an intent (e.g., 'swap X for Y at the best rate'), solvers compete to fulfill it. The Solver Leaderboard ranks them by transaction count, gas efficiency, and total value processed.",
+        id: "solver-strategy",
+        q: "What do the Solver Badges mean?",
+        a: "We use Strategy Intelligence to classify solvers based on their behavior: 'CoW Master' (matches intents directly without external liquidity), 'DeFi Router' (uses external protocols like Uniswap), and 'Whale' (processes high economic volume).",
         icon: Users,
         category: "Solvers"
     },
     {
-        id: "intent-mastery",
-        q: "What is 'Intent Mastery Score'?",
-        a: "Intent Mastery is a composite ranking metric combining a solver's transaction volume weight with their activity count. It's calculated as: (Total Value Processed in ETH + Transaction Count × 2) / 10. This rewards both high-value and high-frequency solvers, giving a balanced view of solver effectiveness.",
+        id: "mastery-score",
+        q: "How is 'Mastery Score' calculated?",
+        a: "Mastery Score rewards solvers who process the most economic value efficiently. It is weighted primarily by USD Volume, followed by transaction count and success rate. This allows users to identify the most reliable matchmakers in the network.",
         icon: BarChart3,
         category: "Solvers"
     },
     {
-        id: "indexed-events",
-        q: "Which events does Gnoma index?",
-        a: "Gnoma indexes all 8 event types emitted by the Anoma Protocol Adapter: TransactionExecuted (settled intents), CommitmentTreeRootAdded (privacy pool updates), ActionExecuted, DiscoveryPayload, ResourcePayload, ExternalPayload, ApplicationPayload, and ForwarderCallExecuted. All events are decoded and categorized for you.",
+        id: "anonymity-set",
+        q: "What is the Anonymity Set?",
+        a: "Privacy in Anoma is a function of the 'Shielded Pool'. The larger the number of commitments in the tree, the harder it is for an observer to link your consumed resources to your created resources. Our Simulator lets you see the mathematical probability of traceability in real-time.",
+        icon: Shield,
+        category: "Privacy"
+    },
+    {
+        id: "zk-transparency",
+        q: "What is ZK-Source Transparency?",
+        a: "Every transaction detail provides a 'Verify Source' button for its ZK Logic Proofs. This maps the RISC Zero Image ID directly to the open-source Rust code on the Anoma GitHub, ensuring you can verify the exact mathematical rules that authorized your intent.",
+        icon: Lock,
+        category: "Privacy"
+    },
+    {
+        id: "auto-asset",
+        q: "How does Automatic Asset Recognition work?",
+        a: "Our indexer performs 'on-the-fly' discovery. It automatically queries new contract addresses for symbols and decimals. It also uses symbol-based inference to assign prices (e.g., tokens containing 'USD' are automatically valued at $1.00), making it future-proof for any new test tokens.",
         icon: Code,
         category: "Technical"
     },
     {
-        id: "hex-decoder",
-        q: "What is the Hex Decoder?",
-        a: "The Hex Decoder is a built-in tool on each transaction detail page that lets you inspect raw payload data in three views: Raw Hex (the original on-chain bytes), UTF-8 Decoded (human-readable text), and JSON Parsed (structured data). This is essential for developers analyzing intent payloads.",
-        icon: Code,
-        category: "Technical"
-    },
-    {
-        id: "blockchain-support",
-        q: "What blockchain does Gnoma support?",
-        a: "Gnoma Explorer natively supports **Base**, **Ethereum Mainnet**, **Optimism**, and **Arbitrum One**. You can easily switch between networks using the chain selector in the top navigation bar. The architecture is designed to be chain-agnostic, allowing us to rapidly onboard new EVM-compatible networks as the Anoma ecosystem expands.",
-        icon: Globe,
+        id: "update-freq",
+        q: "How often is data updated?",
+        a: "The backend indexer runs on a 5-minute cron schedule. Every cycle, it fetches new logs from Blockscout, calculates USD volumes, and updates solver rankings across all supported chains simultaneously.",
+        icon: Clock,
         category: "Technical"
     },
 ]
 
-const CATEGORIES = ['Platform', 'Metrics', 'Solvers', 'Technical']
+const CATEGORIES = ['Platform', 'Architecture', 'Solvers', 'Privacy', 'Technical']
 
 const CONTRACTS = [
     { name: "Anoma Adapter (Base)", address: "0x9ED43C229480659bF6B6607C46d7B96c6D760cBB", type: "Core", explorerUrl: "https://basescan.org/address/" },

@@ -17,6 +17,7 @@ import { TransactionDetail } from './components/TransactionDetail'
 import { SolverProfile } from './components/SolverProfile'
 import { Footer } from './components/Footer'
 import { FAQ } from './components/FAQ'
+import { DebuggerPage } from './pages/DebuggerPage'
 import { AdminLayout } from './components/admin/AdminLayout'
 import { AdminLogin } from './components/admin/AdminLogin'
 import { AdminDashboard } from './components/admin/AdminDashboard'
@@ -39,13 +40,79 @@ function Dashboard() {
           <PrivacyPulse />
         </div>
       </div>
-      <div className="py-12 px-6 max-w-7xl mx-auto flex justify-center">
-        <button
-          onClick={() => navigate('/live')}
-          className="btn-swiss-primary text-lg px-12 py-6 group"
-        >
-          Enter Live Gossip Network <Zap className="w-5 h-5 group-hover:scale-125 transition-transform ml-2" />
-        </button>
+      
+      {/* Primary CTA */}
+      <div className="py-20 px-6 bg-black dark:bg-zinc-950 text-white relative overflow-hidden">
+        <div className="absolute inset-0 swiss-grid-bg opacity-10 pointer-events-none" />
+        <div className="max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
+          <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter mb-6 leading-none">
+            Witness the<br/>Intent Lifecycle
+          </h2>
+          <p className="text-zinc-400 uppercase tracking-widest text-sm mb-10 max-w-xl">
+            Explore the decentralized gossip network where users express desires and solvers compete for optimal settlement.
+          </p>
+          <button 
+            onClick={() => navigate('/live')}
+            className="btn-swiss-primary text-lg px-12 py-6 group hover:scale-105 transition-transform"
+          >
+            Enter Live Gossip Network <Zap className="w-5 h-5 group-hover:scale-125 transition-transform ml-2" />
+          </button>
+        </div>
+      </div>
+
+      {/* Developer & Technical Suite */}
+      <div className="py-24 px-6 max-w-7xl mx-auto">
+        <div className="flex items-center gap-4 mb-12">
+          <div className="w-2 h-12 bg-black dark:bg-white" />
+          <h2 className="text-3xl font-black uppercase tracking-tighter">Developer Suite</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Debugger CTA */}
+          <div 
+            onClick={() => navigate('/debug')}
+            className="swiss-card group cursor-pointer hover:border-[#FF0000] transition-colors"
+          >
+            <Terminal className="w-10 h-10 mb-6 text-gray-300 group-hover:text-[#FF0000] transition-colors" />
+            <h3 className="text-xl font-black uppercase mb-2">Intent Debugger</h3>
+            <p className="text-xs text-gray-500 uppercase font-bold tracking-wider leading-relaxed">
+              Validate ARM balance, verify logic refs, and simulate intent settlement logic.
+            </p>
+            <div className="mt-6 flex items-center gap-2 text-[10px] font-black uppercase text-[#FF0000] opacity-0 group-hover:opacity-100 transition-opacity">
+              Launch Tool <ArrowRight className="w-3 h-3" />
+            </div>
+          </div>
+
+          {/* Topology CTA */}
+          <div 
+            onClick={() => navigate('/domains')}
+            className="swiss-card group cursor-pointer hover:border-[#FF0000] transition-colors"
+          >
+            <Network className="w-10 h-10 mb-6 text-gray-300 group-hover:text-[#FF0000] transition-colors" />
+            <h3 className="text-xl font-black uppercase mb-2">Topology Map</h3>
+            <p className="text-xs text-gray-500 uppercase font-bold tracking-wider leading-relaxed">
+              Visualize the fractal scaling of Anoma's sovereign domains and cross-chain flow.
+            </p>
+            <div className="mt-6 flex items-center gap-2 text-[10px] font-black uppercase text-[#FF0000] opacity-0 group-hover:opacity-100 transition-opacity">
+              View Network <ArrowRight className="w-3 h-3" />
+            </div>
+          </div>
+
+          {/* ZK Registry CTA */}
+          <div 
+            onClick={() => navigate('/circuits')}
+            className="swiss-card group cursor-pointer hover:border-[#FF0000] transition-colors"
+          >
+            <Shield className="w-10 h-10 mb-6 text-gray-300 group-hover:text-[#FF0000] transition-colors" />
+            <h3 className="text-xl font-black uppercase mb-2">ZK Registry</h3>
+            <p className="text-xs text-gray-500 uppercase font-bold tracking-wider leading-relaxed">
+              Audit the RISC Zero image IDs and Rust source code for verified protocol logic.
+            </p>
+            <div className="mt-6 flex items-center gap-2 text-[10px] font-black uppercase text-[#FF0000] opacity-0 group-hover:opacity-100 transition-opacity">
+              Inspect Circuits <ArrowRight className="w-3 h-3" />
+            </div>
+          </div>
+        </div>
       </div>
     </>
   )
@@ -155,7 +222,7 @@ function SolverProfileWrapper() {
 }
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { Zap } from 'lucide-react'
+import { Zap, Terminal, Network, Shield, ArrowRight } from 'lucide-react'
 
 const queryClient = new QueryClient()
 
@@ -174,6 +241,7 @@ function App() {
                   <Route path="/solvers" element={<SolversPage />} />
                   <Route path="/transactions" element={<TransactionsPage />} />
                   <Route path="/mempool" element={<MempoolPage />} />
+                  <Route path="/debug" element={<DebuggerPage />} />
                   <Route path="/faq" element={<FAQ />} />
                   <Route path="/circuits" element={<ZKCircuitRegistry />} />
 
