@@ -7,7 +7,7 @@ export function GhostHunterSVG() {
                 viewBox="-50 0 1300 350"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-full h-auto min-w-[1200px]"
+                className="w-full h-auto min-w-[1000px] max-w-[1440px]"
                 preserveAspectRatio="xMidYMax meet"
                 overflow="visible"
             >
