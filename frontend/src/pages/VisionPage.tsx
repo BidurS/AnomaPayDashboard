@@ -24,7 +24,13 @@ const USE_CASES = [
         solution: 'Capital is marshaled instantaneously only when a complex multi-party intent is globally solvable; the syndicate dissolves immediately post-execution.'
     },
     {
-        rank: 6,
+        rank: 4,
+        title: 'Autonomous AI Agents (OpenAI, Gemini)',
+        problem: 'Foundational models rely on centralized API brokers and Web2 payment rails to execute economic actions, creating friction and trusted middlemen.',
+        solution: 'AI models output cryptographic Intents directly. Solvers globally compute the most efficient execution route (trading, purchasing compute) without intermediaries.'
+    },
+    {
+        rank: 5,
         title: 'Intent-Driven GPU Compute Market',
         problem: 'The highly inefficient, centralized allocation of idle GPU compute for artificial intelligence training.',
         solution: 'Compute requirements are expressed as generic intents and matched globally; Anoma routes verifiable compute tasks without a centralized orchestrator.'
