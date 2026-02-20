@@ -136,11 +136,11 @@ export function Hero() {
                         subValue="Settled USD"
                         delay={0.2}
                     />
-
+                    
                     <BigStat
-                        label={`${timeframe === 'all' ? 'Total' : timeframe} Savings`}
-                        value={loading ? '—' : formatCurrency(stats?.gasSavedUsd || 0)}
-                        subValue="Gas Fees Saved"
+                        label="Intents"
+                        value={loading ? '—' : (stats?.intentCount || 0).toLocaleString()}
+                        subValue="Executed"
                         delay={0.3}
                     />
                 </div>
