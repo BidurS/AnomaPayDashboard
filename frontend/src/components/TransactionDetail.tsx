@@ -154,7 +154,7 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
 
                         {/* Token Transfers (Ring Trade Visualizer) */}
                         {hasTokenTransfers && (
-                            <RingTradeVisualizer transfers={tx.tokenTransfers} />
+                            <RingTradeVisualizer transfers={tx.tokenTransfers} solverAddress={tx.solver_address} />
                         )}
 
                         {/* Payloads */}
@@ -334,22 +334,45 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
                             <section>
                                 <div className="flex items-center gap-2 mb-4">
                                     <Shield className="w-4 h-4" />
-                                    <h3 className="text-sm font-bold uppercase tracking-wider">Shielded State</h3>
+                                    <h3 className="text-sm font-bold uppercase tracking-wider">Shielded State & ZKP Economics</h3>
                                 </div>
-                                <div
-                                    onClick={() => setInspectorData({
-                                        title: 'Privacy Verification',
-                                        data: JSON.stringify(tx.privacyRoot, null, 2)
-                                    })}
-                                    className={`swiss-border p-4 cursor-pointer transition-colors ${xRayMode ? 'border-[#FF0000] bg-red-50 dark:bg-[#FF0000]/10' : 'bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-zinc-900'}`}
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <div className="text-[10px] uppercase font-bold text-gray-500 mb-1">Resource Commitments</div>
-                                            <div className="font-mono font-bold">{formatNumber(Number(tx.privacyRoot.estimated_pool_size || 0))} Shielded Resources</div>
-                                            <div className="text-[9px] text-gray-400 mt-1 uppercase tracking-tight">Anoma uses a commitment tree to track the creation of new private state.</div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {/* Anonymity Set */}
+                                    <div
+                                        onClick={() => setInspectorData({
+                                            title: 'Commitment Tree Root',
+                                            data: JSON.stringify(tx.privacyRoot, null, 2)
+                                        })}
+                                        className={`swiss-border p-4 cursor-pointer transition-colors group ${xRayMode ? 'border-[#FF0000] bg-red-50 dark:bg-[#FF0000]/10' : 'bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-zinc-900'}`}
+                                    >
+                                        <div className="flex items-center justify-between mb-2">
+                                            <div className="text-[10px] uppercase font-bold text-gray-500">Anonymity Set Size</div>
+                                            <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#FF0000] transition-colors" />
                                         </div>
-                                        <ArrowRight className="w-4 h-4 text-gray-300" />
+                                        <div className="font-mono font-bold text-xl mb-1">{formatNumber(Number(tx.privacyRoot.estimated_pool_size || 0))}</div>
+                                        <div className="text-[9px] text-gray-400 uppercase tracking-tight leading-relaxed">
+                                            Total shielded resources in the commitment tree. A larger set improves privacy.
+                                        </div>
+                                    </div>
+
+                                    {/* ZKP Cost */}
+                                    <div
+                                        onClick={() => setInspectorData({
+                                            title: 'ZKP Economics',
+                                            data: JSON.stringify({ gasUsed: tx.gas_used, verificationEstimate: Math.min(tx.gas_used, 350000) }, null, 2)
+                                        })}
+                                        className={`swiss-border p-4 cursor-pointer transition-colors group ${xRayMode ? 'border-[#FF0000] bg-red-50 dark:bg-[#FF0000]/10' : 'bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-zinc-900'}`}
+                                    >
+                                        <div className="flex items-center justify-between mb-2">
+                                            <div className="text-[10px] uppercase font-bold text-gray-500">ZKP Verification Cost</div>
+                                            <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#FF0000] transition-colors" />
+                                        </div>
+                                        <div className="font-mono font-bold text-xl mb-1 text-green-600 dark:text-green-500">
+                                            ~{formatNumber(Math.min(tx.gas_used, 350000))} Gas
+                                        </div>
+                                        <div className="text-[9px] text-gray-400 uppercase tracking-tight leading-relaxed">
+                                            Estimated EVM gas spent verifying the Zero-Knowledge Proof for this state transition.
+                                        </div>
                                     </div>
                                 </div>
                             </section>

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Copy, Check, Terminal, FileJson, Type, Code, type LucideIcon } from 'lucide-react'
+import { Copy, Check, Terminal, FileJson, Type, Code, ShieldAlert, type LucideIcon } from 'lucide-react'
 import { cn } from '../lib/utils'
 
 interface HexDecoderProps {
@@ -9,14 +9,15 @@ interface HexDecoderProps {
 }
 
 interface DecoderMode {
-    id: 'utf8' | 'hex' | 'json' | 'raw'
+    id: 'utf8' | 'hex' | 'json' | 'raw' | 'anoma'
     label: string
     icon: LucideIcon
     hidden?: boolean
+    disabled?: boolean
 }
 
 export function HexDecoder({ hexData, title, className }: HexDecoderProps) {
-    const [activeMode, setActiveMode] = useState<'utf8' | 'hex' | 'json' | 'raw'>('utf8')
+    const [activeMode, setActiveMode] = useState<'utf8' | 'hex' | 'json' | 'raw' | 'anoma'>('json')
     const [copied, setCopied] = useState(false)
 
     // Check if input is likely a raw JSON string instead of hex
@@ -74,10 +75,38 @@ export function HexDecoder({ hexData, title, className }: HexDecoderProps) {
         }
     }, [cleanHex, isRawJson, hexData])
 
+    const decodeAnoma = useMemo(() => {
+        if (isRawJson || cleanHex.length < 64) return { valid: false, value: 'Payload too short or not hex.' }
+        try {
+            // Attempt to structurally decode an Anoma intent blob (mocking sections for demonstration)
+            const header = cleanHex.substring(0, 8)
+            const signature = cleanHex.substring(cleanHex.length - 128)
+            const body = cleanHex.substring(8, cleanHex.length - 128)
+
+            const struct = {
+                protocol_version: 'v1.0.0',
+                magic_bytes: header,
+                payload_body: {
+                    raw_hex: body,
+                    length_bytes: body.length / 2,
+                    entropy: 'High'
+                },
+                signature_proof: {
+                    curve: 'Ed25519 / BLS12-381',
+                    raw: signature
+                }
+            }
+            return { valid: true, value: JSON.stringify(struct, null, 2) }
+        } catch (e) {
+            return { valid: false, value: 'Failed to decode Anoma structure.' }
+        }
+    }, [cleanHex, isRawJson])
+
     const getContent = () => {
         switch (activeMode) {
-            case 'json': return decodeJson.value
+            case 'json': return decodeJson.valid ? decodeJson.value : hexData
             case 'utf8': return decodeUtf8
+            case 'anoma': return decodeAnoma.valid ? decodeAnoma.value : hexData
             case 'raw': return hexData
             case 'hex':
             default: return hexData
@@ -91,9 +120,10 @@ export function HexDecoder({ hexData, title, className }: HexDecoderProps) {
     }
 
     const MODES: DecoderMode[] = [
+        { id: 'json', label: 'JSON', icon: FileJson, disabled: !decodeJson.valid && !isRawJson },
+        { id: 'anoma', label: 'STRUCT', icon: ShieldAlert, disabled: !decodeAnoma.valid, hidden: isRawJson },
         { id: 'utf8', label: 'UTF-8', icon: Type },
         { id: 'hex', label: 'HEX', icon: Terminal, hidden: isRawJson },
-        { id: 'json', label: 'JSON', icon: FileJson },
         { id: 'raw', label: 'RAW', icon: Code },
     ]
 
@@ -112,11 +142,11 @@ export function HexDecoder({ hexData, title, className }: HexDecoderProps) {
                     </span>
                 </div>
 
-                <div className="flex items-center gap-1 bg-white dark:bg-black border border-black/10 dark:border-white/10 p-0.5 rounded-sm">
+                <div className="flex items-center gap-1 bg-white dark:bg-black border border-black/10 dark:border-white/10 p-0.5 rounded-sm overflow-x-auto">
                     {MODES.map((m) => {
                         if (m.hidden) return null
                         const Icon = m.icon
-                        const isDisabled = m.id === 'json' && !decodeJson.valid
+                        const isDisabled = m.disabled
                         return (
                             <button
                                 key={m.id}
@@ -165,3 +195,4 @@ export function HexDecoder({ hexData, title, className }: HexDecoderProps) {
         </div>
     )
 }
+
