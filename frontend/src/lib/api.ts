@@ -20,6 +20,7 @@ export interface Stats {
     intentCount24h: number
     uniqueSolvers: number
     totalGasUsed: number
+    gasSavedUsd: number
 }
 
 export interface Transaction {

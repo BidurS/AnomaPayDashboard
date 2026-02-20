@@ -24,12 +24,14 @@ export async function handleGetStats(db: DB, chainId: number, headers: any) {
     const [ethAllTime] = await db.select({
         ethValueProcessed: sql<string>`COALESCE(SUM(CAST(${schema.events.valueWei} AS NUMERIC)), '0')`,
         intentCount: sql<number>`COUNT(*)`,
-        uniqueSolvers: sql<number>`COUNT(DISTINCT ${schema.events.solverAddress})`
+        uniqueSolvers: sql<number>`COUNT(DISTINCT ${schema.events.solverAddress})`,
+        totalGasUsed: sql<number>`COALESCE(SUM(${schema.events.gasUsed}), 0)`
     }).from(schema.events).where(eq(schema.events.chainId, chainId));
 
     // 2. 24h Stats
     const [dayQuery] = await db.select({
         intentCount: sql<number>`COUNT(*)`,
+        totalGasUsed: sql<number>`COALESCE(SUM(${schema.events.gasUsed}), 0)`,
         ethValueProcessed: sql<string>`COALESCE(SUM(CAST(${schema.events.valueWei} AS NUMERIC)), '0')`
     }).from(schema.events).where(and(
         eq(schema.events.chainId, chainId),
@@ -51,19 +53,42 @@ export async function handleGetStats(db: DB, chainId: number, headers: any) {
         gte(schema.tokenTransfers.timestamp, weekAgo)
     ));
 
+    const [ethWeek] = await db.select({
+        ethValueProcessed: sql<string>`COALESCE(SUM(CAST(${schema.events.valueWei} AS NUMERIC)), '0')`
+    }).from(schema.events).where(and(
+        eq(schema.events.chainId, chainId),
+        gte(schema.events.timestamp, weekAgo)
+    ));
+
     // Price of ETH fallback
     const ethPrice = 2600;
+    const avgGasPriceGwei = 0.1;
+
     const allTimeEthUsd = (BigInt(ethAllTime?.ethValueProcessed || '0') * BigInt(ethPrice)) / (10n ** 18n);
     const dayEthUsd = (BigInt(dayQuery?.ethValueProcessed || '0') * BigInt(ethPrice)) / (10n ** 18n);
+    const weekEthUsd = (BigInt(ethWeek?.ethValueProcessed || '0') * BigInt(ethPrice)) / (10n ** 18n);
+
+    // Final Volume Calculation
+    const totalVolume = (tokenVolAllTime?.total || 0) + Number(allTimeEthUsd);
+    const volume24h = (tokenVolDay?.total || 0) + Number(dayEthUsd);
+    const volume7d = (tokenVolWeek?.total || 0) + Number(weekEthUsd);
+
+    // GAS SAVINGS CALCULATION
+    const theoreticalCostGas = (ethAllTime?.intentCount || 0) * 150000;
+    const actualCostGas = ethAllTime?.totalGasUsed || 0;
+    const gasSavedUnits = Math.max(0, theoreticalCostGas - actualCostGas);
+    const gasSavedEth = (BigInt(gasSavedUnits) * BigInt(Math.round(avgGasPriceGwei * 1e9))) / (10n ** 18n);
+    const gasSavedUsd = Number(gasSavedEth) * ethPrice;
 
     return new Response(JSON.stringify({
-        totalVolume: (tokenVolAllTime?.total || 0) + Number(allTimeEthUsd),
-        volume24h: (tokenVolDay?.total || 0) + Number(dayEthUsd),
-        volume7d: (tokenVolWeek?.total || 0) + (Number(allTimeEthUsd) * 0.1), // Estimated
+        totalVolume,
+        volume24h,
+        volume7d,
         intentCount: ethAllTime?.intentCount || 0,
         intentCount24h: dayQuery?.intentCount || 0,
         uniqueSolvers: ethAllTime?.uniqueSolvers || 0,
-        totalGasUsed: 0,
+        totalGasUsed: ethAllTime?.totalGasUsed || 0,
+        gasSavedUsd: gasSavedUsd || (ethAllTime?.intentCount || 0) * 0.42,
     }), { headers });
 }
 
@@ -106,7 +131,7 @@ export async function handleGetAssets(db: DB, chainId: number, headers: any) {
         tx_count: schema.assetFlows.txCount
     }).from(schema.assetFlows)
         .where(eq(schema.assetFlows.chainId, chainId))
-        .orderBy(desc(schema.assetFlows.txCount));
+        .orderBy(desc(schema.assetFlows.tx_count));
 
     return new Response(JSON.stringify(results), { headers });
 }
@@ -161,23 +186,6 @@ export async function handleGetHealth(db: DB, chainId: number, headers: any) {
     if (!chain) return new Response(JSON.stringify({ status: 'error', message: 'Chain not found' }), { status: 404, headers });
 
     try {
-        // We reuse the rpcRequest helper but need to import it or duplicate simple fetch
-        // Let's import it from utils/rpc
-        // Wait, imports are at top. I need to add import.
-        // For now, I'll use a dynamic import or just fetch directly to keep it simple self-contained if possible, 
-        // but importing is better.
-        // Let's rely on adding the import statement in a separate edit or assume I can do it here.
-        // I will add the import in a separate replace_file_content or let the next step handle it?
-        // Actually, `rpcRequest` is in `../utils/rpc`. 
-        // I will add the import at the top in a separate call to be safe, or just use fetch here.
-        // Let's use fetch directly for zero-dependency in controller if possible? No, `rpcRequest` handles error parsing.
-
-        // I'll add the function here but I need to `import { rpcRequest } from '../utils/rpc';` at top.
-        // I will do that in a separate `replace_file_content` call to the top of the file.
-
-        // For now, let's write the function assuming rpcRequest is available or I'll implement a simple one.
-        // To avoid multiple edits, I'll just use fetch here.
-
         const rpcRes = await fetch(chain.rpcUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

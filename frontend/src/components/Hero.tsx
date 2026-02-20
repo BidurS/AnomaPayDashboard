@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { useStats, useNetworkHealth } from '../lib/api'
 import { useChainContext } from '../context/ChainContext'
-import { formatCurrency, formatNumber, cn } from '../lib/utils'
+import { formatCurrency, cn } from '../lib/utils'
 
 // Pulse Visualization Component
 function PulseBackground() {
@@ -79,14 +79,8 @@ export function Hero() {
     const getVolume = () => {
         if (!stats) return 0
         if (timeframe === '24h') return stats.volume24h
-        if (timeframe === '7d') return stats.volume7d || stats.totalVolume * 0.3 // Fallback if week not fully indexed
+        if (timeframe === '7d') return stats.volume7d
         return stats.totalVolume
-    }
-
-    const getIntentCount = () => {
-        if (!stats) return 0
-        if (timeframe === '24h') return stats.intentCount24h
-        return stats.intentCount
     }
 
     return (
@@ -144,9 +138,9 @@ export function Hero() {
                     />
 
                     <BigStat
-                        label={`${timeframe === 'all' ? 'Total' : timeframe} Intents`}
-                        value={loading ? '—' : formatNumber(getIntentCount())}
-                        subValue="Executions"
+                        label={`${timeframe === 'all' ? 'Total' : timeframe} Savings`}
+                        value={loading ? '—' : formatCurrency(stats?.gasSavedUsd || 0)}
+                        subValue="Gas Fees Saved"
                         delay={0.3}
                     />
                 </div>
@@ -154,4 +148,3 @@ export function Hero() {
         </section>
     )
 }
-
