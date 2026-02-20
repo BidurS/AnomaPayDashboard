@@ -11,15 +11,16 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.png', 'logo.svg', 'apple-touch-icon.png'],
+      includeAssets: ['favicon.png', 'logo.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png'],
       manifest: {
-        name: 'Gnoma Explorer',
+        name: 'Gnoma Explorer — Anoma Protocol',
         short_name: 'Gnoma',
-        description: 'Real-time analytics and solver intelligence for the Anoma Protocol on Base.',
+        description: 'Real-time multichain intent analytics, solver intelligence, and ZK settlement metrics for the Anoma Protocol.',
         theme_color: '#000000',
         background_color: '#000000',
         display: 'standalone',
         orientation: 'portrait',
+        start_url: '/',
         icons: [
           {
             src: 'icon-192.png',
@@ -35,7 +36,12 @@ export default defineConfig({
             src: 'icon-512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable'
+            purpose: 'maskable'
+          },
+          {
+            src: 'apple-touch-icon.png',
+            sizes: '180x180',
+            type: 'image/png'
           }
         ]
       }

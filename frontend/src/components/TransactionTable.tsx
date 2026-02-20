@@ -74,7 +74,12 @@ export function TransactionTable({ searchQuery, onTxClick, onSolverClick, hideHe
     }
 
     const formatTime = (timestamp: string | number) => {
-        return new Date(timestamp).toLocaleString('en-US', {
+        // DB stores timestamps as Unix seconds (integer). JS Date() needs milliseconds.
+        // Detect: if the value is < 1e12 it's in seconds, multiply by 1000.
+        const ms = typeof timestamp === 'number'
+            ? (timestamp < 1_000_000_000_000 ? timestamp * 1000 : timestamp)
+            : new Date(timestamp).getTime()
+        return new Date(ms).toLocaleString('en-US', {
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
