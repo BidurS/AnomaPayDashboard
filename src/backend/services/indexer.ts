@@ -20,6 +20,14 @@ const TOPICS = {
     FORWARDER_CALL_EXECUTED: '0xcddb327adb31fe5437df2a8c68301bb13a6baae432a804838caaf682506aadf1'
 };
 
+function chunkArray<T>(array: T[], size: number): T[][] {
+    const chunked: T[][] = [];
+    for (let i = 0; i < array.length; i += size) {
+        chunked.push(array.slice(i, i + size));
+    }
+    return chunked;
+}
+
 export async function runIndexer(db: DB) {
     const chains = await db.select().from(schema.chains).where(eq(schema.chains.isEnabled, 1));
     const results: any[] = [];
@@ -227,21 +235,28 @@ export async function syncBlockRange(chain: ChainConfig, db: DB, fromBlock: numb
         dailyAggregates.set(date, d);
     }
 
-    // --- BATCH INSERTS ---
+    // --- BATCH INSERTS (Chunked to prevent D1 1MB limit) ---
+    const CHUNK_SIZE = 50; // Safe limit for D1 payload size
 
     if (eventsToInsert.length) {
-        await db.insert(schema.events).values(eventsToInsert).onConflictDoUpdate({
-            target: [schema.events.chainId, schema.events.txHash],
-            set: { valueWei: sql`excluded.value_wei`, gasUsed: sql`excluded.gas_used` }
-        });
+        for (const chunk of chunkArray(eventsToInsert, CHUNK_SIZE)) {
+            await db.insert(schema.events).values(chunk).onConflictDoUpdate({
+                target: [schema.events.chainId, schema.events.txHash],
+                set: { valueWei: sql`excluded.value_wei`, gasUsed: sql`excluded.gas_used` }
+            });
+        }
     }
 
     if (payloadsToInsert.length) {
-        await db.insert(schema.payloads).values(payloadsToInsert).onConflictDoNothing();
+        for (const chunk of chunkArray(payloadsToInsert, CHUNK_SIZE)) {
+            await db.insert(schema.payloads).values(chunk).onConflictDoNothing();
+        }
     }
 
     if (poolStatsToInsert.length) {
-        await db.insert(schema.privacyStates).values(poolStatsToInsert).onConflictDoNothing();
+        for (const chunk of chunkArray(poolStatsToInsert, CHUNK_SIZE)) {
+            await db.insert(schema.privacyStates).values(chunk).onConflictDoNothing();
+        }
     }
 
     // Solvers
@@ -319,11 +334,13 @@ export async function syncBlockRange(chain: ChainConfig, db: DB, fromBlock: numb
             });
         }
 
-        // Insert transfers
-        await db.insert(schema.tokenTransfers).values(transfersToInsert).onConflictDoUpdate({
-            target: [schema.tokenTransfers.chainId, schema.tokenTransfers.txHash, schema.tokenTransfers.tokenAddress, schema.tokenTransfers.fromAddress, schema.tokenTransfers.toAddress],
-            set: { amountUsd: sql`excluded.amount_usd` }
-        });
+        // Insert transfers in chunks
+        for (const chunk of chunkArray(transfersToInsert, CHUNK_SIZE)) {
+            await db.insert(schema.tokenTransfers).values(chunk).onConflictDoUpdate({
+                target: [schema.tokenTransfers.chainId, schema.tokenTransfers.txHash, schema.tokenTransfers.tokenAddress, schema.tokenTransfers.fromAddress, schema.tokenTransfers.toAddress],
+                set: { amountUsd: sql`excluded.amount_usd` }
+            });
+        }
     }
 
     // Update Sync State

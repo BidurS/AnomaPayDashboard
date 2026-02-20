@@ -2,9 +2,9 @@ name = "anomapay-explorer"
 main = "src/backend/index.ts"
 compatibility_date = "2024-01-01"
 
-# Cron Trigger - runs every 5 minutes to index new blocks
+# Cron Trigger - runs every 1 minute to index new blocks
 [triggers]
-crons = ["*/5 * * * *"]
+crons = ["* * * * *"]
 
 # D1 Database binding
 [[d1_databases]]
