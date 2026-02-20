@@ -2,7 +2,7 @@ import { Github, Twitter, ExternalLink, Activity, CheckCircle2, AlertCircle } fr
 import { useSystemStatus } from '../lib/api'
 import { useChainContext } from '../context/ChainContext'
 import { Link } from 'react-router-dom'
-import { SkylineSVG } from './effects/SkylineSVG'
+import { GhostHunterSVG } from './effects/GhostHunterSVG'
 
 export function Footer() {
     const { activeChain } = useChainContext()
@@ -10,8 +10,8 @@ export function Footer() {
 
     return (
         <footer className="relative border-t-4 border-black dark:border-white/10 bg-white dark:bg-black pt-16 transition-colors duration-200 overflow-hidden flex flex-col justify-between min-h-[500px]">
-            {/* Skyline Background Effect (Now full width) */}
-            <SkylineSVG />
+            {/* Ghost Hunter Background Effect */}
+            <GhostHunterSVG />
 
             <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full relative z-10 flex-1 flex flex-col">
 
