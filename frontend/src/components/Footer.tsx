@@ -2,6 +2,7 @@ import { Github, Twitter, ExternalLink, Activity, CheckCircle2, AlertCircle } fr
 import { useSystemStatus } from '../lib/api'
 import { useChainContext } from '../context/ChainContext'
 import { Link } from 'react-router-dom'
+import { SkylineSVG } from './effects/SkylineSVG'
 
 export function Footer() {
     const { activeChain } = useChainContext()
@@ -12,7 +13,7 @@ export function Footer() {
             <div className="max-w-7xl mx-auto px-6 lg:px-8">
                 
                 {/* Main Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16 relative z-10">
                     
                     {/* Brand Section */}
                     <div className="md:col-span-4 space-y-6">
@@ -75,9 +76,13 @@ export function Footer() {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="pt-12 border-t border-black/5 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="pt-32 pb-12 border-t border-black/5 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 relative min-h-[320px]">
+                    
+                    {/* Skyline Background Effect */}
+                    <SkylineSVG />
+
                     {/* System Status */}
-                    <div className="flex items-center gap-2 px-3 py-1.5 border border-gray-200 dark:border-white/10 rounded-full bg-gray-50 dark:bg-zinc-900">
+                    <div className="flex items-center gap-2 px-3 py-1.5 border border-gray-200 dark:border-white/10 rounded-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm relative z-10">
                         {loading ? (
                             <Activity className="w-3 h-3 text-gray-400 animate-pulse" />
                         ) : status?.status === 'synced' ? (
@@ -90,8 +95,8 @@ export function Footer() {
                         </span>
                     </div>
 
-                    <div className="text-center md:text-right">
-                        <p className="text-[10px] text-gray-500 dark:text-zinc-600 uppercase tracking-[0.1em]">
+                    <div className="text-center md:text-right relative z-10">
+                        <p className="text-[10px] text-gray-500 dark:text-zinc-600 uppercase tracking-[0.1em] bg-white/50 dark:bg-black/50 px-2 py-1 backdrop-blur-sm rounded">
                             Contributed by{' '}
                             <a href="https://x.com/justcryptodefi" target="_blank" rel="noopener noreferrer" className="font-bold text-black dark:text-white hover:text-[#FF0000] transition-colors">
                                 @justcryptodefi

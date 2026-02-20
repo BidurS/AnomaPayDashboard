@@ -52,12 +52,12 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
 
     return (
         <header className="sticky top-0 z-50 border-b-4 border-black dark:border-white/10 bg-white dark:bg-black transition-colors duration-200">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="h-16 sm:h-20 flex items-center justify-between gap-3">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6">
+                <div className="h-16 sm:h-20 flex items-center justify-between gap-2">
                     {/* Logo */}
-                    <div className="flex items-center gap-3 cursor-pointer shrink-0" onClick={() => handleNavigate('/')}>
+                    <div className="flex items-center gap-2 cursor-pointer shrink-0" onClick={() => handleNavigate('/')}>
                         <img src="/logo.svg" alt="Gnoma Logo" className="h-10 w-10 sm:h-12 sm:w-12 object-contain" />
-                        <div className="hidden sm:block">
+                        <div className="hidden md:block">
                             <h1 className="text-lg sm:text-xl font-extrabold tracking-tight uppercase text-black dark:text-zinc-100 transition-all hover:scale-105 duration-200"
                                 style={{
                                     textShadow: '1px 1px 0 #ddd, 2px 2px 0 #ccc, 3px 3px 0 #bbb, 4px 4px 0 #aaa, 5px 5px 0 #999, 6px 6px 1px rgba(0,0,0,0.1), 0 0 5px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.3), 0 3px 5px rgba(0,0,0,0.2), 0 5px 10px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.2), 0 20px 20px rgba(0,0,0,0.15)'
@@ -68,8 +68,8 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
                         </div>
                     </div>
 
-                    {/* Desktop Navigation */}
-                    <nav className="hidden xl:flex items-center gap-2 shrink-0">
+                    {/* Desktop Navigation - Switched to lg:flex to match mobile button breakpoint */}
+                    <nav className="hidden lg:flex items-center gap-1 shrink-0">
                         {MAIN_NAV.map((item) => {
                             const Icon = item.icon
                             const isActive = currentView === item.id
@@ -78,7 +78,7 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
                                     key={item.id}
                                     onClick={() => handleNavigate(item.path)}
                                     className={cn(
-                                        "relative px-4 py-3 text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 group",
+                                        "relative px-3 py-3 text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 group",
                                         isActive
                                             ? "text-[#FF0000]"
                                             : "text-gray-500 dark:text-zinc-500 hover:text-black dark:hover:text-zinc-200"
@@ -106,7 +106,7 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
                                 onMouseEnter={() => setIsMoreOpen(true)}
                                 onClick={() => setIsMoreOpen(!isMoreOpen)}
                                 className={cn(
-                                    "relative px-4 py-3 text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 group",
+                                    "relative px-3 py-3 text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 group",
                                     MORE_NAV.some(i => i.id === currentView) ? "text-[#FF0000]" : "text-gray-500 dark:text-zinc-500 hover:text-black dark:hover:text-zinc-200"
                                 )}
                             >
@@ -161,10 +161,10 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
                     </nav>
 
                     {/* Search Bar / Command Palette Trigger */}
-                    <div className="flex-1 max-w-xs mx-2 hidden md:block">
+                    <div className="flex-1 max-w-[180px] xl:max-w-xs mx-2 hidden md:block">
                         <button
                             onClick={onOpenPalette}
-                            className="w-full h-9 px-3 flex items-center justify-between border-2 border-gray-200 dark:border-white/10 hover:border-[#FF0000] focus:border-[#FF0000] outline-none font-mono text-xs uppercase tracking-wide transition-colors bg-gray-50 dark:bg-black hover:bg-white dark:hover:bg-zinc-900 text-gray-400 dark:text-zinc-600 hover:text-black dark:hover:text-white rounded-sm group"
+                            className="w-full h-9 px-3 flex items-center justify-between border-2 border-gray-200 dark:border-white/10 hover:border-[#FF0000] focus:border-[#FF0000] outline-none font-mono text-[10px] uppercase tracking-wide transition-colors bg-gray-50 dark:bg-black hover:bg-white dark:hover:bg-zinc-900 text-gray-400 dark:text-zinc-600 hover:text-black dark:hover:text-white rounded-sm group"
                         >
                             <span className="truncate">Search commands...</span>
                             <div className="flex items-center gap-1">
@@ -174,10 +174,10 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
                     </div>
 
                     {/* Right side controls */}
-                    <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                    <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
                         
                         {/* Trust Perspective Toggle (V3 Feature) */}
-                        <div className="relative hidden lg:block">
+                        <div className="relative hidden xl:block">
                             <button
                                 onClick={() => setIsTrustOpen(!isTrustOpen)}
                                 className={cn(
@@ -228,8 +228,8 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
                                 <button
                                     onClick={() => setIsChainOpen(!isChainOpen)}
                                     className={cn(
-                                        "flex items-center gap-2 px-3 py-2",
-                                        "bg-black dark:bg-zinc-950 text-white dark:text-zinc-200 font-semibold uppercase text-[10px] tracking-wider",
+                                        "flex items-center gap-2 px-2 sm:px-3 py-2",
+                                        "bg-black dark:bg-zinc-950 text-white dark:text-zinc-200 font-semibold uppercase text-[9px] sm:text-[10px] tracking-wider",
                                         "border-2 border-black dark:border-white/10 hover:bg-white hover:text-black dark:hover:bg-zinc-900 transition-colors"
                                     )}
                                 >
@@ -265,9 +265,9 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
                                 </AnimatePresence>
                             </div>
                         ) : (
-                            <div className="flex items-center gap-2 px-3 py-2 bg-black dark:bg-zinc-950 text-white dark:text-zinc-200 border-2 border-black dark:border-white/10">
+                            <div className="flex items-center gap-2 px-2 sm:px-3 py-2 bg-black dark:bg-zinc-950 text-white dark:text-zinc-200 border-2 border-black dark:border-white/10">
                                 <span className="text-sm">{activeChain?.icon}</span>
-                                <span className="font-semibold uppercase text-[10px] tracking-wider hidden sm:inline">{activeChain?.name}</span>
+                                <span className="font-semibold uppercase text-[9px] sm:text-[10px] tracking-wider hidden sm:inline">{activeChain?.name}</span>
                                 <span className="relative flex h-2 w-2">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
@@ -275,7 +275,7 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
                             </div>
                         )}
 
-                        {/* Mobile Menu Button */}
+                        {/* Mobile Menu Button - aligned to lg:hidden to match desktop flex */}
                         <button
                             onClick={() => setIsMobileOpen(!isMobileOpen)}
                             className="lg:hidden p-2 border-2 border-black dark:border-white/10 text-black dark:text-zinc-200 hover:bg-black hover:text-white dark:hover:bg-white/10 transition-colors"
@@ -297,6 +297,27 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
                         className="lg:hidden border-t-2 border-black dark:border-white/10 overflow-hidden"
                     >
                         <div className="px-4 py-3 space-y-1 bg-gray-50 dark:bg-black">
+                            {/* Mobile Trust Perspective - only visible on mobile/small tablet */}
+                            <div className="mb-4 xl:hidden">
+                                <div className="text-[10px] font-black uppercase text-gray-400 dark:text-zinc-500 mb-2 px-1 tracking-widest">Trust Perspective</div>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {['Global Perspective', 'Local Node A', 'Local Node B', 'Taiga Shielded Set'].map((anchor) => (
+                                        <button
+                                            key={anchor}
+                                            onClick={() => setActiveTrustAnchor(anchor as TrustAnchor)}
+                                            className={cn(
+                                                "px-2 py-2 text-[9px] font-bold uppercase tracking-widest border transition-colors",
+                                                activeTrustAnchor === anchor
+                                                    ? "bg-[#FF0000] text-white border-[#FF0000]"
+                                                    : "bg-white dark:bg-zinc-900 text-black dark:text-zinc-400 border-black/10 dark:border-white/10"
+                                            )}
+                                        >
+                                            {anchor.replace(' Perspective', '')}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
                             {/* Mobile Search */}
                             <form onSubmit={handleSearch} className="relative mb-3">
                                 <input
