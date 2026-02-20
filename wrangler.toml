@@ -17,3 +17,4 @@ database_id = "3a23dc95-bff2-4c87-82af-417331a10e52"
 # ADMIN_API_KEY = "your-secret-key" # Better to use: wrangler secret put ADMIN_API_KEY
 # DISCORD_WEBHOOK_URL             # Set via: wrangler secret put DISCORD_WEBHOOK_URL
 
+pages_build_output_dir = "frontend/dist"

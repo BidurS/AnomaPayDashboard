@@ -253,55 +253,28 @@ const CONTRACTS = [
     { name: "Anoma Adapter (OP)", address: "0x094FCC095323080e71a037b2B1e3519c07dd84F8", type: "Core", explorerUrl: "https://optimistic.etherscan.io/address/" },
     { name: "Anoma Adapter (ARB)", address: "0x6d0A05E3535bd4D2C32AaD37FFB28fd0E1e528c3", type: "Core", explorerUrl: "https://arbiscan.io/address/" },
     { name: "Shielded Pool", address: "0x990c1773c28b985c2cf32c0a920192bd8717c871", type: "Core", explorerUrl: "https://basescan.org/address/" },
-    { name: "USDC", address: "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913", type: "Asset", explorerUrl: "https://basescan.org/address/" },
-    { name: "WETH", address: "0x4200000000000000000000000000000000000006", type: "Asset", explorerUrl: "https://basescan.org/address/" },
-    { name: "DAI", address: "0x50c5725949a6f0c72e6c4a641f24049a917db0cb", type: "Asset", explorerUrl: "https://basescan.org/address/" },
-    { name: "USDbC", address: "0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca", type: "Asset", explorerUrl: "https://basescan.org/address/" },
 ]
 
 function Anoma101() {
+    const steps = [
+        { num: '01', label: 'Intent', desc: 'Users express precise off-chain outcome preferences.', accent: false },
+        { num: '02', label: 'Match', desc: 'Solvers compute optimal cross-chain execution paths.', accent: false },
+        { num: '03', label: 'Execute', desc: 'Batched intents settled atomically by Protocol Adapters.', accent: true },
+        { num: '04', label: 'Shield', desc: 'Asset privacy preserved by ZK proofs on every step.', accent: false },
+    ]
     return (
-        <div className="mb-24 md:mb-32">
-            <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-black dark:text-white uppercase leading-none mb-12">
-                Anoma 101
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-8">
-                {/* 1. Intent */}
-                <div className="bg-white dark:bg-black aspect-square p-8 flex flex-col justify-between border-2 border-black dark:border-white relative overflow-hidden group hover:bg-[#FF0000] hover:border-[#FF0000] hover:text-white transition-colors duration-500">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-gray-100 dark:bg-zinc-900 rounded-bl-[100px] -z-10 group-hover:bg-black/10 transition-colors duration-500"></div>
-                    <div className="w-16 h-16 bg-black dark:bg-white rounded-full group-hover:bg-white transition-colors duration-500"></div>
-                    <div className="z-10 mt-12">
-                        <h3 className="text-3xl font-black uppercase mb-3">1. Intent</h3>
-                        <p className="text-sm font-bold text-gray-500 dark:text-gray-400 group-hover:text-white/90">Users express precise off-chain intent preferences.</p>
+        <div className="mb-10">
+            <p className="text-[11px] font-black uppercase tracking-widest text-gray-400 mb-3">Anoma 101</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {steps.map((s) => (
+                    <div key={s.num} className={`flex items-start gap-3 p-4 border ${s.accent ? 'border-[#FF0000] bg-[#FF0000] text-white' : 'border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900'}`}>
+                        <span className={`text-lg font-black font-mono shrink-0 ${s.accent ? 'text-white/60' : 'text-gray-200 dark:text-zinc-700'}`}>{s.num}</span>
+                        <div>
+                            <p className={`text-xs font-black uppercase mb-0.5 ${s.accent ? 'text-white' : 'text-black dark:text-white'}`}>{s.label}</p>
+                            <p className={`text-[11px] leading-snug ${s.accent ? 'text-white/80' : 'text-gray-500 dark:text-gray-400'}`}>{s.desc}</p>
+                        </div>
                     </div>
-                </div>
-
-                {/* 2. Match */}
-                <div className="bg-white dark:bg-black aspect-square p-8 flex flex-col justify-between border-2 border-black dark:border-white relative overflow-hidden group hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black transition-colors duration-500">
-                    <div className="w-16 h-16 border-8 border-black dark:border-white transform rotate-45 group-hover:border-white dark:group-hover:border-black transition-colors duration-500"></div>
-                    <div className="z-10 mt-12">
-                        <h3 className="text-3xl font-black uppercase mb-3">2. Match</h3>
-                        <p className="text-sm font-bold text-gray-500 dark:text-gray-400 group-hover:text-white/90 dark:group-hover:text-black/90">Solvers compute and connect complex execution paths.</p>
-                    </div>
-                </div>
-
-                {/* 3. Execute */}
-                <div className="bg-[#FF0000] text-white aspect-square p-8 flex flex-col justify-between border-2 border-[#FF0000] relative overflow-hidden group hover:bg-white hover:text-[#FF0000] hover:border-black transition-colors duration-500">
-                    <div className="w-16 h-16 bg-white group-hover:bg-[#FF0000] transition-colors duration-500"></div>
-                    <div className="z-10 mt-12">
-                        <h3 className="text-3xl font-black uppercase mb-3">3. Execute</h3>
-                        <p className="text-sm font-bold text-white/90 group-hover:text-black/80">Batched transactions settled atomically on Base.</p>
-                    </div>
-                </div>
-
-                {/* 4. Shield */}
-                <div className="bg-white dark:bg-black aspect-square p-8 flex flex-col justify-between border-2 border-black dark:border-white relative overflow-hidden group hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black transition-colors duration-500">
-                    <div className="w-16 h-16 rounded-full border-8 border-black dark:border-white border-dashed animate-[spin_10s_linear_infinite] group-hover:border-white dark:group-hover:border-black transition-colors duration-500"></div>
-                    <div className="z-10 mt-12">
-                        <h3 className="text-3xl font-black uppercase mb-3">4. Shield</h3>
-                        <p className="text-sm font-bold text-gray-500 dark:text-gray-400 group-hover:text-white/90 dark:group-hover:text-black/90">Asset privacy preserved mathematically via ZK Proofs.</p>
-                    </div>
-                </div>
+                ))}
             </div>
         </div>
     )
@@ -309,36 +282,36 @@ function Anoma101() {
 
 function AccordionItem({ item, isOpen, onToggle, index }: { item: FAQItem; isOpen: boolean; onToggle: () => void; index: number }) {
     const [feedback, setFeedback] = useState<'neutral' | 'helpful' | 'unhelpful'>('neutral')
-    const num = (index + 1).toString().padStart(2, '0');
+    const Icon = item.icon
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.04 }}
-            className={`border-b-2 border-black dark:border-white transition-colors duration-300 ${isOpen ? 'bg-gray-50 dark:bg-zinc-900' : 'hover:bg-gray-50 dark:hover:bg-zinc-900'}`}
+            transition={{ delay: index * 0.025 }}
+            className={`transition-colors duration-200 ${isOpen ? 'bg-gray-50 dark:bg-zinc-900' : 'hover:bg-gray-50 dark:hover:bg-zinc-900'}`}
         >
             <button
                 onClick={onToggle}
-                className="w-full flex items-center gap-6 py-8 md:py-12 px-4 md:px-8 text-left group focus:outline-none"
+                className="w-full flex items-center gap-3 py-3.5 px-5 text-left group focus:outline-none"
             >
-                <div className="text-4xl md:text-6xl font-black text-gray-300 dark:text-gray-800 group-hover:text-[#FF0000] transition-colors font-mono">
-                    {num}
+                {/* Icon */}
+                <div className={`w-8 h-8 shrink-0 flex items-center justify-center rounded-full border transition-colors duration-200 ${isOpen
+                    ? 'border-[#FF0000] text-[#FF0000]'
+                    : 'border-gray-200 dark:border-zinc-700 text-gray-400 group-hover:border-gray-400'}`}>
+                    <Icon className="w-3.5 h-3.5" strokeWidth={2} />
                 </div>
-                <div className="flex-1 min-w-0 pr-4 md:pr-12">
-                    <h3 className={`text-2xl md:text-4xl font-black tracking-tight transition-colors duration-200 uppercase ${isOpen ? 'text-[#FF0000]' : 'text-black dark:text-white group-hover:text-[#FF0000]'}`}>
+                {/* Question */}
+                <div className="flex-1 min-w-0">
+                    <h3 className={`text-sm font-medium transition-colors duration-200 ${isOpen ? 'text-[#FF0000]' : 'text-black dark:text-white group-hover:text-[#FF0000]'}`}>
                         {item.q}
                     </h3>
-                    <div className="mt-4 text-xs font-bold uppercase tracking-widest text-[#FF0000] inline-block border-2 border-[#FF0000] px-3 py-1 bg-[#FF0000]/10">
-                        {item.category}
-                    </div>
                 </div>
-                <div className={`w-12 h-12 md:w-16 md:h-16 rounded-full border-4 flex items-center justify-center transition-all duration-300 shrink-0 ${isOpen
-                    ? 'border-[#FF0000] text-[#FF0000] rotate-180'
-                    : 'border-black dark:border-white text-black dark:text-white group-hover:border-[#FF0000] group-hover:text-[#FF0000]'
-                    }`}>
-                    <ChevronDown className="w-6 h-6 md:w-8 md:h-8" strokeWidth={3} />
-                </div>
+                {/* Chevron */}
+                <ChevronDown
+                    className={`w-4 h-4 shrink-0 transition-transform duration-250 ${isOpen ? 'rotate-180 text-[#FF0000]' : 'text-gray-400'}`}
+                    strokeWidth={2}
+                />
             </button>
 
             <AnimatePresence>
@@ -350,25 +323,28 @@ function AccordionItem({ item, isOpen, onToggle, index }: { item: FAQItem; isOpe
                         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                         className="overflow-hidden"
                     >
-                        <div className="px-4 md:px-8 pb-12 ml-14 md:ml-24 max-w-4xl">
-                            <p className="text-lg md:text-2xl text-gray-700 dark:text-gray-300 leading-relaxed font-medium mb-8 border-l-4 border-[#FF0000] pl-6">
+                        <div className="px-5 pb-4 pl-[3.75rem]">
+                            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed border-l-2 border-[#FF0000] pl-3 mb-3">
                                 {item.a}
                             </p>
-
-                            {/* Feedback */}
-                            <div className="flex items-center gap-4 text-sm font-bold uppercase tracking-wider">
-                                <span className="text-gray-400">Did this help?</span>
+                            <div className="flex items-center gap-2 mb-2">
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-[#FF0000] border border-[#FF0000]/40 px-2 py-0.5 bg-[#FF0000]/5">
+                                    {item.category}
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider">
+                                <span className="text-gray-300 dark:text-gray-600">Helpful?</span>
                                 <button
                                     onClick={() => setFeedback('helpful')}
-                                    className={`flex items-center gap-2 px-4 py-2 border-2 transition-colors focus:outline-none ${feedback === 'helpful' ? 'border-green-500 text-green-600 bg-green-50 dark:bg-green-900/20' : 'border-gray-200 dark:border-zinc-800 text-gray-500 hover:border-black dark:hover:border-white hover:text-black dark:hover:text-white'}`}
+                                    className={`flex items-center gap-1 px-2.5 py-1 border transition-colors focus:outline-none ${feedback === 'helpful' ? 'border-green-500 text-green-600 bg-green-50 dark:bg-green-900/20' : 'border-gray-200 dark:border-zinc-800 text-gray-400 hover:border-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
                                 >
-                                    <ThumbsUp className="w-4 h-4" /> YES
+                                    <ThumbsUp className="w-2.5 h-2.5" /> Yes
                                 </button>
                                 <button
                                     onClick={() => setFeedback('unhelpful')}
-                                    className={`flex items-center gap-2 px-4 py-2 border-2 transition-colors focus:outline-none ${feedback === 'unhelpful' ? 'border-red-500 text-red-600 bg-red-50 dark:bg-red-900/20' : 'border-gray-200 dark:border-zinc-800 text-gray-500 hover:border-black dark:hover:border-white hover:text-black dark:hover:text-white'}`}
+                                    className={`flex items-center gap-1 px-2.5 py-1 border transition-colors focus:outline-none ${feedback === 'unhelpful' ? 'border-red-400 text-red-600 bg-red-50 dark:bg-red-900/20' : 'border-gray-200 dark:border-zinc-800 text-gray-400 hover:border-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
                                 >
-                                    <ThumbsDown className="w-4 h-4" /> NO
+                                    <ThumbsDown className="w-2.5 h-2.5" /> No
                                 </button>
                             </div>
                         </div>
@@ -405,124 +381,129 @@ export function FAQ() {
     }, [activeCategory, searchQuery])
 
     return (
-        <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-[1400px] mx-auto min-h-screen bg-white dark:bg-black">
+        <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-[1400px] mx-auto min-h-screen bg-white dark:bg-black">
             <SEO title="Protocol Dynamics" description="Frequently asked questions about Gnoma Explorer and the Anoma Protocol." />
 
             <Anoma101 />
 
-            <div className="mb-16 flex flex-col xl:flex-row xl:items-end justify-between gap-8 mt-32">
-                <div>
-                    <h2 className="text-6xl md:text-8xl font-black tracking-tighter text-black dark:text-white uppercase leading-[0.85]">
-                        KNOWLEDGE<br />BASE
-                    </h2>
-                </div>
-                <div className="w-full xl:w-[500px]">
-                    <div className="relative group">
-                        <div className="absolute inset-0 bg-[#FF0000] opacity-0 group-focus-within:opacity-20 transition-opacity blur-xl"></div>
-                        <div className="relative bg-white dark:bg-black border-4 border-black dark:border-white flex items-center focus-within:border-[#FF0000] dark:focus-within:border-[#FF0000] transition-colors">
-                            <Search className="w-8 h-8 ml-6 text-black dark:text-white group-focus-within:text-[#FF0000]" strokeWidth={3} />
+            {/* ── Two-column layout ────────────────────────────────────────── */}
+            <div className="flex flex-col lg:flex-row gap-8 lg:gap-14">
+
+                {/* LEFT SIDEBAR */}
+                <aside className="lg:w-[300px] xl:w-[340px] shrink-0">
+                    <div className="lg:sticky lg:top-8">
+                        {/* Badge */}
+                        <div className="inline-flex items-center gap-2 mb-5">
+                            <span className="w-2 h-2 rounded-full bg-[#FF0000] animate-pulse" />
+                            <span className="text-[11px] font-black uppercase tracking-widest text-[#FF0000]">Knowledge Base</span>
+                        </div>
+
+                        {/* Title */}
+                        <h1 className="text-3xl font-black text-black dark:text-white leading-tight mb-3">
+                            Protocol<br />Dynamics
+                        </h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-6">
+                            Deep dive into the mechanics of the Anoma Protocol Adapter. Search below or browse by category.
+                        </p>
+
+                        {/* Search */}
+                        <div className="flex items-center gap-2 border border-gray-200 dark:border-zinc-700 px-3 py-2 focus-within:border-[#FF0000] transition-colors mb-6 bg-white dark:bg-zinc-900">
+                            <Search className="w-3.5 h-3.5 text-gray-400 shrink-0" strokeWidth={2} />
                             <input
                                 type="text"
-                                placeholder="SEARCH ENTRY..."
+                                placeholder="Search questions..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full p-6 bg-transparent outline-none text-2xl font-black uppercase placeholder-gray-300 dark:placeholder-gray-700 text-black dark:text-white focus:outline-none focus:ring-0"
+                                className="w-full bg-transparent outline-none text-sm text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-600"
                             />
                         </div>
-                    </div>
-                </div>
-            </div>
 
-            <div className="mb-12 flex flex-wrap gap-4">
-                <button
-                    onClick={() => { setActiveCategory('all'); setOpenItem(null) }}
-                    className={`px-8 py-4 text-xl font-black uppercase tracking-widest border-4 transition-colors focus:outline-none ${activeCategory === 'all' ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white' : 'bg-transparent text-gray-400 border-gray-200 dark:border-zinc-800 hover:border-black dark:hover:border-white hover:text-black dark:hover:text-white'}`}
-                >
-                    ALL
-                </button>
-                {CATEGORIES.map(cat => (
-                    <button
-                        key={cat}
-                        onClick={() => { setActiveCategory(cat); setOpenItem(null) }}
-                        className={`px-8 py-4 text-xl font-black uppercase tracking-widest border-4 transition-colors focus:outline-none ${activeCategory === cat ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white' : 'bg-transparent text-gray-400 border-gray-200 dark:border-zinc-800 hover:border-black dark:hover:border-white hover:text-black dark:hover:text-white'}`}
-                    >
-                        {cat}
-                    </button>
-                ))}
-            </div>
-
-            <div className="border-t-4 border-black dark:border-white">
-                {filteredItems.length > 0 ? (
-                    filteredItems.map((item, i) => (
-                        <AccordionItem
-                            key={item.id}
-                            item={item}
-                            isOpen={openItem === item.id}
-                            onToggle={() => setOpenItem(openItem === item.id ? null : item.id)}
-                            index={i}
-                        />
-                    ))
-                ) : (
-                    <div className="py-32 text-center text-gray-400">
-                        <Search className="w-24 h-24 mx-auto mb-8 opacity-20" strokeWidth={1} />
-                        <p className="text-3xl font-black uppercase tracking-widest">No entries found</p>
-                        <button
-                            onClick={() => setSearchQuery('')}
-                            className="mt-8 text-xl text-[#FF0000] font-black uppercase hover:underline focus:outline-none"
-                        >
-                            Clear Search
-                        </button>
-                    </div>
-                )}
-            </div>
-
-            <div className="mt-32 border-t-8 border-black dark:border-white pt-16">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-                    <h3 className="text-4xl md:text-6xl font-black tracking-tighter uppercase text-black dark:text-white leading-[0.85]">
-                        Smart<br />Contracts
-                    </h3>
-                    <div className="inline-flex items-center gap-3 px-6 py-3 border-4 border-black dark:border-white bg-black text-white dark:bg-white dark:text-black">
-                        <span className="w-3 h-3 bg-[#FF0000] animate-pulse" />
-                        <span className="text-lg font-black uppercase tracking-widest">Verified Logic</span>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {CONTRACTS.map((c, i) => (
-                        <div key={i} className="group p-8 border-4 border-gray-200 dark:border-zinc-800 hover:border-black dark:hover:border-white transition-colors">
-                            <div className="flex items-start justify-between mb-6">
-                                <div>
-                                    <h4 className="font-black text-xl text-black dark:text-white uppercase mb-2 leading-none">{c.name}</h4>
-                                    <span className="text-xs font-bold font-mono text-gray-500 uppercase tracking-widest">{c.type}</span>
-                                </div>
-                                <a
-                                    href={`${c.explorerUrl}${c.address}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-gray-400 hover:text-[#FF0000] transition-colors"
-                                >
-                                    <Link className="w-6 h-6" strokeWidth={3} />
-                                </a>
-                            </div>
-
-                            <div className="flex border-2 border-gray-200 dark:border-zinc-800 group-hover:border-black dark:group-hover:border-white transition-colors">
-                                <div className="flex-1 font-mono text-xs md:text-sm text-gray-600 dark:text-gray-400 truncate p-4 bg-gray-50 dark:bg-zinc-900 group-hover:text-black dark:group-hover:text-white transition-colors">
-                                    {c.address}
-                                </div>
+                        {/* Category list */}
+                        <nav className="flex flex-col">
+                            <button
+                                onClick={() => { setActiveCategory('all'); setOpenItem(null) }}
+                                className={`text-left px-3 py-2 text-xs font-bold uppercase tracking-wider transition-colors border-l-2 ${activeCategory === 'all'
+                                    ? 'border-[#FF0000] text-black dark:text-white bg-gray-50 dark:bg-zinc-900'
+                                    : 'border-transparent text-gray-400 hover:text-black dark:hover:text-white'}`}
+                            >
+                                All Questions
+                            </button>
+                            {CATEGORIES.map(cat => (
                                 <button
-                                    onClick={() => copyToClipboard(c.address)}
-                                    className="p-4 border-l-2 border-gray-200 dark:border-zinc-800 hover:bg-[#FF0000] hover:text-white hover:border-[#FF0000] transition-colors focus:outline-none"
+                                    key={cat}
+                                    onClick={() => { setActiveCategory(cat); setOpenItem(null) }}
+                                    className={`text-left px-3 py-2 text-xs font-bold uppercase tracking-wider transition-colors border-l-2 ${activeCategory === cat
+                                        ? 'border-[#FF0000] text-black dark:text-white bg-gray-50 dark:bg-zinc-900'
+                                        : 'border-transparent text-gray-400 hover:text-black dark:hover:text-white'}`}
                                 >
-                                    {copiedAddress === c.address ? (
-                                        <Check className="w-5 h-5 text-green-500" strokeWidth={3} />
-                                    ) : (
-                                        <Copy className="w-5 h-5" strokeWidth={3} />
-                                    )}
+                                    {cat}
                                 </button>
+                            ))}
+                        </nav>
+
+                        {/* Smart contracts compact */}
+                        <div className="mt-8 pt-6 border-t border-gray-100 dark:border-zinc-800">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Smart Contracts</p>
+                            <div className="flex flex-col gap-1.5">
+                                {CONTRACTS.map((c, i) => (
+                                    <div key={i} className="flex items-center justify-between group px-2 py-1.5 border border-gray-100 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-600 transition-colors">
+                                        <div className="min-w-0">
+                                            <p className="text-[11px] font-bold text-black dark:text-white truncate">{c.name}</p>
+                                            <p className="text-[10px] font-mono text-gray-400 truncate">{c.address.slice(0, 14)}…</p>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                                            <button
+                                                onClick={() => copyToClipboard(c.address)}
+                                                className="text-gray-300 hover:text-[#FF0000] transition-colors"
+                                            >
+                                                {copiedAddress === c.address
+                                                    ? <Check className="w-3 h-3 text-green-500" strokeWidth={2.5} />
+                                                    : <Copy className="w-3 h-3" strokeWidth={2} />}
+                                            </button>
+                                            <a
+                                                href={`${c.explorerUrl}${c.address}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-gray-300 hover:text-[#FF0000] transition-colors"
+                                            >
+                                                <Link className="w-3 h-3" strokeWidth={2} />
+                                            </a>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
-                    ))}
+                    </div>
+                </aside>
+
+                {/* RIGHT: ACCORDION */}
+                <div className="flex-1 min-w-0">
+                    <div className="border border-gray-200 dark:border-zinc-800 divide-y divide-gray-100 dark:divide-zinc-800">
+                        {filteredItems.length > 0 ? (
+                            filteredItems.map((item, i) => (
+                                <AccordionItem
+                                    key={item.id}
+                                    item={item}
+                                    isOpen={openItem === item.id}
+                                    onToggle={() => setOpenItem(openItem === item.id ? null : item.id)}
+                                    index={i}
+                                />
+                            ))
+                        ) : (
+                            <div className="py-16 text-center text-gray-400">
+                                <Search className="w-8 h-8 mx-auto mb-3 opacity-20" strokeWidth={1} />
+                                <p className="text-sm font-bold uppercase tracking-widest">No entries found</p>
+                                <button
+                                    onClick={() => setSearchQuery('')}
+                                    className="mt-2 text-xs text-[#FF0000] font-bold uppercase hover:underline focus:outline-none"
+                                >
+                                    Clear Search
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
+
             </div>
         </section>
     )
