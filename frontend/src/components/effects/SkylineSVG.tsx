@@ -2,16 +2,16 @@ import { motion } from 'framer-motion'
 
 export function SkylineSVG() {
     return (
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-50 dark:opacity-20 overflow-hidden flex items-end">
+        <div className="absolute inset-x-0 bottom-0 z-0 pointer-events-none opacity-50 dark:opacity-30 flex items-end justify-center w-full">
             <svg
-                viewBox="0 0 1200 300"
+                viewBox="-50 0 1300 300"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-full h-auto min-h-[300px]"
+                className="w-full h-auto min-w-[1200px]"
                 preserveAspectRatio="xMidYMax meet"
             >
                 {/* --- San Francisco Section (Left) --- */}
-                
+
                 {/* Salesforce Tower */}
                 <motion.path
                     d="M100 300 L100 150 Q115 130 130 150 L130 300 Z"
@@ -73,18 +73,18 @@ export function SkylineSVG() {
                     strokeWidth="8"
                     className="text-gray-200 dark:text-zinc-900"
                 />
-                
+
                 {/* Data Center Racks */}
                 <rect x="880" y="220" width="12" height="60" fill="currentColor" className="text-gray-400 dark:text-zinc-800" />
                 <rect x="898" y="220" width="12" height="60" fill="currentColor" className="text-gray-400 dark:text-zinc-800" />
                 <rect x="916" y="220" width="12" height="60" fill="currentColor" className="text-gray-400 dark:text-zinc-800" />
-                
+
                 {/* Racks Activity Lights */}
                 {Array.from({ length: 15 }).map((_, i) => (
                     <motion.circle
                         key={i}
-                        cx={886 + (Math.floor(i/5) * 18)}
-                        cy={225 + (i%5 * 10)}
+                        cx={886 + (Math.floor(i / 5) * 18)}
+                        cy={225 + (i % 5 * 10)}
                         r="1.2"
                         fill={Math.random() > 0.5 ? "#00FF00" : "#FFCC00"}
                         animate={{ opacity: [0, 1, 0] }}
@@ -105,8 +105,8 @@ export function SkylineSVG() {
                 <g transform="translate(1080, 240)">
                     <path d="M-15 0 Q0 -25 15 0" stroke="currentColor" strokeWidth="2" fill="none" className="text-gray-400 dark:text-zinc-700" />
                     <line x1="0" y1="0" x2="0" y2="15" stroke="currentColor" strokeWidth="2" className="text-gray-400 dark:text-zinc-700" />
-                    <motion.line 
-                        x1="0" y1="-10" x2="0" y2="-25" 
+                    <motion.line
+                        x1="0" y1="-10" x2="0" y2="-25"
                         stroke="#0066CC" strokeWidth="1.5"
                         animate={{ y: [-3, 3, -3] }}
                         transition={{ duration: 3, repeat: Infinity }}
@@ -117,7 +117,7 @@ export function SkylineSVG() {
                 <motion.circle
                     r="3"
                     fill="#FF0000"
-                    animate={{ 
+                    animate={{
                         cx: [800, 115],
                         cy: [250, 155],
                         opacity: [0, 1, 0]
@@ -127,7 +127,7 @@ export function SkylineSVG() {
                 <motion.circle
                     r="2"
                     fill="#0066CC"
-                    animate={{ 
+                    animate={{
                         cx: [115, 880],
                         cy: [155, 250],
                         opacity: [0, 1, 0]

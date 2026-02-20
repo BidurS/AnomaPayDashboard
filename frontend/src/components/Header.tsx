@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Menu, X, Users, ArrowRightLeft, HelpCircle, Home as HomeIcon, Activity, Shield, Zap, MoreHorizontal, Network, Terminal, Eye } from 'lucide-react'
+import { ChevronDown, Menu, X, Users, ArrowRightLeft, HelpCircle, Home as HomeIcon, Activity, Shield, Zap, MoreHorizontal, Network, Terminal, Eye, BookOpen } from 'lucide-react'
 import { ThemeToggle } from './ThemeToggle'
 import { useChainContext } from '../context/ChainContext'
 import { useTrust, type TrustAnchor } from '../context/TrustContext'
@@ -22,6 +22,7 @@ const MAIN_NAV = [
 
 const MORE_NAV = [
     { id: 'domains', label: 'Topology', icon: Network, path: '/domains', isLive: true },
+    { id: 'vision', label: 'Vision', icon: BookOpen, path: '/vision' },
     { id: 'live', label: 'Live Data', icon: Activity, path: '/live', isLive: true },
     { id: 'debug', label: 'Debugger', icon: Terminal, path: '/debug' },
     { id: 'circuits', label: 'ZK Registry', icon: Shield, path: '/circuits' },
@@ -175,7 +176,7 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
 
                     {/* Right side controls */}
                     <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-                        
+
                         {/* Trust Perspective Toggle (V3 Feature) */}
                         <div className="relative hidden xl:block">
                             <button

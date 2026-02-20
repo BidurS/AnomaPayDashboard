@@ -9,12 +9,15 @@ export function Footer() {
     const { status, loading } = useSystemStatus(activeChain?.id || 8453)
 
     return (
-        <footer className="border-t-4 border-black dark:border-white/10 bg-white dark:bg-black py-16 transition-colors duration-200">
-            <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                
+        <footer className="relative border-t-4 border-black dark:border-white/10 bg-white dark:bg-black pt-16 transition-colors duration-200 overflow-hidden flex flex-col justify-between min-h-[500px]">
+            {/* Skyline Background Effect (Now full width) */}
+            <SkylineSVG />
+
+            <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full relative z-10 flex-1 flex flex-col">
+
                 {/* Main Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16 relative z-10">
-                    
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-auto relative z-10">
+
                     {/* Brand Section */}
                     <div className="md:col-span-4 space-y-6">
                         <div className="flex items-center gap-4">
@@ -29,7 +32,7 @@ export function Footer() {
                         <p className="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed max-w-sm">
                             The industry-standard analytics platform for the Anoma Protocol. Visualizing the lifecycle of intents from gossip to ZK-settlement.
                         </p>
-                        
+
                         {/* Socials */}
                         <div className="flex items-center gap-3 pt-4">
                             <a href="https://github.com/anoma" target="_blank" rel="noopener noreferrer" className="p-2 border border-black/10 dark:border-white/10 hover:bg-black hover:text-white transition-colors">
@@ -76,10 +79,7 @@ export function Footer() {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="pt-32 pb-12 border-t border-black/5 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 relative min-h-[320px]">
-                    
-                    {/* Skyline Background Effect */}
-                    <SkylineSVG />
+                <div className="pt-32 pb-12 mt-16 border-t border-black/5 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 relative min-h-[120px]">
 
                     {/* System Status */}
                     <div className="flex items-center gap-2 px-3 py-1.5 border border-gray-200 dark:border-white/10 rounded-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm relative z-10">

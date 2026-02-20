@@ -25,6 +25,8 @@ import { CommandPalette } from './components/CommandPalette'
 import { ZKCircuitRegistry } from './components/ZKCircuitRegistry'
 import { MempoolPage } from './pages/MempoolPage'
 import { DomainsPage } from './pages/DomainsPage'
+import { VisionPage } from './pages/VisionPage'
+import { VisionArchitecturePage } from './pages/VisionArchitecturePage'
 import { SEO } from './components/SEO'
 import './index.css'
 
@@ -40,18 +42,18 @@ function Dashboard() {
           <PrivacyPulse />
         </div>
       </div>
-      
+
       {/* Primary CTA */}
       <div className="py-20 px-6 bg-black dark:bg-zinc-950 text-white relative overflow-hidden">
         <div className="absolute inset-0 swiss-grid-bg opacity-10 pointer-events-none" />
         <div className="max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
           <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter mb-6 leading-none">
-            Witness the<br/>Intent Lifecycle
+            Witness the<br />Intent Lifecycle
           </h2>
           <p className="text-zinc-400 uppercase tracking-widest text-sm mb-10 max-w-xl">
             Explore the decentralized gossip network where users express desires and solvers compete for optimal settlement.
           </p>
-          <button 
+          <button
             onClick={() => navigate('/live')}
             className="btn-swiss-primary text-lg px-12 py-6 group hover:scale-105 transition-transform"
           >
@@ -66,10 +68,10 @@ function Dashboard() {
           <div className="w-2 h-12 bg-black dark:bg-white" />
           <h2 className="text-3xl font-black uppercase tracking-tighter">Developer Suite</h2>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Debugger CTA */}
-          <div 
+          <div
             onClick={() => navigate('/debug')}
             className="swiss-card group cursor-pointer hover:border-[#FF0000] transition-colors"
           >
@@ -84,7 +86,7 @@ function Dashboard() {
           </div>
 
           {/* Topology CTA */}
-          <div 
+          <div
             onClick={() => navigate('/domains')}
             className="swiss-card group cursor-pointer hover:border-[#FF0000] transition-colors"
           >
@@ -99,7 +101,7 @@ function Dashboard() {
           </div>
 
           {/* ZK Registry CTA */}
-          <div 
+          <div
             onClick={() => navigate('/circuits')}
             className="swiss-card group cursor-pointer hover:border-[#FF0000] transition-colors"
           >
@@ -164,6 +166,7 @@ function Layout() {
     if (location.pathname === '/live') return 'live'
     if (location.pathname === '/mempool') return 'mempool'
     if (location.pathname === '/domains') return 'domains'
+    if (location.pathname.startsWith('/vision')) return 'vision'
     if (location.pathname === '/solvers' || location.pathname.startsWith('/solver/')) return 'solvers'
     if (location.pathname === '/transactions' || location.pathname.startsWith('/tx/')) return 'transactions'
     if (location.pathname === '/circuits') return 'circuits'
@@ -238,6 +241,8 @@ function App() {
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/live" element={<LiveFeedPage />} />
                   <Route path="/domains" element={<DomainsPage />} />
+                  <Route path="/vision" element={<VisionPage />} />
+                  <Route path="/vision/architecture" element={<VisionArchitecturePage />} />
                   <Route path="/solvers" element={<SolversPage />} />
                   <Route path="/transactions" element={<TransactionsPage />} />
                   <Route path="/mempool" element={<MempoolPage />} />
