@@ -1,6 +1,6 @@
 
 import { useState } from 'react'
-import { HashRouter, Routes, Route, useNavigate, useLocation, Outlet, useParams, useOutletContext } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, Outlet, useParams, useOutletContext } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import { ChainProvider } from './context/ChainContext'
 import { ThemeProvider } from './context/ThemeContext'
@@ -235,7 +235,7 @@ function App() {
       <ChainProvider>
         <ThemeProvider>
           <HelmetProvider>
-            <HashRouter>
+            <BrowserRouter>
               <Routes>
                 <Route element={<Layout />}>
                   <Route path="/" element={<Dashboard />} />
@@ -261,7 +261,7 @@ function App() {
                   </Route>
                 </Route>
               </Routes>
-            </HashRouter>
+            </BrowserRouter>
           </HelmetProvider>
         </ThemeProvider>
       </ChainProvider>

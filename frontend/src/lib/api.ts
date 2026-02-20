@@ -422,3 +422,24 @@ export function useSystemStatus(chainId: number) {
 
     return { status: status || null, loading: isLoading };
 }
+
+export interface PrivacyPoolStat {
+    block_number: number
+    timestamp: number
+    estimated_pool_size: number
+    root_hash: string
+}
+
+export function usePrivacyStats(chainId: number) {
+    const { data: stats, isLoading } = useQuery({
+        queryKey: ['privacyStats', chainId],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/privacy-stats?chainId=${chainId}`);
+            return res.json() as Promise<PrivacyPoolStat[]>;
+        },
+        refetchInterval: 15000, // Poll every 15s to keep pulse alive
+        staleTime: 10000,
+    });
+
+    return { stats: stats || [], loading: isLoading };
+}

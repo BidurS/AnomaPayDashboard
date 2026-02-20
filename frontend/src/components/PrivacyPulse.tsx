@@ -5,6 +5,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { AnonymitySimulator } from './AnonymitySimulator'
 import { useChainContext } from '../context/ChainContext'
 import { formatNumber } from '../lib/utils'
+import { usePrivacyStats } from '../lib/api'
 
 // Animated counter component
 function AnimatedNumber({ value, duration = 1.5 }: { value: number; duration?: number }) {
@@ -39,15 +40,6 @@ function PulsingDot({ cx, cy }: { cx?: number; cy?: number }) {
     )
 }
 
-const API_URL = import.meta.env.DEV ? '' : 'https://anomapay-explorer.bidurandblog.workers.dev'
-
-interface PrivacyPoolStat {
-    block_number: number
-    timestamp: number
-    estimated_pool_size: number
-    root_hash: string
-}
-
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (!active || !payload) return null
     return (
@@ -69,56 +61,13 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export function PrivacyPulse() {
     const { activeChain } = useChainContext()
-    const [data, setData] = useState<PrivacyPoolStat[]>([])
-    const [loading, setLoading] = useState(true)
-    const [currentPoolSize, setCurrentPoolSize] = useState(0)
+    const chainId = activeChain?.id || 8453
+    const { stats, loading } = usePrivacyStats(chainId)
 
-    useEffect(() => {
-        setLoading(true)
-        fetch(`${API_URL}/api/privacy-stats?chainId=${activeChain?.id || 8453}`)
-            .then(res => res.json())
-            .then(stats => {
-                // Handle V3 Object format { anonymitySetSize, ... }
-                if (stats && stats.anonymitySetSize !== undefined) {
-                    const poolSize = stats.anonymitySetSize || 0
-                    setCurrentPoolSize(poolSize)
-                    
-                    setData(prev => {
-                        const newDataPoint = {
-                            block_number: 0,
-                            timestamp: Date.now() / 1000,
-                            estimated_pool_size: poolSize,
-                            root_hash: 'live'
-                        }
-                        if (prev.length === 0) {
-                            const history = Array.from({ length: 20 }).map((_, i) => ({
-                                block_number: 0,
-                                timestamp: (Date.now() / 1000) - (20 - i) * 3600,
-                                estimated_pool_size: Math.max(0, poolSize - (20 - i) * 5),
-                                root_hash: 'hist'
-                            }))
-                            return [...history, newDataPoint]
-                        }
-                        return [...prev, newDataPoint].slice(-30)
-                    })
-                } 
-                // Handle D1 Array format [{ estimated_pool_size, ... }]
-                else if (Array.isArray(stats)) {
-                    const latest = stats[stats.length - 1];
-                    setCurrentPoolSize(latest?.estimated_pool_size || 0);
-                    setData(stats.map(s => ({
-                        block_number: s.block_number,
-                        timestamp: s.timestamp,
-                        estimated_pool_size: s.estimated_pool_size,
-                        root_hash: s.root_hash
-                    })));
-                }
-                setLoading(false)
-            })
-            .catch(() => setLoading(false))
-    }, [activeChain?.id])
+    // Data is already ASC from API (old to new)
+    const data = Array.isArray(stats) ? stats : []
+    const currentPoolSize = data.length > 0 ? data[data.length - 1].estimated_pool_size : 0
 
-    // Data is already ASC from API (old to new) — perfect for chart
     const chartData = data.map(d => ({
         date: new Date(d.timestamp * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
         actions: d.estimated_pool_size,
@@ -126,9 +75,8 @@ export function PrivacyPulse() {
     }))
 
     const hasData = chartData.length > 0
-    const displayPoolSize = currentPoolSize
     const growthPercent = hasData && chartData.length > 1
-        ? ((chartData[chartData.length - 1].actions - chartData[0].actions) / chartData[0].actions * 100).toFixed(1)
+        ? ((chartData[chartData.length - 1].actions - chartData[0].actions) / Math.max(chartData[0].actions, 1) * 100).toFixed(1)
         : '0'
 
     const stagger = {
@@ -166,7 +114,7 @@ export function PrivacyPulse() {
                             <div className="flex items-center gap-6">
                                 <div className="text-right">
                                     <div className="swiss-number text-black dark:text-white">
-                                        {loading ? '—' : <AnimatedNumber value={displayPoolSize} />}
+                                        {loading ? '—' : <AnimatedNumber value={currentPoolSize} />}
                                     </div>
                                     <div className="text-[10px] text-gray-500 dark:text-zinc-500 uppercase tracking-[0.2em]">
                                         True Anonymity Set
@@ -224,7 +172,6 @@ export function PrivacyPulse() {
                                                     animationDuration={1500}
                                                     animationEasing="ease-out"
                                                 />
-                                                {/* Pulsing dot on latest data point */}
                                                 {chartData.length > 0 && (
                                                     <ReferenceDot
                                                         x={chartData[chartData.length - 1].date}
