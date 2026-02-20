@@ -12,79 +12,240 @@ interface FAQItem {
 }
 
 const FAQ_ITEMS: FAQItem[] = [
+    // ── PLATFORM ──────────────────────────────────────────────────────────────
     {
         id: "platform-intro",
         q: "What is Gnoma Explorer?",
-        a: "Gnoma Explorer is a world-class analytics engine for the Anoma Protocol. It visualizes the full lifecycle of an intent—from P2P gossip to solver matchmaking and final ZK-settlement. It currently supports indexing for Base, Ethereum, and other EVM-compatible protocol adapters.",
+        a: "Gnoma Explorer is a world-class analytics engine for the Anoma Protocol. It visualizes the full lifecycle of an intent—from P2P gossip to solver matchmaking and final ZK-verified settlement. It indexes real-time data from the Anoma Protocol Adapters deployed on Ethereum, Base, Optimism, and Arbitrum, and provides deep analytics on solvers, shielded pools, and resource state.",
         icon: Zap,
         category: "Platform"
     },
     {
         id: "live-vs-mock",
         q: "Is the data real-time or simulated?",
-        a: "The dashboard uses a high-fidelity hybrid model. Settlement data (Transactions, Solvers, Volumes) is indexed in real-time directly from the blockchain every 5 minutes. The Intent Mempool and P2P Topology currently use a functional simulation (Mock Data) to demonstrate future Anoma mainnet capabilities while the gossip network is in private devnet.",
+        a: "The dashboard uses a high-fidelity hybrid model. Settlement data (Transactions, Solvers, Volumes, ARM State) is indexed in real-time directly from the blockchain every 5 minutes via Blockscout. The Intent Mempool and P2P Topology currently use a functional simulation to demonstrate future Anoma mainnet capabilities while the gossip network is in private devnet. Live data indicators throughout the UI show which data is real vs. simulated.",
         icon: Activity,
         category: "Platform"
     },
     {
-        id: "arm-scale",
-        q: "What is the ARM Balance Scale?",
-        a: "Anoma uses an Abstract Resource Machine (ARM) where state changes are represented by consuming old resources (Nullifiers) and creating new ones (Commitments). Every transaction detail page features a literal scale that proves the transaction is 'balanced'—ensuring no resources were created or destroyed illegally.",
-        icon: Layers,
-        category: "Architecture"
+        id: "supported-chains",
+        q: "Which chains does Gnoma Explorer support?",
+        a: "Gnoma Explorer currently indexes four chains via Anoma Protocol Adapters: Ethereum Mainnet, Base, Optimism, and Arbitrum. You can switch chains using the network selector in the header. Solana and Cosmos/IBC support are planned for future releases as Anoma expands its Protocol Adapter ecosystem.",
+        icon: Globe,
+        category: "Platform"
     },
     {
-        id: "multi-domain",
-        q: "How does Multi-Domain Topology work?",
-        a: "Anoma is designed as a unified operating system for all blockchains. The Topology map visualizes user intents originating on various domains (Optimism, Arbitrum, ETH) and being solved by a central Anoma P2P layer before settling on a specific execution domain like Base.",
-        icon: Globe,
-        category: "Architecture"
+        id: "update-freq",
+        q: "How often is data updated?",
+        a: "The backend indexer runs on a 5-minute cron schedule. Every cycle it fetches new event logs from Blockscout across all supported chains simultaneously, calculates USD volumes using live pricing, and updates solver rankings. WebSocket connections push live data directly to the UI for the Mempool and Topology views.",
+        icon: Clock,
+        category: "Platform"
     },
+
+    // ── INTENTS ───────────────────────────────────────────────────────────────
+    {
+        id: "what-is-intent",
+        q: "What is an Intent?",
+        a: "An intent is a signed, machine-readable expression of what you want—not how to get it. Instead of specifying exact transaction steps ('call Uniswap → swap X for Y → bridge to Z'), you declare your desired outcome ('I want at least 1,000 USDC for my 0.5 ETH, settled within 10 minutes, preserving my privacy'). The protocol then finds the optimal execution path on your behalf. This is the foundational shift from imperative blockchains to declarative ones.",
+        icon: Zap,
+        category: "Intents"
+    },
+    {
+        id: "intent-lifecycle",
+        q: "What is the lifecycle of an intent through Anoma?",
+        a: "An intent travels through 5 phases: (1) Creation — the user signs an intent specifying desired outcomes and validity conditions. (2) Gossip — the intent propagates through the P2P network of solvers who evaluate it. (3) Solving — one or more solvers identify a matching combination (possibly combined with other intents) that satisfies all parties. (4) ZK-Proof Generation — the solution is translated into a resource-balanced transaction with validity proofs. (5) Settlement — the transaction is submitted to the Protocol Adapter on the target chain, where it is verified and finalized on-chain.",
+        icon: Activity,
+        category: "Intents"
+    },
+    {
+        id: "cow-intents",
+        q: "What is a Coincidence of Wants (CoW)?",
+        a: "A Coincidence of Wants (CoW) occurs when two or more users' intents can be matched directly against each other without routing through any external liquidity source. For example, Alice wants to trade ETH for USDC and Bob wants to trade USDC for ETH at the same ratio — they can be matched directly. CoW is the most capital-efficient settlement method: zero price impact, zero liquidity fees, pure peer-to-peer exchange. Gnoma's Solver Leaderboard tracks which solvers specialize in CoW matching.",
+        icon: Users,
+        category: "Intents"
+    },
+    {
+        id: "intent-vs-tx",
+        q: "How are intents different from regular transactions?",
+        a: "Traditional blockchain transactions are imperative instructions: 'call this contract with these exact parameters.' If the state changes before your transaction executes, it may fail or give you a worse outcome. Intents are declarative constraints: 'satisfy these conditions for me.' This shifts the burden of finding the correct execution path from the user to competitive solvers, eliminates front-running risk (solvers cannot reorder intents since the user sets the outcome bounds), and enables cross-chain settlement without the user bridging manually.",
+        icon: Code,
+        category: "Intents"
+    },
+    {
+        id: "intent-mempool",
+        q: "What is the Intent Mempool?",
+        a: "The Intent Mempool is the off-chain P2P overlay network where signed intents are broadcast and gossiped between solvers before settlement. Unlike Ethereum's public mempool (where transaction ordering creates MEV opportunities), Anoma's intent mempool does not expose full execution details publicly. Privacy-preserving gossip protocols mean solvers see enough to identify matches but not enough to front-run or extract value from individual users. Gnoma's Mempool page visualizes this live gossip layer.",
+        icon: Layers,
+        category: "Intents"
+    },
+
+    // ── ARM ───────────────────────────────────────────────────────────────────
+    {
+        id: "what-is-arm",
+        q: "What is the Abstract Resource Machine (ARM)?",
+        a: "The ARM is Anoma's core execution model. Instead of accounts with balances (like Ethereum's EVM), the ARM models state as a set of discrete Resources — like UTXO-style objects that exist either in a committed (unspent) or nullified (consumed) state. A valid ARM transaction must be perfectly balanced: every resource consumed must be exactly offset by resources created. This balance check is analogous to double-entry bookkeeping, making accounting errors mathematically impossible.",
+        icon: Layers,
+        category: "ARM"
+    },
+    {
+        id: "arm-vs-evm",
+        q: "How does the ARM compare to the EVM account model?",
+        a: "The EVM uses mutable accounts: a global state tree where balances are numbers that change in place. This creates ordering dependencies (transactions must run sequentially) and makes parallel execution hard. The ARM uses an immutable resource model: resources are created and consumed, never modified. This means ARM transactions are naturally parallelizable (no shared mutable state conflicts), easier to prove in ZK (you prove the nullifier and commitment sets are valid), and more composable across chains (resources can exist on multiple domains simultaneously — Chimera Resources).",
+        icon: BarChart3,
+        category: "ARM"
+    },
+    {
+        id: "arm-scale",
+        q: "What is the ARM Balance Scale on transaction pages?",
+        a: "Every transaction detail page in Gnoma features a visual ARM Balance Scale. This renders the mathematical proof that the transaction is valid: the left pan shows all resources consumed (Nullifiers), the right pan shows all resources created (Commitments), and they must be perfectly equal. If the scale tips, the transaction would be rejected by the protocol. This is a real visualization of the ARM's core invariant: ΣNullifiers = ΣCommitments.",
+        icon: Layers,
+        category: "ARM"
+    },
+    {
+        id: "validity-predicates",
+        q: "What are Validity Predicates?",
+        a: "Every resource in the ARM carries a Validity Predicate (VP) — a ZK-verifiable program that defines the conditions under which that resource can be consumed. Think of it as smart contract logic that lives on the resource itself rather than in a shared contract. A token's VP might say 'I can only be spent if the owner's signature is present.' An NFT's VP might say 'I can only be transferred if a royalty payment is included in the same transaction.' VPs are written in Juvix and compile to ZK circuit constraints.",
+        icon: Lock,
+        category: "ARM"
+    },
+    {
+        id: "ephemeral-resources",
+        q: "What are Ephemeral Resources?",
+        a: "Ephemeral Resources exist only within the scope of a single transaction — they are created and consumed in the same step and leave no permanent state on-chain. This makes them ideal for intermediate computation values, temporary authorization tokens, or complex multi-step swaps where intermediate states should not be visible on-chain. A DEX trade might use an ephemeral resource to represent 'authorization to complete this specific swap' that disappears the moment the swap settles.",
+        icon: Zap,
+        category: "ARM"
+    },
+
+    // ── SOLVERS ───────────────────────────────────────────────────────────────
     {
         id: "solver-strategy",
-        q: "What do the Solver Badges mean?",
-        a: "We use Strategy Intelligence to classify solvers based on their behavior: 'CoW Master' (matches intents directly without external liquidity), 'DeFi Router' (uses external protocols like Uniswap), and 'Whale' (processes high economic volume).",
+        q: "What do Solver Badges mean?",
+        a: "Strategy Intelligence badges classify solvers by their primary behavior. 'CoW Master' identifies intents that can be matched peer-to-peer without external liquidity. 'DeFi Router' uses external protocols like Uniswap, Curve, or Balancer. 'Aggregation Solver' combines multiple intents into a single optimal batch. 'Cross-Chain Solver' routes settlements across multiple domains. 'Whale' processes very high economic volume. Solvers often employ multiple strategies simultaneously.",
         icon: Users,
         category: "Solvers"
     },
     {
         id: "mastery-score",
-        q: "How is 'Mastery Score' calculated?",
-        a: "Mastery Score rewards solvers who process the most economic value efficiently. It is weighted primarily by USD Volume, followed by transaction count and success rate. This allows users to identify the most reliable matchmakers in the network.",
+        q: "How is Mastery Score calculated?",
+        a: "Mastery Score rewards solvers who process the most economic value efficiently. It is weighted: 70% USD Volume processed, 20% transaction count, 10% success rate. This surfaces the most reliable and high-volume matchmakers in the network. A high mastery score indicates a solver has consistently found valid matches across many intents over time — the gold standard for intent infrastructure quality.",
         icon: BarChart3,
         category: "Solvers"
     },
     {
+        id: "solver-competition",
+        q: "How do Solvers compete for intents?",
+        a: "Solvers subscribe to the intent gossip network and race to find valid solutions for incoming intents. The first solver to submit a valid, balanced ARM transaction that satisfies all intent constraints wins the right to settle it and collect any available fees. Solvers with better algorithms (finding CoW matches faster, routing more efficiently, or proving ZK validity faster) earn more. This competitive market dynamic drives efficiency and innovation without protocol-level intervention.",
+        icon: Zap,
+        category: "Solvers"
+    },
+    {
+        id: "mev-solvers",
+        q: "Can Solvers front-run or extract MEV?",
+        a: "Solver competition in Anoma is fundamentally different from Ethereum MEV. Because intents specify outcome bounds (minimum amounts, maximum slippage, deadlines), solvers cannot worsen a user's outcome beyond what the user explicitly accepts. Any surplus a solver finds beyond the user's minimum constraint can be split or retained as solver profit, but this is a feature — it incentivizes solvers to find the best execution — not traditional MEV which harms users. Intent-based systems effectively eliminate harmful sandwich attacks.",
+        icon: Shield,
+        category: "Solvers"
+    },
+
+    // ── PRIVACY & ZK ──────────────────────────────────────────────────────────
+    {
         id: "anonymity-set",
         q: "What is the Anonymity Set?",
-        a: "Privacy in Anoma is a function of the 'Shielded Pool'. The larger the number of commitments in the tree, the harder it is for an observer to link your consumed resources to your created resources. Our Simulator lets you see the mathematical probability of traceability in real-time.",
+        a: "Privacy in Anoma scales with the size of the Shielded Pool. The Anonymity Set is the count of unspent commitments (UTXOs) in the ARM commitment tree. When you consume a resource, an observer sees a nullifier emerge — but must guess which of the N commitments in the pool it corresponds to. If N = 1,400 (current Gnoma testnet), the probability of tracing your transaction is 1/1,400. Our Privacy Pulse widget tracks this number in real time.",
         icon: Shield,
-        category: "Privacy"
+        category: "Privacy & ZK"
+    },
+    {
+        id: "what-is-ifc",
+        q: "What is Information Flow Control (IFC)?",
+        a: "IFC is Anoma's four-tier privacy architecture. Tier 1 (State Privacy): shielded pools hide balances and resource ownership using ZK proofs — nobody can see what you hold. Tier 2 (Intent Privacy): intent content (amounts, counterparty, strategy) is encrypted end-to-end using threshold encryption, only revealed to matched solvers. Tier 3 (P2P Network Privacy): the gossip layer uses mix networks and onion routing so that even network-level observers cannot correlate IP addresses with intent activity. Tier 4 (Future — Full Homomorphic Encryption): planned FHE layer will allow solvers to compute on fully encrypted intents without ever decrypting them — the ultimate privacy guarantee.",
+        icon: Lock,
+        category: "Privacy & ZK"
     },
     {
         id: "zk-transparency",
         q: "What is ZK-Source Transparency?",
-        a: "Every transaction detail provides a 'Verify Source' button for its ZK Logic Proofs. This maps the RISC Zero Image ID directly to the open-source Rust code on the Anoma GitHub, ensuring you can verify the exact mathematical rules that authorized your intent.",
+        a: "Every transaction detail in Gnoma provides a 'Verify Source' link for its ZK logic proofs. This maps the RISC Zero Image ID (a hash of the proof circuit) directly to the open-source Rust code on the Anoma GitHub. Anyone can verify that the exact mathematical rules encoded in the circuit match the published code — making the ZK guarantees auditable by anyone, not just cryptographers.",
         icon: Lock,
-        category: "Privacy"
+        category: "Privacy & ZK"
+    },
+    {
+        id: "zk-stack",
+        q: "What ZK proof system does Anoma use?",
+        a: "Anoma uses a four-layer ZK stack: (1) Constraint System — Validity Predicates compile to arithmetic circuits encoding resource logic. (2) Proof System — PLONK-family proofs (specifically a variant called Taiga) verify individual resource transitions with sub-second proof times. (3) Recursive Aggregation — individual resource proofs are aggregated into a single transaction proof using recursive SNARKs, so settlement requires only one on-chain verification regardless of transaction complexity. (4) Proof Generation — RISC Zero generates proofs for the cross-chain Settlement Layer, enabling trustless bridging.",
+        icon: Code,
+        category: "Privacy & ZK"
+    },
+
+    // ── PROTOCOL ──────────────────────────────────────────────────────────────
+    {
+        id: "is-anoma-blockchain",
+        q: "Is Anoma a blockchain?",
+        a: "Anoma is best described as an intent-centric protocol and operating system for heterogeneous blockchains — not a single blockchain itself. It is a unified middleware layer that sits across existing chains. It processes intents, runs the ARM, and settles via Protocol Adapters on whichever execution layer makes sense (Ethereum, Base, Solana, etc.). Think of it less like 'a new chain' and more like 'a new layer of the internet that coordinates value exchange across all chains.'",
+        icon: Globe,
+        category: "Protocol"
+    },
+    {
+        id: "chimera-chains",
+        q: "What are Chimera Chains?",
+        a: "Chimera Chains are a novel Anoma construction where a single chain simultaneously satisfies two different consensus systems. For example, a Chimera Chain might finalize under both Ethereum's and Anoma's consensus rules, meaning assets native to either chain can be used on it with full finality guarantees from both. This eliminates the need for traditional bridges (which require trust in a multisig or validator set) — Chimera resources are natively valid on multiple domains.",
+        icon: Layers,
+        category: "Protocol"
+    },
+    {
+        id: "protocol-adapters",
+        q: "What are Protocol Adapters?",
+        a: "Protocol Adapters (PAs) are smart contracts deployed on existing blockchains (Ethereum, Base, Optimism, Arbitrum) that bridge the gap between those chains' native execution environments and the Anoma ARM model. When a solver produces a valid ARM transaction for settlement, it is submitted to the Protocol Adapter, which: (1) verifies the ZK proof, (2) enforces resource balance, (3) executes any required EVM interactions. PAs are what make Anoma chain-agnostic without requiring existing chains to change their VMs.",
+        icon: Globe,
+        category: "Protocol"
+    },
+    {
+        id: "gas-abstraction",
+        q: "How is gas abstracted in Anoma?",
+        a: "Anoma abstracts gas from end users in two ways. First, solvers bear the gas cost of submitting settlement transactions and recover it via the surplus they earn from optimal execution. Second, intents can specify any token as the fee token — users don't need to hold the native chain gas token (ETH, MATIC, etc.) at all. The solver handles gas denomination conversion. This makes Anoma invisible as infrastructure: users express what they want, they pay in whatever they have, and the protocol handles the rest.",
+        icon: Zap,
+        category: "Protocol"
+    },
+    {
+        id: "what-is-juvix",
+        q: "What is Juvix?",
+        a: "Juvix is Anoma's purpose-built functional programming language for writing intent logic and Validity Predicates. It is designed for high-assurance code: its type system catches entire classes of bugs at compile time, and it compiles directly to ZK circuits (via an intermediate representation called VampIR). Writing a shielded token swap in Juvix looks like writing a type-safe specification of your constraints — not low-level circuit arithmetic. This makes intent programming accessible to developers who know functional programming but not cryptography.",
+        icon: Code,
+        category: "Protocol"
+    },
+    {
+        id: "anoma-roadmap",
+        q: "What is Anoma's current development stage?",
+        a: "As of early 2026, Anoma is in active Protocol Adapter testnet phase. Protocol Adapters are live on Ethereum, Base, Optimism, and Arbitrum — meaning real intents are being settled on real chains (which Gnoma indexes). The full ARM devnet (Taiga ZK proofs, Juvix compiler, Solver gossip network) is in private testnet. The public mainnet launch with full privacy, cross-chain ARM, and solver competition is the next major milestone on the official roadmap at anoma.net/roadmap.",
+        icon: Activity,
+        category: "Protocol"
+    },
+
+    // ── TECHNICAL ─────────────────────────────────────────────────────────────
+    {
+        id: "arm-scale-tx",
+        q: "What is the ARM Balance Scale on transaction pages?",
+        a: "Every transaction detail page in Gnoma features a visual ARM Balance Scale proving the transaction is mathematically valid: left pan shows all resources consumed (Nullifiers), right pan shows all resources created (Commitments), and they must be perfectly balanced — ΣNullifiers = ΣCommitments. If the scale tilts, the transaction would be rejected by the protocol. It's a live visualization of the ARM's core conservation invariant.",
+        icon: Layers,
+        category: "Technical"
     },
     {
         id: "auto-asset",
         q: "How does Automatic Asset Recognition work?",
-        a: "Our indexer performs 'on-the-fly' discovery. It automatically queries new contract addresses for symbols and decimals. It also uses symbol-based inference to assign prices (e.g., tokens containing 'USD' are automatically valued at $1.00), making it future-proof for any new test tokens.",
+        a: "Our indexer performs on-the-fly token discovery. When it encounters a new ERC-20 contract address, it automatically queries it for symbol, name, and decimals. It then uses symbol-based price inference (tokens containing 'USD' default to $1.00, WETH maps to live ETH price, etc.) and falls back to CoinGecko lookups for broader coverage. This means Gnoma is automatically future-proof for any new test tokens deployed to Anoma Protocol Adapters.",
         icon: Code,
         category: "Technical"
     },
     {
-        id: "update-freq",
-        q: "How often is data updated?",
-        a: "The backend indexer runs on a 5-minute cron schedule. Every cycle, it fetches new logs from Blockscout, calculates USD volumes, and updates solver rankings across all supported chains simultaneously.",
-        icon: Clock,
+        id: "multi-domain",
+        q: "How does Multi-Domain Topology work?",
+        a: "Anoma is designed as a unified operating system for all blockchains. The Topology map visualizes user intents originating across multiple domains (Base, Optimism, Ethereum, Arbitrum) being matched by a central Anoma solver layer before settling on a specific execution domain. Resources can be native to any domain; the ARM ensures cross-domain consistency without bridges. Gnoma's Topology visualization shows this live mesh.",
+        icon: Globe,
         category: "Technical"
     },
 ]
 
-const CATEGORIES = ['Platform', 'Architecture', 'Solvers', 'Privacy', 'Technical']
+const CATEGORIES = ['Platform', 'Intents', 'ARM', 'Solvers', 'Privacy & ZK', 'Protocol', 'Technical']
+
 
 const CONTRACTS = [
     { name: "Anoma Adapter (Base)", address: "0x9ED43C229480659bF6B6607C46d7B96c6D760cBB", type: "Core", explorerUrl: "https://basescan.org/address/" },
@@ -251,74 +412,74 @@ export function FAQ() {
 
             <div className="mb-16 flex flex-col xl:flex-row xl:items-end justify-between gap-8 mt-32">
                 <div>
-                     <h2 className="text-6xl md:text-8xl font-black tracking-tighter text-black dark:text-white uppercase leading-[0.85]">
-                         KNOWLEDGE<br/>BASE
-                     </h2>
+                    <h2 className="text-6xl md:text-8xl font-black tracking-tighter text-black dark:text-white uppercase leading-[0.85]">
+                        KNOWLEDGE<br />BASE
+                    </h2>
                 </div>
                 <div className="w-full xl:w-[500px]">
-                     <div className="relative group">
-                         <div className="absolute inset-0 bg-[#FF0000] opacity-0 group-focus-within:opacity-20 transition-opacity blur-xl"></div>
-                         <div className="relative bg-white dark:bg-black border-4 border-black dark:border-white flex items-center focus-within:border-[#FF0000] dark:focus-within:border-[#FF0000] transition-colors">
-                             <Search className="w-8 h-8 ml-6 text-black dark:text-white group-focus-within:text-[#FF0000]" strokeWidth={3} />
-                             <input
-                                 type="text"
-                                 placeholder="SEARCH ENTRY..."
-                                 value={searchQuery}
-                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                 className="w-full p-6 bg-transparent outline-none text-2xl font-black uppercase placeholder-gray-300 dark:placeholder-gray-700 text-black dark:text-white focus:outline-none focus:ring-0"
-                             />
-                         </div>
-                     </div>
+                    <div className="relative group">
+                        <div className="absolute inset-0 bg-[#FF0000] opacity-0 group-focus-within:opacity-20 transition-opacity blur-xl"></div>
+                        <div className="relative bg-white dark:bg-black border-4 border-black dark:border-white flex items-center focus-within:border-[#FF0000] dark:focus-within:border-[#FF0000] transition-colors">
+                            <Search className="w-8 h-8 ml-6 text-black dark:text-white group-focus-within:text-[#FF0000]" strokeWidth={3} />
+                            <input
+                                type="text"
+                                placeholder="SEARCH ENTRY..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full p-6 bg-transparent outline-none text-2xl font-black uppercase placeholder-gray-300 dark:placeholder-gray-700 text-black dark:text-white focus:outline-none focus:ring-0"
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div className="mb-12 flex flex-wrap gap-4">
-                 <button
-                      onClick={() => { setActiveCategory('all'); setOpenItem(null) }}
-                      className={`px-8 py-4 text-xl font-black uppercase tracking-widest border-4 transition-colors focus:outline-none ${activeCategory === 'all' ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white' : 'bg-transparent text-gray-400 border-gray-200 dark:border-zinc-800 hover:border-black dark:hover:border-white hover:text-black dark:hover:text-white'}`}
-                 >
-                     ALL
-                 </button>
-                 {CATEGORIES.map(cat => (
-                     <button
-                          key={cat}
-                          onClick={() => { setActiveCategory(cat); setOpenItem(null) }}
-                          className={`px-8 py-4 text-xl font-black uppercase tracking-widest border-4 transition-colors focus:outline-none ${activeCategory === cat ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white' : 'bg-transparent text-gray-400 border-gray-200 dark:border-zinc-800 hover:border-black dark:hover:border-white hover:text-black dark:hover:text-white'}`}
-                     >
-                         {cat}
-                     </button>
-                 ))}
+                <button
+                    onClick={() => { setActiveCategory('all'); setOpenItem(null) }}
+                    className={`px-8 py-4 text-xl font-black uppercase tracking-widest border-4 transition-colors focus:outline-none ${activeCategory === 'all' ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white' : 'bg-transparent text-gray-400 border-gray-200 dark:border-zinc-800 hover:border-black dark:hover:border-white hover:text-black dark:hover:text-white'}`}
+                >
+                    ALL
+                </button>
+                {CATEGORIES.map(cat => (
+                    <button
+                        key={cat}
+                        onClick={() => { setActiveCategory(cat); setOpenItem(null) }}
+                        className={`px-8 py-4 text-xl font-black uppercase tracking-widest border-4 transition-colors focus:outline-none ${activeCategory === cat ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white' : 'bg-transparent text-gray-400 border-gray-200 dark:border-zinc-800 hover:border-black dark:hover:border-white hover:text-black dark:hover:text-white'}`}
+                    >
+                        {cat}
+                    </button>
+                ))}
             </div>
 
             <div className="border-t-4 border-black dark:border-white">
-                 {filteredItems.length > 0 ? (
-                     filteredItems.map((item, i) => (
-                         <AccordionItem
-                             key={item.id}
-                             item={item}
-                             isOpen={openItem === item.id}
-                             onToggle={() => setOpenItem(openItem === item.id ? null : item.id)}
-                             index={i}
-                         />
-                     ))
-                 ) : (
-                     <div className="py-32 text-center text-gray-400">
-                         <Search className="w-24 h-24 mx-auto mb-8 opacity-20" strokeWidth={1} />
-                         <p className="text-3xl font-black uppercase tracking-widest">No entries found</p>
-                         <button
-                             onClick={() => setSearchQuery('')}
-                             className="mt-8 text-xl text-[#FF0000] font-black uppercase hover:underline focus:outline-none"
-                         >
-                             Clear Search
-                         </button>
-                     </div>
-                 )}
+                {filteredItems.length > 0 ? (
+                    filteredItems.map((item, i) => (
+                        <AccordionItem
+                            key={item.id}
+                            item={item}
+                            isOpen={openItem === item.id}
+                            onToggle={() => setOpenItem(openItem === item.id ? null : item.id)}
+                            index={i}
+                        />
+                    ))
+                ) : (
+                    <div className="py-32 text-center text-gray-400">
+                        <Search className="w-24 h-24 mx-auto mb-8 opacity-20" strokeWidth={1} />
+                        <p className="text-3xl font-black uppercase tracking-widest">No entries found</p>
+                        <button
+                            onClick={() => setSearchQuery('')}
+                            className="mt-8 text-xl text-[#FF0000] font-black uppercase hover:underline focus:outline-none"
+                        >
+                            Clear Search
+                        </button>
+                    </div>
+                )}
             </div>
 
             <div className="mt-32 border-t-8 border-black dark:border-white pt-16">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
                     <h3 className="text-4xl md:text-6xl font-black tracking-tighter uppercase text-black dark:text-white leading-[0.85]">
-                        Smart<br/>Contracts
+                        Smart<br />Contracts
                     </h3>
                     <div className="inline-flex items-center gap-3 px-6 py-3 border-4 border-black dark:border-white bg-black text-white dark:bg-white dark:text-black">
                         <span className="w-3 h-3 bg-[#FF0000] animate-pulse" />
