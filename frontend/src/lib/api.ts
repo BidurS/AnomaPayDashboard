@@ -151,21 +151,17 @@ export interface ResourceChurn {
 //  Hooks (TanStack Query)
 // =============================================================
 
+export const MOCK_DOMAINS: Chain[] = [
+    { id: 8453, name: 'Global Hub', explorer_url: 'https://basescan.org', icon: '🌐' },
+    { id: 1, name: 'DeFi Fractal', explorer_url: '#', icon: '🏦' },
+    { id: 2, name: 'Social Realm', explorer_url: '#', icon: '🗣️' },
+    { id: 3, name: 'Gaming Subnet', explorer_url: '#', icon: '🎮' },
+    { id: 4, name: 'Privacy Mixnode', explorer_url: '#', icon: '🛡️' },
+]
+
 export function useChains() {
-    const { data: chains, isLoading } = useQuery({
-        queryKey: ['chains'],
-        queryFn: async () => {
-            const res = await fetch(`${API_URL}/api/chains`);
-            if (!res.ok) throw new Error('Failed to fetch chains');
-            return res.json() as Promise<Chain[]>;
-        },
-        staleTime: 1000 * 60 * 60, // 1 hour (Chains rarely change)
-    });
-
-    // Fallback if API fails (optional, based on previous logic)
-    const fallbackChains = chains || [{ id: 8453, name: 'Base', explorer_url: 'https://basescan.org', icon: '🔵' }];
-
-    return { chains: fallbackChains, loading: isLoading };
+    // Mock Domains to illustrate Anoma's fractal scaling properties
+    return { chains: MOCK_DOMAINS, loading: false };
 }
 
 export function useStats(chainId: number) {

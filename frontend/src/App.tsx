@@ -23,6 +23,7 @@ import { AdminDashboard } from './components/admin/AdminDashboard'
 import { CommandPalette } from './components/CommandPalette'
 import { ZKCircuitRegistry } from './components/ZKCircuitRegistry'
 import { MempoolPage } from './pages/MempoolPage'
+import { DomainsPage } from './pages/DomainsPage'
 import { SEO } from './components/SEO'
 import './index.css'
 
@@ -95,6 +96,7 @@ function Layout() {
     if (location.pathname === '/') return 'dashboard'
     if (location.pathname === '/live') return 'live'
     if (location.pathname === '/mempool') return 'mempool'
+    if (location.pathname === '/domains') return 'domains'
     if (location.pathname === '/solvers' || location.pathname.startsWith('/solver/')) return 'solvers'
     if (location.pathname === '/transactions' || location.pathname.startsWith('/tx/')) return 'transactions'
     if (location.pathname === '/circuits') return 'circuits'
@@ -168,6 +170,7 @@ function App() {
                 <Route element={<Layout />}>
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/live" element={<LiveFeedPage />} />
+                  <Route path="/domains" element={<DomainsPage />} />
                   <Route path="/solvers" element={<SolversPage />} />
                   <Route path="/transactions" element={<TransactionsPage />} />
                   <Route path="/mempool" element={<MempoolPage />} />

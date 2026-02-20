@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Menu, X, Users, ArrowRightLeft, HelpCircle, Home as HomeIcon, Activity, Shield, Zap, MoreHorizontal } from 'lucide-react'
+import { ChevronDown, Menu, X, Users, ArrowRightLeft, HelpCircle, Home as HomeIcon, Activity, Shield, Zap, MoreHorizontal, Network } from 'lucide-react'
 import { ThemeToggle } from './ThemeToggle'
 import { useChainContext } from '../context/ChainContext'
 import { useNavigate } from 'react-router-dom'
@@ -20,7 +20,8 @@ const MAIN_NAV = [
 ]
 
 const MORE_NAV = [
-    { id: 'live', label: 'Topology', icon: Activity, path: '/live', isLive: true },
+    { id: 'domains', label: 'Topology', icon: Network, path: '/domains', isLive: true },
+    { id: 'live', label: 'Live Data', icon: Activity, path: '/live', isLive: true },
     { id: 'circuits', label: 'ZK Registry', icon: Shield, path: '/circuits' },
     { id: 'faq', label: 'FAQ', icon: HelpCircle, path: '/faq' },
 ]
