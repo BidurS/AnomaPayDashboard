@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowUpRight, Copy, Check, Layers, Download, RefreshCw, ArrowRight, X } from 'lucide-react'
 import { useLatestTransactions, type Transaction } from '../lib/api'
+import { useWebSocket } from '../context/WebSocketContext'
 import { useChainContext } from '../context/ChainContext'
 import { shortenAddress, cn, formatWei } from '../lib/utils'
 
@@ -16,12 +17,30 @@ interface TransactionTableProps {
 export function TransactionTable({ searchQuery, onTxClick, onSolverClick, hideHeader, compact }: TransactionTableProps) {
     const { activeChain } = useChainContext()
     const [page, setPage] = useState(1)
-    const { transactions, pagination, loading, refetch } = useLatestTransactions(activeChain?.id || 8453, searchQuery, page)
+    const { transactions: fetchedTransactions, pagination, loading, refetch } = useLatestTransactions(activeChain?.id || 8453, searchQuery, page)
+    const { latestResource } = useWebSocket()
+    const [transactions, setTransactions] = useState<Transaction[]>([])
+
     const [copiedHash, setCopiedHash] = useState<string | null>(null)
     const [hoveredRow, setHoveredRow] = useState<string | null>(null)
     // Sticky note hint to educate users that they can click elements
     const [showTxHint, setShowTxHint] = useState(true)
     const [showSolverHint, setShowSolverHint] = useState(true)
+
+    // Sync fetched transactions to local state
+    useEffect(() => {
+        setTransactions(fetchedTransactions || [])
+    }, [fetchedTransactions])
+
+    // Prepend live transactions from WebSocket (only if on page 1 and not actively searching)
+    useEffect(() => {
+        if (latestResource?.transaction && page === 1 && !searchQuery) {
+            setTransactions(prev => {
+                if (prev.some(t => t.tx_hash === latestResource.transaction.tx_hash)) return prev;
+                return [latestResource.transaction, ...prev].slice(0, 50);
+            })
+        }
+    }, [latestResource, page, searchQuery])
 
     // Derived state for pagination/data
     const hasData = transactions.length > 0

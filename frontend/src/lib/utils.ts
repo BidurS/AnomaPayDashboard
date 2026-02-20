@@ -9,7 +9,8 @@ export function cn(...inputs: ClassValue[]) {
 export const API_URL = 'https://anomapay-explorer.bidurandblog.workers.dev'
 
 // Format large numbers
-export function formatNumber(num: number): string {
+export function formatNumber(num: number | undefined | null): string {
+    if (num === undefined || num === null) return '0'
     if (num >= 1_000_000) {
         return `${(num / 1_000_000).toFixed(2)}M`
     }

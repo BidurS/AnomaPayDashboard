@@ -1,15 +1,33 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Shield, Code, ArrowLeft, Search, Filter } from 'lucide-react'
+import { Shield, Code, ArrowLeft, Search, Filter, Activity } from 'lucide-react'
 import { SEO } from './SEO'
 import { ZK_PROGRAM_MAPPING } from '../lib/zkMapping'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useChainContext } from '../context/ChainContext'
+
+const API_URL = import.meta.env.DEV ? 'http://localhost:3001' : 'https://anomapay-explorer.bidurandblog.workers.dev'
+
+interface CircuitRanking {
+    logicRef: string;
+    usageCount: number;
+}
 
 export function ZKCircuitRegistry() {
     const navigate = useNavigate()
     const location = useLocation()
+    const { activeChain } = useChainContext()
     const [searchTerm, setSearchTerm] = useState('')
     const [selectedCircuit, setSelectedCircuit] = useState<string | null>(null)
+    const [rankings, setRankings] = useState<CircuitRanking[]>([])
+
+    // Fetch dynamic rankings
+    useEffect(() => {
+        fetch(`${API_URL}/api/circuits/ranking?chainId=${activeChain?.id || 8453}`)
+            .then(res => res.json())
+            .then(data => setRankings(Array.isArray(data) ? data : []))
+            .catch(console.error)
+    }, [activeChain?.id])
 
     // Check query params for a specific circuit to highlight
     useEffect(() => {
@@ -26,13 +44,36 @@ export function ZKCircuitRegistry() {
     }, [location.search])
 
     const ObjectEntries = Object.entries as <T>(o: T) => [Extract<keyof T, string>, T[keyof T]][]
-    const circuits = ObjectEntries(ZK_PROGRAM_MAPPING).filter(([id]) => id !== 'default')
+    const knownCircuits = ObjectEntries(ZK_PROGRAM_MAPPING).filter(([id]) => id !== 'default')
+
+    // Combine known mappings with dynamic rankings
+    const allCircuitsMap = new Map<string, any>()
+    knownCircuits.forEach(([id, program]) => {
+        allCircuitsMap.set(id, { ...program, usageCount: 0 })
+    })
+
+    rankings.forEach(ranking => {
+        if (allCircuitsMap.has(ranking.logicRef)) {
+            allCircuitsMap.get(ranking.logicRef).usageCount = ranking.usageCount
+        } else {
+            allCircuitsMap.set(ranking.logicRef, {
+                name: 'Unknown Custom Circuit',
+                description: 'A custom logic reference observed on the network without a verified source code mapping.',
+                sourceUrl: '#',
+                tags: ['CUSTOM', 'UNVERIFIED'],
+                usageCount: ranking.usageCount
+            })
+        }
+    })
+
+    // Convert map to array and sort by usage
+    const circuits = Array.from(allCircuitsMap.entries()).sort((a, b) => b[1].usageCount - a[1].usageCount)
 
     const filteredCircuits = circuits.filter(([id, program]) => {
         const term = searchTerm.toLowerCase()
         return id.toLowerCase().includes(term) ||
             program.name.toLowerCase().includes(term) ||
-            program.tags.some(t => t.toLowerCase().includes(term))
+            program.tags.some((t: string) => t.toLowerCase().includes(term))
     })
 
     return (
@@ -98,17 +139,27 @@ export function ZKCircuitRegistry() {
                                     </p>
 
                                     <div className="flex flex-wrap gap-2 mb-6">
-                                        {program.tags.map(tag => (
+                                        {program.tags.map((tag: string) => (
                                             <span key={tag} className="px-3 py-1 bg-gray-100 dark:bg-zinc-800 text-[10px] font-bold uppercase tracking-widest text-black dark:text-white">
                                                 {tag}
                                             </span>
                                         ))}
                                     </div>
 
-                                    <div className="bg-gray-50 dark:bg-black border border-black/10 dark:border-white/10 p-4">
-                                        <div className="text-[10px] uppercase font-bold text-gray-500 tracking-widest mb-1">Circuit Hash (Image ID)</div>
-                                        <div className="font-mono text-sm md:text-base break-all text-black dark:text-white">
-                                            {id}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="bg-gray-50 dark:bg-black border border-black/10 dark:border-white/10 p-4">
+                                            <div className="text-[10px] uppercase font-bold text-gray-500 tracking-widest mb-1">Circuit Hash (Image ID)</div>
+                                            <div className="font-mono text-sm md:text-base break-all text-black dark:text-white">
+                                                {id}
+                                            </div>
+                                        </div>
+                                        <div className="bg-gray-50 dark:bg-black border border-black/10 dark:border-white/10 p-4 flex flex-col justify-center">
+                                            <div className="text-[10px] uppercase font-bold text-gray-500 tracking-widest mb-1 flex items-center gap-1">
+                                                <Activity className="w-3 h-3 text-[#FF0000]" /> Network Usage
+                                            </div>
+                                            <div className="font-mono text-xl font-bold text-black dark:text-white">
+                                                {program.usageCount.toLocaleString()} <span className="text-xs text-gray-500 font-normal">Commitments</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

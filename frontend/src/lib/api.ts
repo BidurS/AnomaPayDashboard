@@ -43,6 +43,15 @@ export interface TransactionDetail extends Transaction {
     forwarderCalls: ForwarderCall[]
     actionEvents: ActionEvent[]
     privacyRoot: { root_hash: string; estimated_pool_size: number } | null
+    // V3 Fields (Optional for D1 compatibility)
+    intents?: any[]
+    hash?: string
+    solverAddress?: string
+    originChain?: string
+    destinationChain?: string
+    id?: string
+    sender?: string
+    appData?: any
 }
 
 export interface ForwarderCall {
@@ -89,6 +98,10 @@ export interface Solver {
     badges?: string[]
     first_seen: number
     last_seen: number
+    // V3 Fields (Optional for D1 compatibility)
+    successfulMatches?: number
+    savingsMetric?: number
+    latency?: number
 }
 
 export interface SolverDetail extends Solver {

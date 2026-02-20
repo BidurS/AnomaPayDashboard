@@ -1,15 +1,31 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Network, Activity } from 'lucide-react'
+import { Network, Activity, EyeOff, Shield } from 'lucide-react'
 import { SEO } from '../components/SEO'
 import { MOCK_DOMAINS } from '../lib/api'
+import { useWebSocket } from '../context/WebSocketContext'
+import { useTrust } from '../context/TrustContext'
+import { cn } from '../lib/utils'
 
 // Simple helper to generate a random 0-100 percentage
 const randPercent = () => Math.floor(Math.random() * 100)
 
 export function DomainsPage() {
+    const { isConnected } = useWebSocket()
+    const { activeTrustAnchor } = useTrust()
     const [activeNode, setActiveNode] = useState<number | null>(MOCK_DOMAINS[0]?.id || 9000) // Default to global hub
     const [traffic, setTraffic] = useState<{ from: number, to: number }[]>([])
+
+    // Determine trust radius visual properties
+    const trustRadius = activeTrustAnchor === 'Global Perspective' ? 600 : 
+                        activeTrustAnchor === 'Taiga Shielded Set' ? 120 : 250;
+    
+    const isNodeTrusted = (index: number) => {
+        if (activeTrustAnchor === 'Global Perspective') return true;
+        if (index === 0) return true; // Hub is always visible
+        if (activeTrustAnchor === 'Taiga Shielded Set') return index % 2 === 0;
+        return index < 4; // Local nodes see only immediate neighborhood
+    }
 
     // Simulate cross-domain intent gossip
     useEffect(() => {
@@ -51,6 +67,14 @@ export function DomainsPage() {
                 <div className="flex gap-4">
                     <div className="swiss-border bg-gray-50 dark:bg-zinc-900 p-4 min-w-[120px]">
                         <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1">
+                            Daemon Link
+                        </div>
+                        <div className={cn("text-xl font-black font-mono mt-2", isConnected ? "text-green-500" : "text-[#FF0000]")}>
+                            {isConnected ? "CONNECTED" : "OFFLINE"}
+                        </div>
+                    </div>
+                    <div className="swiss-border bg-gray-50 dark:bg-zinc-900 p-4 min-w-[120px]">
+                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1">
                             <Activity className="w-3 h-3" /> Active Domains
                         </div>
                         <div className="text-3xl font-mono-swiss text-black dark:text-white">{MOCK_DOMAINS.length}</div>
@@ -63,6 +87,17 @@ export function DomainsPage() {
 
                 {/* Background grid */}
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.05)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
+
+                {/* Trust Radius Overlay */}
+                <motion.div 
+                    animate={{ width: trustRadius * 2, height: trustRadius * 2 }}
+                    transition={{ type: "spring", stiffness: 100, damping: 20 }}
+                    className="absolute z-0 rounded-full border-2 border-dashed border-[#FF0000]/30 bg-[#FF0000]/5 flex items-center justify-center pointer-events-none"
+                >
+                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 flex items-center gap-1 text-[8px] font-black uppercase text-[#FF0000] tracking-widest whitespace-nowrap">
+                        <Shield className="w-2 h-2" /> Trust Radius: {activeTrustAnchor}
+                    </div>
+                </motion.div>
 
                 {/* Central Hub */}
                 <motion.div
@@ -79,6 +114,7 @@ export function DomainsPage() {
 
                 {/* Satellite Nodes */}
                 {MOCK_DOMAINS.slice(1).map((domain, i) => {
+                    const index = i + 1
                     const angle = (i / (MOCK_DOMAINS.length - 1)) * Math.PI * 2 - Math.PI / 2
                     const radius = 200 // Pixel distance from center
 
@@ -88,6 +124,7 @@ export function DomainsPage() {
 
                     const isTargeted = traffic.some(t => t.to === domain.id || t.from === domain.id)
                     const isGlobalTargeted = traffic.some(t => t.to === MOCK_DOMAINS[0].id || t.from === MOCK_DOMAINS[0].id)
+                    const trusted = isNodeTrusted(index)
 
                     return (
                         <div key={domain.id} className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -99,9 +136,10 @@ export function DomainsPage() {
                                     stroke={isTargeted || isGlobalTargeted ? "#FF0000" : "currentColor"}
                                     strokeWidth={isTargeted || isGlobalTargeted ? "2" : "1"}
                                     strokeDasharray="4 4"
-                                    className="text-gray-300 dark:text-zinc-800 transition-colors duration-500"
+                                    style={{ opacity: trusted ? 1 : 0.1 }}
+                                    className="text-gray-300 dark:text-zinc-800 transition-all duration-500"
                                 />
-                                {traffic.filter(t => (t.from === domain.id && t.to === MOCK_DOMAINS[0].id) || (t.to === domain.id && t.from === MOCK_DOMAINS[0].id)).map((t, idx) => (
+                                {trusted && traffic.filter(t => (t.from === domain.id && t.to === MOCK_DOMAINS[0].id) || (t.to === domain.id && t.from === MOCK_DOMAINS[0].id)).map((t, idx) => (
                                     <motion.circle
                                         key={`${t.from}-${t.to}-${idx}`}
                                         r="3"
@@ -122,16 +160,25 @@ export function DomainsPage() {
                             {/* Node */}
                             <motion.div
                                 initial={{ opacity: 0, scale: 0 }}
-                                animate={{ opacity: 1, scale: 1 }}
+                                animate={{ 
+                                    opacity: 1, 
+                                    scale: trusted ? 1 : 0.8,
+                                    filter: trusted ? 'none' : 'grayscale(1) contrast(0.5)'
+                                }}
                                 transition={{ type: "spring", stiffness: 200, damping: 20, delay: i * 0.1 }}
                                 style={{ x, y }}
-                                onClick={() => setActiveNode(domain.id)}
-                                className={`pointer-events-auto absolute z-10 w-24 h-24 rounded-full flex flex-col items-center justify-center cursor-pointer transition-all duration-300 shadow-xl
+                                onClick={() => trusted && setActiveNode(domain.id)}
+                                className={`pointer-events-auto absolute z-10 w-24 h-24 rounded-full flex flex-col items-center justify-center cursor-pointer transition-all duration-300 shadow-xl relative
                                     ${activeNode === domain.id ? 'bg-[#FF0000] text-white border-2 border-black dark:border-white scale-110' : 'bg-white dark:bg-black border-2 border-black dark:border-white/20 text-black dark:text-white hover:border-[#FF0000] dark:hover:border-[#FF0000]'}`}
                             >
+                                {!trusted && (
+                                    <div className="absolute inset-0 z-20 flex items-center justify-center bg-gray-50/50 dark:bg-black/50 rounded-full">
+                                        <EyeOff className="w-6 h-6 text-gray-400" />
+                                    </div>
+                                )}
                                 <span className="text-2xl mb-1">{domain.icon}</span>
                                 <span className="font-bold text-[9px] uppercase tracking-widest text-center px-1 leading-tight">{domain.name}</span>
-                                {isTargeted && (
+                                {isTargeted && trusted && (
                                     <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#FF0000] rounded-full animate-ping" />
                                 )}
                             </motion.div>

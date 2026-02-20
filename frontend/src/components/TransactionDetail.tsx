@@ -4,11 +4,12 @@ import { SEO } from './SEO'
 import { HexDecoder } from './HexDecoder'
 import { ResourceScale } from './ResourceScale'
 import { RingTradeVisualizer } from './RingTradeVisualizer'
+import { CoordinationTree } from './CoordinationTree'
 import { useTxDetail } from '../lib/api'
 import { useChainContext } from '../context/ChainContext'
 import { shortenAddress, formatNumber, timeAgo } from '../lib/utils'
 import { getZKProgram } from '../lib/zkMapping'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface TransactionDetailProps {
     txHash: string
@@ -26,12 +27,14 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
     const [inspectorData, setInspectorData] = useState<{ title: string, data: string } | null>(null)
 
     // Set default inspector data when tx loads
-    if (tx && !inspectorData) {
-        setInspectorData({
-            title: 'Raw Transaction Data',
-            data: JSON.stringify(tx, null, 2)
-        })
-    }
+    useEffect(() => {
+        if (tx && !inspectorData) {
+            setInspectorData({
+                title: 'Raw Transaction Data',
+                data: JSON.stringify(tx, null, 2)
+            })
+        }
+    }, [tx, inspectorData])
 
     const copyHash = () => {
         navigator.clipboard.writeText(txHash)
@@ -151,6 +154,22 @@ export function TransactionDetail({ txHash, onBack, onSolverClick }: Transaction
                                 <div className="font-mono font-bold text-lg">{formatNumber(tx.gas_used)}</div>
                             </div>
                         </div>
+
+                        {/* Coordination Tree Visualization */}
+                        {tx.intents && tx.intents.length > 0 ? (
+                            <CoordinationTree
+                                txHash={tx.hash || txHash}
+                                solverAddress={tx.solverAddress || tx.solver_address || '0xUNKNOWN'}
+                                intents={tx.intents}
+                            />
+                        ) : (
+                            <CoordinationTree
+                                txHash={txHash}
+                                solverAddress={tx.solver_address || '0xUNKNOWN'}
+                                // Passing empty intents to trigger the CoordinationTree's internal mock fallback
+                                intents={[]}
+                            />
+                        )}
 
                         {/* Token Transfers (Ring Trade Visualizer) */}
                         {hasTokenTransfers && (

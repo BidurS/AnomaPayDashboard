@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Menu, X, Users, ArrowRightLeft, HelpCircle, Home as HomeIcon, Activity, Shield, Zap, MoreHorizontal, Network, Terminal } from 'lucide-react'
+import { ChevronDown, Menu, X, Users, ArrowRightLeft, HelpCircle, Home as HomeIcon, Activity, Shield, Zap, MoreHorizontal, Network, Terminal, Eye } from 'lucide-react'
 import { ThemeToggle } from './ThemeToggle'
 import { useChainContext } from '../context/ChainContext'
+import { useTrust, type TrustAnchor } from '../context/TrustContext'
 import { useNavigate } from 'react-router-dom'
 import { cn } from '../lib/utils'
 
@@ -29,8 +30,10 @@ const MORE_NAV = [
 
 export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
     const { chains, activeChain, setActiveChainId } = useChainContext()
+    const { activeTrustAnchor, setActiveTrustAnchor } = useTrust()
     const navigate = useNavigate()
     const [isChainOpen, setIsChainOpen] = useState(false)
+    const [isTrustOpen, setIsTrustOpen] = useState(false)
     const [isMobileOpen, setIsMobileOpen] = useState(false)
     const [isMoreOpen, setIsMoreOpen] = useState(false)
     const [searchValue, setSearchValue] = useState('')
@@ -172,6 +175,51 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
 
                     {/* Right side controls */}
                     <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                        
+                        {/* Trust Perspective Toggle (V3 Feature) */}
+                        <div className="relative hidden lg:block">
+                            <button
+                                onClick={() => setIsTrustOpen(!isTrustOpen)}
+                                className={cn(
+                                    "flex items-center gap-2 px-3 py-2",
+                                    "bg-gray-100 dark:bg-zinc-900 text-black dark:text-zinc-200 font-bold uppercase text-[9px] tracking-widest",
+                                    "border border-black/10 dark:border-white/10 hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors"
+                                )}
+                            >
+                                <Eye className="w-3.5 h-3.5" />
+                                <span>{activeTrustAnchor}</span>
+                                <ChevronDown className={cn("w-3 h-3 transition-transform", isTrustOpen && "rotate-180")} />
+                            </button>
+                            <AnimatePresence>
+                                {isTrustOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 8 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 8 }}
+                                        transition={{ duration: 0.15 }}
+                                        className="absolute right-0 mt-2 w-56 bg-white dark:bg-black border-2 border-black dark:border-white/20 shadow-[4px_4px_0_#000] dark:shadow-none z-50 py-1"
+                                    >
+                                        <div className="px-4 py-2 text-[8px] font-black uppercase text-gray-400 dark:text-zinc-500 border-b border-gray-100 dark:border-white/10 mb-1">
+                                            Trust Sociograph Perspective
+                                        </div>
+                                        {['Global Perspective', 'Local Node A', 'Local Node B', 'Taiga Shielded Set'].map((anchor) => (
+                                            <button
+                                                key={anchor}
+                                                onClick={() => { setActiveTrustAnchor(anchor as TrustAnchor); setIsTrustOpen(false) }}
+                                                className={cn(
+                                                    "w-full px-4 py-2 flex items-center gap-3 text-left text-[10px] font-bold uppercase tracking-widest text-black dark:text-zinc-200",
+                                                    "hover:bg-gray-100 dark:hover:bg-white/5 transition-colors",
+                                                    activeTrustAnchor === anchor && "bg-[#FF0000]/10 text-[#FF0000] dark:bg-[#FF0000]/20"
+                                                )}
+                                            >
+                                                {anchor}
+                                            </button>
+                                        ))}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
                         <ThemeToggle />
 
                         {/* Chain Badge */}

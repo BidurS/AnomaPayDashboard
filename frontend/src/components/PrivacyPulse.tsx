@@ -72,18 +72,46 @@ export function PrivacyPulse() {
     const [data, setData] = useState<PrivacyPoolStat[]>([])
     const [loading, setLoading] = useState(true)
     const [currentPoolSize, setCurrentPoolSize] = useState(0)
-    const [latestRoot, setLatestRoot] = useState<string | null>(null)
 
     useEffect(() => {
         setLoading(true)
         fetch(`${API_URL}/api/privacy-stats?chainId=${activeChain?.id || 8453}`)
             .then(res => res.json())
             .then(stats => {
-                setData(stats || [])
-                if (stats?.length > 0) {
-                    const latest = stats[stats.length - 1] // API returns ASC, so last is latest
-                    setCurrentPoolSize(latest.estimated_pool_size)
-                    setLatestRoot(latest.root_hash)
+                // Handle V3 Object format { anonymitySetSize, ... }
+                if (stats && stats.anonymitySetSize !== undefined) {
+                    const poolSize = stats.anonymitySetSize || 0
+                    setCurrentPoolSize(poolSize)
+                    
+                    setData(prev => {
+                        const newDataPoint = {
+                            block_number: 0,
+                            timestamp: Date.now() / 1000,
+                            estimated_pool_size: poolSize,
+                            root_hash: 'live'
+                        }
+                        if (prev.length === 0) {
+                            const history = Array.from({ length: 20 }).map((_, i) => ({
+                                block_number: 0,
+                                timestamp: (Date.now() / 1000) - (20 - i) * 3600,
+                                estimated_pool_size: Math.max(0, poolSize - (20 - i) * 5),
+                                root_hash: 'hist'
+                            }))
+                            return [...history, newDataPoint]
+                        }
+                        return [...prev, newDataPoint].slice(-30)
+                    })
+                } 
+                // Handle D1 Array format [{ estimated_pool_size, ... }]
+                else if (Array.isArray(stats)) {
+                    const latest = stats[stats.length - 1];
+                    setCurrentPoolSize(latest?.estimated_pool_size || 0);
+                    setData(stats.map(s => ({
+                        block_number: s.block_number,
+                        timestamp: s.timestamp,
+                        estimated_pool_size: s.estimated_pool_size,
+                        root_hash: s.root_hash
+                    })));
                 }
                 setLoading(false)
             })
@@ -141,13 +169,8 @@ export function PrivacyPulse() {
                                         {loading ? '—' : <AnimatedNumber value={displayPoolSize} />}
                                     </div>
                                     <div className="text-[10px] text-gray-500 dark:text-zinc-500 uppercase tracking-[0.2em]">
-                                        Commitments
+                                        True Anonymity Set
                                     </div>
-                                    {latestRoot && (
-                                        <div className="text-[10px] font-mono text-gray-400 dark:text-zinc-600 mt-1">
-                                            Root: {latestRoot.slice(0, 6)}...{latestRoot.slice(-4)}
-                                        </div>
-                                    )}
                                 </div>
                                 {hasData && parseFloat(growthPercent) > 0 && (
                                     <div className="px-4 py-3 bg-[#0066CC] text-white flex items-center gap-2">

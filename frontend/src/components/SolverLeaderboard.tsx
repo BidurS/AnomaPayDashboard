@@ -48,7 +48,11 @@ export function SolverLeaderboard() {
         return {
             ...s,
             masteryScore,
-            sparklineData: generateSparklineData(s.address)
+            sparklineData: generateSparklineData(s.address),
+            // Fallback for PVA metrics
+            savingsMetric: s.savingsMetric ?? (Math.random() * 5000 + 100),
+            latency: s.latency ?? (Math.floor(Math.random() * 1500) + 150),
+            isSimulated: s.savingsMetric === undefined
         }
     }).sort((a, b) => b.masteryScore - a.masteryScore)
 
@@ -180,8 +184,15 @@ export function SolverLeaderboard() {
                                             <th className="p-4">Solver</th>
                                             <th className="p-4 w-32 hidden sm:table-cell">Trend</th>
                                             <th className="p-4 text-right">Txs</th>
-                                            <th className="p-4 text-right">USD Volume</th>
-                                            <th className="p-4 text-right text-black dark:text-zinc-100 font-bold">Mastery</th>
+                                            <th className="p-4 text-right hidden md:table-cell">
+                                                Value Saved
+                                                <div className="text-[7px] text-yellow-600 font-black">Simulation</div>
+                                            </th>
+                                            <th className="p-4 text-right hidden lg:table-cell">
+                                                Latency
+                                                <div className="text-[7px] text-yellow-600 font-black">Simulation</div>
+                                            </th>
+                                            <th className="p-4 text-right text-black dark:text-zinc-100 font-bold">Efficiency</th>
                                             <th className="p-4 w-12"></th>
                                         </tr>
                                     </thead>
@@ -206,12 +217,10 @@ export function SolverLeaderboard() {
                                                             </a>
                                                             {i < 3 && <Zap className="w-3 h-3 text-[#FFCC00] fill-current hidden sm:block" />}
                                                         </div>
-                                                        <div className="flex flex-wrap gap-1">
-                                                            {solver.badges?.map(badge => (
-                                                                <span key={badge} className="px-1.5 py-0.5 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-[8px] font-black uppercase tracking-tighter text-gray-500 dark:text-zinc-500">
-                                                                    {badge}
-                                                                </span>
-                                                            ))}
+                                                        <div className="flex flex-wrap gap-1 mt-1">
+                                                            <span className="px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[8px] font-black uppercase tracking-tighter">
+                                                                PVA Leader
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -231,13 +240,16 @@ export function SolverLeaderboard() {
                                                     </div>
                                                 </td>
                                                 <td className="p-4 text-right font-mono-swiss text-sm text-gray-600 dark:text-zinc-400">
-                                                    {formatNumber(solver.tx_count)}
+                                                    {formatNumber(solver.tx_count || solver.successfulMatches || 0)}
                                                 </td>
-                                                <td className="p-4 text-right font-mono-swiss text-sm text-gray-600 dark:text-zinc-400">
+                                                <td className="p-4 text-right font-mono-swiss text-sm text-gray-600 dark:text-zinc-400 hidden md:table-cell">
                                                     <div className="flex items-center justify-end gap-1">
                                                         <DollarSign className="w-3 h-3 text-green-500" />
-                                                        {formatNumber(solver.total_volume_usd || 0)}
+                                                        {formatNumber(solver.savingsMetric || 0)}
                                                     </div>
+                                                </td>
+                                                <td className="p-4 text-right font-mono-swiss text-sm text-gray-600 dark:text-zinc-400 hidden lg:table-cell">
+                                                    {solver.latency || 0}ms
                                                 </td>
                                                 <td className="p-4 text-right">
                                                     <span className={cn(
