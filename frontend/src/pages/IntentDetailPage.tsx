@@ -73,6 +73,26 @@ function LifecycleTimeline({ lifecycle, createdAt }: {
     lifecycle: any[];
     createdAt: number;
 }) {
+    const STAGES = ['created', 'pending', 'matched', 'settling', 'settled'];
+    const STAGE_LABELS: Record<string, string> = {
+        created: 'Created', pending: 'Submitted', matched: 'Matched',
+        settling: 'Solving', settled: 'Settled', failed: 'Failed', expired: 'Expired',
+    };
+    const STAGE_COLORS: Record<string, string> = {
+        created: 'border-blue-400 bg-blue-500/20 text-blue-400',
+        pending: 'border-yellow-400 bg-yellow-500/20 text-yellow-400',
+        matched: 'border-cyan-400 bg-cyan-500/20 text-cyan-400',
+        settling: 'border-purple-400 bg-purple-500/20 text-purple-400',
+        settled: 'border-green-400 bg-green-500/20 text-green-400',
+        failed: 'border-red-400 bg-red-500/20 text-red-400',
+        expired: 'border-gray-400 bg-gray-500/20 text-gray-400',
+    };
+    const STAGE_GLOW: Record<string, string> = {
+        created: 'shadow-blue-500/30', pending: 'shadow-yellow-500/30',
+        matched: 'shadow-cyan-500/30', settling: 'shadow-purple-500/30',
+        settled: 'shadow-green-500/30', failed: 'shadow-red-500/30',
+    };
+
     const events = [
         { status: 'created', timestamp: createdAt, label: 'Intent Created' },
         ...lifecycle.map(e => ({
@@ -84,35 +104,142 @@ function LifecycleTimeline({ lifecycle, createdAt }: {
         })),
     ];
 
+    // Determine which stages are completed
+    const completedStatuses = new Set(events.map(e => e.status));
+    const currentStatus = events[events.length - 1]?.status || 'created';
+
+    // Calculate time deltas
+    const getTimeDelta = (fromTs: number, toTs: number) => {
+        const diff = toTs - fromTs;
+        if (diff < 60) return `${diff}s`;
+        if (diff < 3600) return `${Math.floor(diff / 60)}m ${diff % 60}s`;
+        return `${Math.floor(diff / 3600)}h ${Math.floor((diff % 3600) / 60)}m`;
+    };
+
     return (
-        <div className="space-y-0">
-            {events.map((event, i) => {
-                const Icon = STATUS_ICONS[event.status] || Activity;
-                const isLast = i === events.length - 1;
-                return (
-                    <div key={i} className="flex gap-4">
-                        {/* Timeline line + dot */}
-                        <div className="flex flex-col items-center">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isLast ? 'bg-red-500/20 border-2 border-red-500' : 'bg-black/10 dark:bg-white/10 border border-black/20 dark:border-white/20'}`}>
-                                <Icon size={14} className={isLast ? 'text-red-400' : 'text-black/60 dark:text-white/60'} />
-                            </div>
-                            {!isLast && <div className="w-px h-8 bg-black/10 dark:bg-white/10" />}
-                        </div>
-                        {/* Content */}
-                        <div className={`pb-4 ${isLast ? '' : ''}`}>
-                            <p className="text-sm font-bold">{event.label}</p>
-                            <p className="text-xs text-black/50 dark:text-white/50 font-mono mt-0.5">
-                                {new Date(event.timestamp * 1000).toLocaleString()}
-                            </p>
-                            {'triggeredBy' in event && event.triggeredBy && (
-                                <p className="text-xs text-black/40 dark:text-white/40 mt-0.5">by {event.triggeredBy.slice(0, 10)}…</p>
+        <div className="space-y-4">
+            {/* Horizontal flow diagram (desktop) */}
+            <div className="hidden sm:flex items-center justify-between gap-1">
+                {STAGES.map((stage, i) => {
+                    const isCompleted = completedStatuses.has(stage);
+                    const isCurrent = stage === currentStatus;
+                    const event = events.find(e => e.status === stage);
+                    const Icon = STATUS_ICONS[stage] || Activity;
+
+
+                    return (
+                        <div key={stage} className="flex items-center gap-1 flex-1">
+                            <motion.div
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ delay: i * 0.1 }}
+                                className="flex flex-col items-center min-w-[54px]"
+                            >
+                                {/* Stage circle */}
+                                <div
+                                    className={`w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all ${isCurrent
+                                        ? `${STAGE_COLORS[stage]} shadow-lg ${STAGE_GLOW[stage] || ''}`
+                                        : isCompleted
+                                            ? `${STAGE_COLORS[stage]} opacity-80`
+                                            : 'border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-black/20 dark:text-white/20'
+                                        }`}
+                                >
+                                    {isCompleted ? <Icon size={14} /> : <div className="w-2 h-2 rounded-full bg-current opacity-30" />}
+                                </div>
+                                {/* Label */}
+                                <p className={`text-[9px] font-bold uppercase tracking-wider mt-1.5 ${isCompleted ? 'text-black/70 dark:text-white/70' : 'text-black/20 dark:text-white/20'
+                                    }`}>{STAGE_LABELS[stage]}</p>
+                                {/* Timestamp */}
+                                {event && (
+                                    <p className="text-[8px] font-mono text-black/30 dark:text-white/30 mt-0.5">
+                                        {new Date(event.timestamp * 1000).toLocaleTimeString()}
+                                    </p>
+                                )}
+                            </motion.div>
+                            {/* Connector line */}
+                            {i < STAGES.length - 1 && (
+                                <div className="flex-1 flex flex-col items-center -mt-5">
+                                    <div className="relative w-full h-px">
+                                        <div className="absolute inset-0 bg-black/10 dark:bg-white/10" />
+                                        {isCompleted && completedStatuses.has(STAGES[i + 1]) && (
+                                            <motion.div
+                                                initial={{ scaleX: 0 }}
+                                                animate={{ scaleX: 1 }}
+                                                transition={{ delay: i * 0.15 + 0.1, duration: 0.3 }}
+                                                className="absolute inset-0 bg-green-400/60 origin-left"
+                                            />
+                                        )}
+                                    </div>
+                                    {/* Time delta */}
+                                    {event && events.find(e => e.status === STAGES[i + 1]) && (
+                                        <p className="text-[7px] font-mono text-black/30 dark:text-white/30 mt-0.5">
+                                            {getTimeDelta(event.timestamp, events.find(e => e.status === STAGES[i + 1])!.timestamp)}
+                                        </p>
+                                    )}
+                                </div>
                             )}
                         </div>
-                    </div>
-                );
-            })}
-            {events.length === 1 && (
-                <p className="text-xs text-black/40 dark:text-white/40 ml-12">Awaiting lifecycle transitions…</p>
+                    );
+                })}
+            </div>
+
+            {/* Vertical timeline (mobile + detailed view) */}
+            <div className="sm:mt-4 space-y-0">
+                {events.map((event, i) => {
+                    const Icon = STATUS_ICONS[event.status] || Activity;
+                    const isLast = i === events.length - 1;
+                    const timeDelta = i > 0 ? getTimeDelta(events[i - 1].timestamp, event.timestamp) : null;
+                    return (
+                        <motion.div
+                            key={i}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.08 }}
+                            className="flex gap-3"
+                        >
+                            {/* Timeline line + dot */}
+                            <div className="flex flex-col items-center">
+                                <div className={`w-7 h-7 rounded-full flex items-center justify-center border-2 ${STAGE_COLORS[event.status] || STAGE_COLORS.created
+                                    } ${isLast ? `shadow-md ${STAGE_GLOW[event.status] || ''}` : ''}`}>
+                                    <Icon size={12} />
+                                </div>
+                                {!isLast && <div className="w-px h-6 bg-black/10 dark:bg-white/10" />}
+                            </div>
+                            {/* Content */}
+                            <div className="pb-3 min-w-0">
+                                <div className="flex items-center gap-2">
+                                    <p className="text-xs font-bold">{STAGE_LABELS[event.status] || event.label}</p>
+                                    {timeDelta && (
+                                        <span className="text-[9px] font-mono text-black/30 dark:text-white/30 bg-black/5 dark:bg-white/5 px-1.5 py-0.5 rounded">
+                                            +{timeDelta}
+                                        </span>
+                                    )}
+                                </div>
+                                <p className="text-[10px] text-black/40 dark:text-white/40 font-mono mt-0.5">
+                                    {new Date(event.timestamp * 1000).toLocaleString()}
+                                </p>
+                                {'triggeredBy' in event && event.triggeredBy && (
+                                    <p className="text-[10px] text-black/30 dark:text-white/30 mt-0.5">
+                                        Solver: <span className="font-mono">{event.triggeredBy.slice(0, 14)}…</span>
+                                    </p>
+                                )}
+                            </div>
+                        </motion.div>
+                    );
+                })}
+                {events.length === 1 && (
+                    <p className="text-xs text-black/40 dark:text-white/40 ml-10 italic">Awaiting lifecycle transitions…</p>
+                )}
+            </div>
+
+            {/* Total settlement time */}
+            {events.length > 1 && (
+                <div className="flex items-center gap-2 pt-2 border-t border-black/5 dark:border-white/5">
+                    <Zap size={12} className="text-green-400" />
+                    <span className="text-[10px] text-black/50 dark:text-white/50">
+                        Total time: <span className="font-bold font-mono">{getTimeDelta(events[0].timestamp, events[events.length - 1].timestamp)}</span>
+                    </span>
+                </div>
             )}
         </div>
     );
