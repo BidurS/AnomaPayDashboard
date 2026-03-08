@@ -507,7 +507,7 @@ async function insertData(
                     txHash: t.txHash,
                     blockNumber: t.blockNumber,
                     eventType: 'TransactionExecuted',
-                    solverAddress: t.solverAddress,
+                    solverAddress: t.solverAddress?.toLowerCase() || '0x0',
                     valueWei: t.valueWei,
                     gasUsed: t.gasUsed,
                     gasPriceWei: t.gasPriceWei,
