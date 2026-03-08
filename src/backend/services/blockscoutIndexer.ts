@@ -31,12 +31,26 @@ const TOPICS: Record<string, string> = {
 };
 
 const KNOWN_TOKENS: Record<string, { symbol: string; decimals: number; priceUsd: number }> = {
+    // ─── Base ───
     '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913': { symbol: 'USDC', decimals: 6, priceUsd: 1.0 },
     '0x4200000000000000000000000000000000000006': { symbol: 'WETH', decimals: 18, priceUsd: 2600 },
     '0x50c5725949a6f0c72e6c4a641f24049a917db0cb': { symbol: 'DAI', decimals: 18, priceUsd: 1.0 },
     '0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca': { symbol: 'USDbC', decimals: 6, priceUsd: 1.0 },
     '0xfde4c96c8593536e31f229ea8f37b2ada2699bb2': { symbol: 'USDT', decimals: 6, priceUsd: 1.0 },
     '0x0b3e328455822223971387461073df58222bc358': { symbol: 'cbBTC', decimals: 8, priceUsd: 95000 },
+    // ─── Ethereum Mainnet ───
+    '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48': { symbol: 'USDC', decimals: 6, priceUsd: 1.0 },
+    '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2': { symbol: 'WETH', decimals: 18, priceUsd: 2600 },
+    '0x6b175474e89094c44da98b954eedeac495271d0f': { symbol: 'DAI', decimals: 18, priceUsd: 1.0 },
+    '0xdac17f958d2ee523a2206206994597c13d831ec7': { symbol: 'USDT', decimals: 6, priceUsd: 1.0 },
+    '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599': { symbol: 'WBTC', decimals: 8, priceUsd: 95000 },
+    // ─── Optimism ───
+    '0x0b2c639c533813f4aa9d7837caf62653d097ff85': { symbol: 'USDC', decimals: 6, priceUsd: 1.0 },
+    '0x94b008aa00579c1307b0ef2c499ad98a8ce58e58': { symbol: 'USDT', decimals: 6, priceUsd: 1.0 },
+    // ─── Arbitrum ───
+    '0xaf88d065e77c8cc2239327c5edb3a432268e5831': { symbol: 'USDC', decimals: 6, priceUsd: 1.0 },
+    '0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9': { symbol: 'USDT', decimals: 6, priceUsd: 1.0 },
+    '0x82af49447d8a07e3bd95bd0d56f35241523fbab1': { symbol: 'WETH', decimals: 18, priceUsd: 2600 },
 };
 
 const PAYLOAD_TYPE_MAP: Record<string, string> = {
@@ -72,7 +86,7 @@ async function fetchTokenMetadata(chain: ChainConfig, tokenAddress: string): Pro
         }
 
         const decimals = decimalsHex ? parseInt(decimalsHex, 16) : 18;
-        
+
         // AUTOMATIC RECOGNITION LOGIC
         let priceUsd = 0;
         const s = symbol.toUpperCase();
@@ -126,20 +140,42 @@ export async function runBlockscoutIndexer(db: DB, chain: ChainConfig): Promise<
     try {
         // Step 1: Fetch recent transactions from Blockscout (newest first)
         const newTxs = await fetchNewTransactions(db, chain, apiUrl, result);
-        if (newTxs.length === 0) return result;
 
-        // Step 2: Fetch logs for these transactions
-        const { payloads, privacyStats, forwarderCalls } = await fetchAndProcessLogs(db, chain, apiUrl, newTxs, result);
+        if (newTxs.length > 0) {
+            // Step 2: Fetch logs for these transactions
+            const { payloads, privacyStats, forwarderCalls } = await fetchAndProcessLogs(db, chain, apiUrl, newTxs, result);
 
-        // Step 3: Fetch token transfers
-        const tokenTransfers = await fetchTokenTransfersForTxs(chain, apiUrl, newTxs, result);
+            // Step 3: Fetch token transfers
+            const tokenTransfers = await fetchTokenTransfersForTxs(chain, apiUrl, newTxs, result);
 
-        // Step 4: Insert everything into DB
-        const maxBlock = Math.max(...newTxs.map(t => t.blockNumber), 0);
-        await insertData(db, chain.id, newTxs, payloads, privacyStats, tokenTransfers, forwarderCalls, result, maxBlock);
-
+            // Step 4: Insert everything into DB
+            const maxBlock = Math.max(...newTxs.map(t => t.blockNumber), 0);
+            await insertData(db, chain.id, newTxs, payloads, privacyStats, tokenTransfers, forwarderCalls, result, maxBlock);
+        }
     } catch (e: any) {
         result.errors.push(`Top-level: ${e.message}`);
+    } finally {
+        // Step 5: ALWAYS update sync state to current block (closes the gap)
+        // This runs even if Blockscout API fails, ensuring the gap closes
+        try {
+            const currentBlockHex = await rpcRequest(chain.rpcUrl, 'eth_blockNumber', []);
+            const currentBlock = parseInt(currentBlockHex, 16);
+            if (currentBlock > 0) {
+                await db.insert(schema.syncState).values({
+                    chainId: chain.id,
+                    lastBlock: currentBlock,
+                    updatedAt: Math.floor(Date.now() / 1000),
+                }).onConflictDoUpdate({
+                    target: schema.syncState.chainId,
+                    set: {
+                        lastBlock: sql`MAX(${schema.syncState.lastBlock}, ${currentBlock})`,
+                        updatedAt: Math.floor(Date.now() / 1000),
+                    },
+                });
+            }
+        } catch (e: any) {
+            result.errors.push(`SyncState update: ${e.message}`);
+        }
     }
 
     return result;

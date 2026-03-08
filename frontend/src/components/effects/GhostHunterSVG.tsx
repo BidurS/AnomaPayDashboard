@@ -1,8 +1,10 @@
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 
 export function GhostHunterSVG() {
+    const shouldReduceMotion = useReducedMotion()
+
     return (
-        <div className="absolute inset-x-0 bottom-0 z-0 pointer-events-none opacity-80 dark:opacity-60 flex items-end justify-center w-full overflow-hidden">
+        <div className="absolute inset-x-0 bottom-0 z-0 pointer-events-none opacity-80 dark:opacity-60 flex items-end justify-center w-full overflow-hidden hidden md:flex">
             <svg
                 viewBox="-50 0 1300 350"
                 fill="none"
@@ -81,13 +83,14 @@ export function GhostHunterSVG() {
                 {['#00FF00', '#00FFFF', '#FF00FF', '#FFFF00', '#FF0000'].map((color, i) => (
                     <motion.g
                         key={`gem-${i}`}
-                        animate={{
+                        animate={shouldReduceMotion ? {} : {
                             y: [0, -20, 0],
                             x: [0, 10, -10, 0],
                             rotate: [0, 180, 360]
                         }}
                         transition={{ duration: 5 + i * 2, repeat: Infinity, ease: "easeInOut" }}
                         transform={`translate(${300 + i * 200}, ${100 + (i % 3) * 50})`}
+                        style={{ willChange: 'transform' }}
                     >
                         <path d="M 0,-15 L 10,0 L 0,15 L -10,0 Z" fill={color} opacity="0.8" />
                         <motion.circle cx="0" cy="0" r="20" fill={color} opacity="0.1" animate={{ scale: [1, 1.5, 1] }} transition={{ duration: 3, repeat: Infinity }} />
@@ -99,11 +102,12 @@ export function GhostHunterSVG() {
                 {/* Character 1 (Raised shadow to prevent clipping) */}
                 <motion.g
                     initial={{ x: -150 }}
-                    animate={{ x: [-150, 1400], y: [0, -20, 0, -15, 0] }}
+                    animate={shouldReduceMotion ? {} : { x: [-150, 1400], y: [0, -20, 0, -15, 0] }}
                     transition={{
                         x: { duration: 30, repeat: Infinity, ease: "linear" },
                         y: { duration: 5, repeat: Infinity, ease: "easeInOut" }
                     }}
+                    style={{ willChange: 'transform' }}
                 >
                     <g transform="translate(0, 190) scale(1.6)">
                         {/* Shadow underneath */}
@@ -153,11 +157,12 @@ export function GhostHunterSVG() {
                 {/* Character 2 */}
                 <motion.g
                     initial={{ x: -250 }}
-                    animate={{ x: [-250, 1300], y: [0, -15, 0, -25, 0] }}
+                    animate={shouldReduceMotion ? {} : { x: [-250, 1300], y: [0, -15, 0, -25, 0] }}
                     transition={{
                         x: { duration: 30, repeat: Infinity, ease: "linear", delay: 0.5 },
                         y: { duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1 }
                     }}
+                    style={{ willChange: 'transform' }}
                 >
                     <g transform="translate(0, 205) scale(1.1)">
                         <motion.ellipse cx="0" cy="45" rx="15" ry="4" fill="black" opacity="0.2" />

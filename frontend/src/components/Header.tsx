@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Menu, X, Users, ArrowRightLeft, HelpCircle, Home as HomeIcon, Activity, Shield, Zap, MoreHorizontal, Network, Terminal, Eye, BookOpen } from 'lucide-react'
+import { ChevronDown, Menu, X, Users, ArrowRightLeft, HelpCircle, Home as HomeIcon, Activity, Shield, Zap, MoreHorizontal, Network, Terminal, Eye, BookOpen, Code2, Package, Settings } from 'lucide-react'
 import { ThemeToggle } from './ThemeToggle'
+import { SettingsPanel } from './SettingsPanel'
 import { useChainContext } from '../context/ChainContext'
 import { useTrust, type TrustAnchor } from '../context/TrustContext'
 import { useNavigate } from 'react-router-dom'
@@ -15,6 +16,9 @@ interface HeaderProps {
 
 const MAIN_NAV = [
     { id: 'dashboard', label: 'Dashboard', icon: HomeIcon, path: '/' },
+    { id: 'intents', label: 'Intents', icon: Activity, path: '/intents', isLive: true },
+    { id: 'ai-insights', label: 'AI Insights', icon: Activity, path: '/ai-insights', isLive: true },
+    { id: 'developers', label: 'Developers', icon: Zap, path: '/developers' },
     { id: 'mempool', label: 'Mempool', icon: Zap, path: '/mempool', isLive: true },
     { id: 'solvers', label: 'Solvers', icon: Users, path: '/solvers' },
     { id: 'transactions', label: 'Transactions', icon: ArrowRightLeft, path: '/transactions' },
@@ -26,6 +30,8 @@ const MORE_NAV = [
     { id: 'live', label: 'Live Data', icon: Activity, path: '/live', isLive: true },
     { id: 'debug', label: 'Debugger', icon: Terminal, path: '/debug' },
     { id: 'circuits', label: 'ZK Registry', icon: Shield, path: '/circuits' },
+    { id: 'decoder', label: 'Decoder', icon: Code2, path: '/decoder' },
+    { id: 'batches', label: 'Batch Auctions', icon: Package, path: '/batches' },
     { id: 'faq', label: 'FAQ', icon: HelpCircle, path: '/faq' },
 ]
 
@@ -37,6 +43,7 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
     const [isTrustOpen, setIsTrustOpen] = useState(false)
     const [isMobileOpen, setIsMobileOpen] = useState(false)
     const [isMoreOpen, setIsMoreOpen] = useState(false)
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false)
     const [searchValue, setSearchValue] = useState('')
     const hasMultipleChains = chains.length > 1
 
@@ -175,7 +182,7 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
                     </div>
 
                     {/* Right side controls */}
-                    <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+                    <div className="flex items-center gap-2 sm:gap-3 shrink-0">
 
                         {/* Trust Perspective Toggle (V3 Feature) */}
                         <div className="relative hidden xl:block">
@@ -222,6 +229,18 @@ export function Header({ currentView, onSearch, onOpenPalette }: HeaderProps) {
                         </div>
 
                         <ThemeToggle />
+
+                        {/* Settings Gear */}
+                        <button
+                            onClick={() => setIsSettingsOpen(true)}
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white"
+                            aria-label="Open settings"
+                            title="Display Settings"
+                        >
+                            <Settings className="w-5 h-5" />
+                        </button>
+
+                        <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
 
                         {/* Chain Badge */}
                         {hasMultipleChains ? (

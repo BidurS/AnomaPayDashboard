@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Zap, ArrowRight, Shield, Layers, Database, Timer, Check, AlertTriangle } from 'lucide-react'
 import { SEO } from '../components/SEO'
@@ -41,13 +42,13 @@ export function MempoolPage() {
     const { activeChain } = useChainContext()
     const { transactions } = useLatestTransactions(activeChain?.id || 8453, undefined, 1, 10)
     const { assets } = useAssets(activeChain?.id || 8453)
-    
+
     // Auto-populate tokens based on actual contract usage
-    const availableTokens = assets && assets.length > 1 
-        ? assets.map(a => a.asset_symbol || 'UNKNOWN').filter(s => s !== 'UNKNOWN') 
+    const availableTokens = assets && assets.length > 1
+        ? assets.map(a => a.asset_symbol || 'UNKNOWN').filter(s => s !== 'UNKNOWN')
         : DEFAULT_TOKENS
     const tokensToUse = availableTokens.length > 1 ? availableTokens : DEFAULT_TOKENS
-    
+
     const [intents, setIntents] = useState<PendingIntent[]>([])
     const [stats, setStats] = useState({ active: 0, matched: 0 })
     const [seenHashes, setSeenHashes] = useState<Set<string>>(new Set())
@@ -57,7 +58,7 @@ export function MempoolPage() {
         if (!transactions || transactions.length === 0) return
 
         const newTxs = transactions.filter((tx: Transaction) => !seenHashes.has(tx.tx_hash))
-        
+
         if (newTxs.length > 0) {
             setSeenHashes(prev => {
                 const updated = new Set(prev)
@@ -148,7 +149,7 @@ export function MempoolPage() {
                     <p className="text-gray-500 uppercase tracking-widest text-sm max-w-xl leading-relaxed mb-4">
                         Live visualization of the Anoma P2P Gossip Network. Unsettled user intents stream in as "Wants vs Offers" before Solvers batch and settle them on-chain.
                     </p>
-                    
+
                     {/* Data Model Disclaimer */}
                     <div className="flex flex-col gap-2">
                         <div className="inline-block bg-green-500/10 border border-green-500/20 px-3 py-1.5 text-[10px] text-green-600 dark:text-green-500 font-bold uppercase tracking-widest flex items-center gap-2 max-w-fit">
@@ -226,9 +227,9 @@ export function MempoolPage() {
                                                 <Timer className="w-4 h-4 text-gray-400" />
                                             </>
                                         ) : (
-                                            <a href={`#/solver/${intent.solver}`} className="font-mono-swiss text-xs bg-black text-white px-2 py-1 hover:bg-[#FF0000] transition-colors cursor-pointer">
+                                            <Link to={`/solver/${intent.solver}`} className="font-mono-swiss text-xs bg-black text-white px-2 py-1 hover:bg-[#FF0000] transition-colors cursor-pointer">
                                                 {shortenAddress(intent.solver || '', 6, 4)} <Check className="inline w-3 h-3 ml-1 text-green-400" />
-                                            </a>
+                                            </Link>
                                         )}
                                     </div>
                                     <div className="mt-2 text-[cursor:help] relative group">
@@ -242,9 +243,9 @@ export function MempoolPage() {
                                             </div>
                                         )}
                                         {intent.status === 'matched' ? (
-                                            <a href={`#/tx/${intent.id}`} className="font-mono text-[8px] text-gray-400 hover:text-[#FF0000] mt-1 block">
+                                            <Link to={`/tx/${intent.id}`} className="font-mono text-[8px] text-gray-400 hover:text-[#FF0000] mt-1 block">
                                                 {shortenAddress(intent.id, 8, 8)} &rarr;
-                                            </a>
+                                            </Link>
                                         ) : (
                                             <div className="font-mono text-[8px] text-gray-300 dark:text-zinc-700 mt-1">
                                                 {shortenAddress(intent.id, 8, 8)}

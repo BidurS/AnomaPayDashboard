@@ -1,0 +1,43 @@
+{
+    "name": "@anomascan/sdk",
+    "version": "1.0.0",
+    "description": "TypeScript SDK for the AnomaScan multichain intent explorer API",
+    "main": "dist/index.js",
+    "module": "dist/index.mjs",
+    "types": "dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist",
+        "README.md"
+    ],
+    "scripts": {
+        "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+        "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+        "typecheck": "tsc --noEmit"
+    },
+    "keywords": [
+        "anoma",
+        "blockchain",
+        "intents",
+        "solver",
+        "explorer",
+        "sdk",
+        "api"
+    ],
+    "author": "AnomaScan",
+    "license": "MIT",
+    "devDependencies": {
+        "tsup": "^8.0.0",
+        "typescript": "^5.4.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/anomascan/sdk"
+    }
+}

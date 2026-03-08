@@ -28,7 +28,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
     return chunked;
 }
 
-export async function runIndexer(db: DB) {
+export async function runIndexer(db: DB, batchSize: number = 2000) {
     const chains = await db.select().from(schema.chains).where(eq(schema.chains.isEnabled, 1));
     const results: any[] = [];
 
@@ -51,10 +51,10 @@ export async function runIndexer(db: DB) {
             const currentBlock = parseInt(currentBlockHex, 16);
             chainResult.currentBlock = currentBlock;
 
-            // Process multiple batches per invocation for faster catchup
-            // Alchemy free tier: 10 blocks/call (inclusive), CF Worker: 50 subrequest limit
-            const MAX_BATCHES = 40;
-            const BATCH_SIZE = 9;
+            // Alchemy paid tier supports 2000+ block ranges per eth_getLogs call
+            // CF Worker: ~50 subrequest limit, so limit batches
+            const MAX_BATCHES = 5;
+            const BATCH_SIZE = batchSize;
 
             for (let batch = 0; batch < MAX_BATCHES; batch++) {
                 const syncState = await db.select().from(schema.syncState).where(eq(schema.syncState.chainId, chain.id)).get();

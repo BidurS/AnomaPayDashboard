@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Globe, Zap, Database, Layers, ArrowRight, Anchor } from 'lucide-react'
 import { cn } from '../lib/utils'
-import { useWebSocket } from '../context/WebSocketContext'
+import { useWebSocket } from '../context/EventStreamContext'
 import { useState, useEffect } from 'react'
 
 const DOMAINS = [
@@ -71,7 +71,7 @@ export function CrossChainTopology() {
                             </p>
                         </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-4">
                         <div className="p-4 border-2 border-black dark:border-white/10 flex flex-col gap-1">
                             <span className="text-[10px] font-bold text-gray-400 uppercase">Live Links</span>
@@ -91,7 +91,7 @@ export function CrossChainTopology() {
                     {/* Topology Map */}
                     <div className="lg:col-span-3 swiss-card bg-gray-50 dark:bg-zinc-950 border-4 border-black dark:border-white/10 p-0 h-[500px] relative">
                         <div className="absolute inset-0 swiss-grid-bg opacity-30" />
-                        
+
                         <svg className="w-full h-full relative z-10" viewBox="0 0 100 100" preserveAspectRatio="none">
                             {/* Connecting Lines (Intent Flow) */}
                             <defs>
@@ -150,15 +150,15 @@ export function CrossChainTopology() {
                         {/* Universal Intent Bridge O-D Tracker Particle */}
                         <motion.div
                             className="absolute w-6 h-6 bg-[#FF0000] rounded-none border-2 border-white z-30 flex items-center justify-center shadow-[0_0_20px_#FF0000]"
-                            animate={{ 
+                            animate={{
                                 left: ['10%', '50%', '90%'],
                                 top: ['20%', '50%', '50%'],
                                 opacity: [0, 1, 1, 0],
                                 rotate: [0, 90, 180, 180]
                             }}
-                            transition={{ 
-                                duration: 5, 
-                                repeat: Infinity, 
+                            transition={{
+                                duration: 5,
+                                repeat: Infinity,
                                 ease: "easeInOut",
                                 times: [0, 0.4, 0.8, 1]
                             }}

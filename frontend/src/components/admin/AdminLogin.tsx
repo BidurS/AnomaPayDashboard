@@ -38,18 +38,18 @@ export function AdminLogin() {
 
     return (
         <div className="flex items-center justify-center min-h-[80vh]">
-            <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md border border-gray-200">
-                <h2 className="text-2xl font-bold mb-6 text-center text-gray-900">Admin Access</h2>
+            <div className="w-full max-w-md bg-white dark:bg-zinc-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-zinc-700">
+                <h2 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white">Admin Access</h2>
                 <form onSubmit={handleLogin} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
                             Cloudflare Secret (Admin Key)
                         </label>
                         <input
                             type="password"
                             value={key}
                             onChange={(e) => setKey(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
                             placeholder="Enter admin key..."
                             required
                         />
@@ -58,7 +58,7 @@ export function AdminLogin() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 disabled:opacity-50"
+                        className="w-full bg-black dark:bg-white text-white dark:text-black py-2 px-4 rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 disabled:opacity-50"
                     >
                         {loading ? "Verifying..." : "Login"}
                     </button>

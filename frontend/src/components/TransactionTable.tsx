@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowUpRight, Copy, Check, Layers, Download, RefreshCw, ArrowRight, X } from 'lucide-react'
 import { useLatestTransactions, type Transaction } from '../lib/api'
-import { useWebSocket } from '../context/WebSocketContext'
+import { useWebSocket } from '../context/EventStreamContext'
 import { useChainContext } from '../context/ChainContext'
 import { shortenAddress, cn, formatWei } from '../lib/utils'
 
@@ -289,7 +289,7 @@ export function TransactionTable({ searchQuery, onTxClick, onSolverClick, hideHe
                             </table>
                         </div>
 
-                        {/* Mobile List View - Optimized for width */}
+                        {/* Mobile List View - Full Feature Parity */}
                         <div className="md:hidden">
                             {transactions.map((tx: Transaction, i: number) => (
                                 <motion.div
@@ -297,25 +297,38 @@ export function TransactionTable({ searchQuery, onTxClick, onSolverClick, hideHe
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: i * 0.05 }}
-                                    className="border-b border-gray-100 dark:border-white/5 p-4 active:bg-gray-50 dark:active:bg-zinc-900 relative group"
-                                    onClick={() => onTxClick?.(tx.tx_hash)}
+                                    className="border-b border-gray-100 dark:border-white/5 p-4"
                                 >
+                                    {/* Row 1: Description + Time */}
                                     <div className="flex justify-between items-start mb-2">
-                                        <div className="flex flex-col">
-                                            <span className="font-mono-swiss text-xs font-bold text-black dark:text-zinc-200 mb-1 flex items-center gap-2">
+                                        <button
+                                            onClick={() => onTxClick?.(tx.tx_hash)}
+                                            className="flex flex-col items-start text-left"
+                                        >
+                                            <span className="font-mono-swiss text-xs font-bold text-black dark:text-zinc-200 flex items-center gap-1.5">
                                                 {getHumanReadableDescription(tx)}
-                                                <ArrowRight className="w-3 h-3 text-[#FF0000] opacity-0 group-active:opacity-100 transition-opacity" />
+                                                <ArrowUpRight className="w-3 h-3 text-[#FF0000]" />
                                             </span>
-                                            <span className="font-mono-swiss text-[10px] text-gray-500 dark:text-zinc-500">
+                                            <span className="font-mono-swiss text-[10px] text-gray-500 dark:text-zinc-500 mt-0.5">
                                                 {shortenAddress(tx.tx_hash, 8, 8)}
                                             </span>
+                                        </button>
+                                        <div className="flex items-center gap-1.5 shrink-0">
+                                            <button
+                                                onClick={() => copyHash(tx.tx_hash)}
+                                                className="p-1.5 text-gray-400 hover:text-black dark:hover:text-white active:scale-90 transition-all"
+                                                title="Copy Hash"
+                                            >
+                                                {copiedHash === tx.tx_hash ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                                            </button>
+                                            <span className="text-[10px] font-mono text-gray-400 dark:text-zinc-600 bg-gray-100 dark:bg-white/5 px-1.5 py-0.5 rounded">
+                                                {formatTime(tx.timestamp).split(',')[1]}
+                                            </span>
                                         </div>
-                                        <span className="text-[10px] font-mono text-gray-400 dark:text-zinc-600 bg-gray-100 dark:bg-white/5 px-1.5 py-0.5 rounded">
-                                            {formatTime(tx.timestamp).split(',')[1]}
-                                        </span>
                                     </div>
 
-                                    <div className="flex items-center justify-between text-xs mt-3">
+                                    {/* Row 2: Type + Value */}
+                                    <div className="flex items-center justify-between text-xs mt-2">
                                         <div className="flex items-center gap-2">
                                             <div className={cn(
                                                 "w-1.5 h-1.5 rounded-full",
@@ -324,15 +337,31 @@ export function TransactionTable({ searchQuery, onTxClick, onSolverClick, hideHe
                                             )} />
                                             <span className="text-gray-600 dark:text-zinc-400 text-[10px] uppercase tracking-wider">{tx.primary_type}</span>
                                         </div>
-
-                                        <div className="font-mono-swiss text-black dark:text-zinc-300">
+                                        <div className="font-mono-swiss font-bold text-black dark:text-zinc-300">
                                             {formatWei(tx.value_wei)} ETH
                                         </div>
                                     </div>
 
-                                    {/* Mobile Explicit Click Affordance */}
-                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                                        <ArrowUpRight className="w-4 h-4 text-gray-300" />
+                                    {/* Row 3: Solver Link (CRITICAL — was missing on mobile!) */}
+                                    <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100 dark:border-white/5">
+                                        <button
+                                            onClick={() => onSolverClick?.(tx.solver_address)}
+                                            className="inline-flex items-center gap-1.5 font-mono-swiss text-[11px] font-bold text-[#666] dark:text-zinc-400 bg-gray-100 dark:bg-white/5 px-3 py-1.5 rounded active:bg-black active:text-white dark:active:bg-white dark:active:text-black transition-all min-h-[32px]"
+                                        >
+                                            <span>Solver:</span>
+                                            <span className="text-black dark:text-zinc-200">{shortenAddress(tx.solver_address)}</span>
+                                            <ArrowRight className="w-3 h-3 text-[#FF0000]" />
+                                        </button>
+                                        {activeChain?.explorer_url && (
+                                            <a
+                                                href={`${activeChain.explorer_url}/tx/${tx.tx_hash}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="p-2 text-gray-400 hover:text-black dark:hover:text-white"
+                                            >
+                                                <ArrowUpRight className="w-4 h-4" />
+                                            </a>
+                                        )}
                                     </div>
                                 </motion.div>
                             ))}

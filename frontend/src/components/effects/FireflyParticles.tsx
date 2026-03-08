@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import type { EffectIntensity } from '../../context/PreferencesContext';
 
 interface Firefly {
     x: number;
@@ -11,7 +12,11 @@ interface Firefly {
     color: string;
 }
 
-export function FireflyParticles() {
+interface FireflyParticlesProps {
+    intensity?: EffectIntensity;
+}
+
+export function FireflyParticles({ intensity = 'full' }: FireflyParticlesProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const mouseRef = useRef<{ x: number | null; y: number | null }>({ x: null, y: null });
 
@@ -25,6 +30,10 @@ export function FireflyParticles() {
         let animationFrameId: number;
         let fireflies: Firefly[] = [];
 
+        // Intensity multipliers
+        const countMultiplier = intensity === 'subtle' ? 0.3 : 1;
+        const speedMultiplier = intensity === 'subtle' ? 0.5 : 1;
+
         const resizeCanvas = () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -32,7 +41,7 @@ export function FireflyParticles() {
         };
 
         const initFireflies = () => {
-            const count = Math.floor(window.innerWidth / 15);
+            const count = Math.floor((window.innerWidth / 15) * countMultiplier);
             fireflies = [];
             for (let i = 0; i < count; i++) {
                 createFirefly();
@@ -44,8 +53,8 @@ export function FireflyParticles() {
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
                 radius: Math.random() * 2 + 1,
-                speedX: Math.random() * 1 - 0.5,
-                speedY: Math.random() * 1 - 0.5,
+                speedX: (Math.random() * 1 - 0.5) * speedMultiplier,
+                speedY: (Math.random() * 1 - 0.5) * speedMultiplier,
                 alpha: Math.random(),
                 fading: Math.random() > 0.5,
                 color: `rgba(255, 215, 0,`, // Gold/Yellow base
@@ -63,19 +72,19 @@ export function FireflyParticles() {
                 if (img.y < 0 || img.y > canvas.height) img.speedY *= -1;
 
                 // Fading effect
+                const fadeSpeed = intensity === 'subtle' ? 0.005 : 0.01;
                 if (img.fading) {
-                    img.alpha -= 0.01;
+                    img.alpha -= fadeSpeed;
                     if (img.alpha <= 0) {
                         img.alpha = 0;
                         img.fading = false;
-                        // Reposition occasionally when fully faded
                         if (Math.random() < 0.1) {
                             img.x = Math.random() * canvas.width;
                             img.y = Math.random() * canvas.height;
                         }
                     }
                 } else {
-                    img.alpha += 0.01;
+                    img.alpha += fadeSpeed;
                     if (img.alpha >= 1) {
                         img.alpha = 1;
                         img.fading = true;
@@ -92,7 +101,6 @@ export function FireflyParticles() {
                     if (dist < attractionRange) {
                         img.x += (dx / dist) * 2;
                         img.y += (dy / dist) * 2;
-                        // Glow brighter near mouse
                         img.alpha = Math.min(1, img.alpha + 0.05);
                     }
                 }
@@ -101,7 +109,6 @@ export function FireflyParticles() {
 
         const drawFireflies = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            // Global composite operation for glowing effect
             ctx.globalCompositeOperation = 'lighter';
 
             fireflies.forEach(f => {
@@ -131,18 +138,14 @@ export function FireflyParticles() {
             mouseRef.current = { x: null, y: null };
         }
 
-        // Handling click for "explosion" or disperse effect is nice, 
-        // but user asked for "glow like firefly in screen if user click on it".
-        // Let's make them converge or pulse on click.
         const handleClick = (e: MouseEvent) => {
-            // Creating a temporary burst of new fireflies at click
             for (let i = 0; i < 5; i++) {
                 fireflies.push({
                     x: e.clientX,
                     y: e.clientY,
                     radius: Math.random() * 3 + 1,
-                    speedX: Math.random() * 4 - 2,
-                    speedY: Math.random() * 4 - 2,
+                    speedX: (Math.random() * 4 - 2) * speedMultiplier,
+                    speedY: (Math.random() * 4 - 2) * speedMultiplier,
                     alpha: 1,
                     fading: true,
                     color: `rgba(255, 100, 0,` // More orange/intense
@@ -152,7 +155,7 @@ export function FireflyParticles() {
 
         window.addEventListener('resize', resizeCanvas);
         window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mousedown', handleClick); // Use mousedown for instant reaction
+        window.addEventListener('mousedown', handleClick);
         window.addEventListener('mouseleave', handleMouseLeave);
 
         resizeCanvas();
@@ -165,9 +168,7 @@ export function FireflyParticles() {
             window.removeEventListener('mouseleave', handleMouseLeave);
             cancelAnimationFrame(animationFrameId);
         };
-    }, []);
+    }, [intensity]);
 
     return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full pointer-events-none z-[0] opacity-80" />;
-    // z-index 0 to be behind heavy generic content but careful not to block clicks if pointer-events is auto. 
-    // pointer-events-none ensures clicks pass through to UI, but we listen on window for interaction.
 }

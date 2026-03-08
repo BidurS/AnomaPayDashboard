@@ -1,14 +1,14 @@
 
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, Outlet, useParams, useOutletContext } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import { ChainProvider } from './context/ChainContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { BackgroundEffects } from './components/effects/BackgroundEffects'
+import { PreferencesProvider } from './context/PreferencesContext'
 import { Header } from './components/Header'
 import { Hero } from './components/Hero'
 import { Charts } from './components/Charts'
-import { SolverLeaderboard } from './components/SolverLeaderboard'
 import { PrivacyPulse } from './components/PrivacyPulse'
 import { IntentMempool } from './components/IntentMempool'
 import { CrossChainTopology } from './components/CrossChainTopology'
@@ -17,18 +17,39 @@ import { TransactionDetail } from './components/TransactionDetail'
 import { SolverProfile } from './components/SolverProfile'
 import { Footer } from './components/Footer'
 import { FAQ } from './components/FAQ'
-import { DebuggerPage } from './pages/DebuggerPage'
 import { AdminLayout } from './components/admin/AdminLayout'
 import { AdminLogin } from './components/admin/AdminLogin'
-import { AdminDashboard } from './components/admin/AdminDashboard'
 import { CommandPalette } from './components/CommandPalette'
-import { ZKCircuitRegistry } from './components/ZKCircuitRegistry'
-import { MempoolPage } from './pages/MempoolPage'
-import { DomainsPage } from './pages/DomainsPage'
-import { VisionPage } from './pages/VisionPage'
-import { VisionArchitecturePage } from './pages/VisionArchitecturePage'
+import { ARMOverview } from './components/ARMOverview'
 import { SEO } from './components/SEO'
 import './index.css'
+
+/* ─── Lazy-loaded pages (code splitting) ─── */
+const DomainsPage = lazy(() => import('./pages/DomainsPage').then(m => ({ default: m.DomainsPage })))
+const VisionPage = lazy(() => import('./pages/VisionPage').then(m => ({ default: m.VisionPage })))
+const VisionArchitecturePage = lazy(() => import('./pages/VisionArchitecturePage').then(m => ({ default: m.VisionArchitecturePage })))
+const IntentExplorerPage = lazy(() => import('./pages/IntentExplorerPage').then(m => ({ default: m.IntentExplorerPage })))
+const IntentDetailPage = lazy(() => import('./pages/IntentDetailPage'))
+const AIInsightsPage = lazy(() => import('./pages/AIInsightsPage'))
+const DevPortalPage = lazy(() => import('./pages/DevPortalPage'))
+const DebuggerPage = lazy(() => import('./pages/DebuggerPage').then(m => ({ default: m.DebuggerPage })))
+const MempoolPage = lazy(() => import('./pages/MempoolPage').then(m => ({ default: m.MempoolPage })))
+const IntentDecoderPage = lazy(() => import('./pages/IntentDecoderPage'))
+const BatchAuctionPage = lazy(() => import('./pages/BatchAuctionPage'))
+const ZKCircuitRegistry = lazy(() => import('./components/ZKCircuitRegistry').then(m => ({ default: m.ZKCircuitRegistry })))
+const AdminDashboard = lazy(() => import('./components/admin/AdminDashboard'))
+const LazySolversPage = lazy(() => import('./pages/SolversPage'))
+
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-8 h-8 border-4 border-gray-200 dark:border-zinc-700 border-t-[#FF0000] rounded-full animate-spin" />
+        <span className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-zinc-600">Loading</span>
+      </div>
+    </div>
+  )
+}
 
 function Dashboard() {
   const navigate = useNavigate()
@@ -36,6 +57,7 @@ function Dashboard() {
     <>
       <SEO title="Dashboard" description="High-level overview of Anoma Protocol intent settlement and network health." />
       <Hero />
+      <ARMOverview />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border-b border-black dark:border-white/10">
         <Charts />
         <div className="border-l border-black dark:border-white/10">
@@ -130,14 +152,7 @@ function LiveFeedPage() {
   )
 }
 
-function SolversPage() {
-  return (
-    <>
-      <SEO title="Solver Intelligence" description="Deep analytics and strategy classification for Anoma network solvers." />
-      <SolverLeaderboard />
-    </>
-  )
-}
+// SolversPage is now lazy-loaded from ./pages/SolversPage.tsx
 
 function TransactionsPage() {
   const { searchQuery } = useOutletContext<{ searchQuery: string }>()
@@ -166,7 +181,11 @@ function Layout() {
     if (location.pathname === '/live') return 'live'
     if (location.pathname === '/mempool') return 'mempool'
     if (location.pathname === '/domains') return 'domains'
+    if (location.pathname === '/intents') return 'intents'
+    if (location.pathname.startsWith('/intents/')) return 'intents'
+    if (location.pathname === '/ai-insights') return 'ai-insights'
     if (location.pathname.startsWith('/vision')) return 'vision'
+    if (location.pathname === '/developers') return 'developers'
     if (location.pathname === '/solvers' || location.pathname.startsWith('/solver/')) return 'solvers'
     if (location.pathname === '/transactions' || location.pathname.startsWith('/tx/')) return 'transactions'
     if (location.pathname === '/circuits') return 'circuits'
@@ -202,7 +221,9 @@ function Layout() {
         )}
 
         <main className="flex-1">
-          <Outlet context={{ searchQuery }} />
+          <Suspense fallback={<PageLoader />}>
+            <Outlet context={{ searchQuery }} />
+          </Suspense>
         </main>
 
         {!location.pathname.startsWith('/admin') && <Footer />}
@@ -234,35 +255,43 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ChainProvider>
         <ThemeProvider>
-          <HelmetProvider>
-            <BrowserRouter>
-              <Routes>
-                <Route element={<Layout />}>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/live" element={<LiveFeedPage />} />
-                  <Route path="/domains" element={<DomainsPage />} />
-                  <Route path="/vision" element={<VisionPage />} />
-                  <Route path="/vision/architecture" element={<VisionArchitecturePage />} />
-                  <Route path="/solvers" element={<SolversPage />} />
-                  <Route path="/transactions" element={<TransactionsPage />} />
-                  <Route path="/mempool" element={<MempoolPage />} />
-                  <Route path="/debug" element={<DebuggerPage />} />
-                  <Route path="/faq" element={<FAQ />} />
-                  <Route path="/circuits" element={<ZKCircuitRegistry />} />
+          <PreferencesProvider>
+            <HelmetProvider>
+              <BrowserRouter>
+                <Routes>
+                  <Route element={<Layout />}>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/live" element={<LiveFeedPage />} />
+                    <Route path="/domains" element={<DomainsPage />} />
+                    <Route path="/vision" element={<VisionPage />} />
+                    <Route path="/vision/architecture" element={<VisionArchitecturePage />} />
+                    <Route path="/solvers" element={<LazySolversPage />} />
+                    <Route path="/transactions" element={<TransactionsPage />} />
+                    <Route path="/mempool" element={<MempoolPage />} />
+                    <Route path="/intents" element={<IntentExplorerPage />} />
+                    <Route path="/intents/:id" element={<IntentDetailPage />} />
+                    <Route path="/ai-insights" element={<AIInsightsPage />} />
+                    <Route path="/developers" element={<DevPortalPage />} />
+                    <Route path="/debug" element={<DebuggerPage />} />
+                    <Route path="/faq" element={<FAQ />} />
+                    <Route path="/circuits" element={<ZKCircuitRegistry />} />
+                    <Route path="/decoder" element={<IntentDecoderPage />} />
+                    <Route path="/batches" element={<BatchAuctionPage />} />
 
-                  <Route path="/tx/:hash" element={<TxDetailWrapper />} />
-                  <Route path="/solver/:address" element={<SolverProfileWrapper />} />
+                    <Route path="/tx/:hash" element={<TxDetailWrapper />} />
+                    <Route path="/solver/:address" element={<SolverProfileWrapper />} />
 
-                  {/* Admin Routes */}
-                  <Route path="/admin" element={<AdminLayout />}>
-                    <Route index element={<AdminDashboard />} />
-                    <Route path="dashboard" element={<AdminDashboard />} />
-                    <Route path="login" element={<AdminLogin />} />
+                    {/* Admin Routes */}
+                    <Route path="/admin" element={<AdminLayout />}>
+                      <Route index element={<AdminDashboard />} />
+                      <Route path="dashboard" element={<AdminDashboard />} />
+                      <Route path="login" element={<AdminLogin />} />
+                    </Route>
                   </Route>
-                </Route>
-              </Routes>
-            </BrowserRouter>
-          </HelmetProvider>
+                </Routes>
+              </BrowserRouter>
+            </HelmetProvider>
+          </PreferencesProvider>
         </ThemeProvider>
       </ChainProvider>
     </QueryClientProvider>

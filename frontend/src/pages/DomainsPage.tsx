@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Network, Activity, EyeOff, Shield } from 'lucide-react'
 import { SEO } from '../components/SEO'
 import { MOCK_DOMAINS } from '../lib/api'
-import { useWebSocket } from '../context/WebSocketContext'
+import { useWebSocket } from '../context/EventStreamContext'
 import { useTrust } from '../context/TrustContext'
 import { cn } from '../lib/utils'
 
@@ -17,9 +17,9 @@ export function DomainsPage() {
     const [traffic, setTraffic] = useState<{ from: number, to: number }[]>([])
 
     // Determine trust radius visual properties
-    const trustRadius = activeTrustAnchor === 'Global Perspective' ? 600 : 
-                        activeTrustAnchor === 'Taiga Shielded Set' ? 120 : 250;
-    
+    const trustRadius = activeTrustAnchor === 'Global Perspective' ? 600 :
+        activeTrustAnchor === 'Taiga Shielded Set' ? 120 : 250;
+
     const isNodeTrusted = (index: number) => {
         if (activeTrustAnchor === 'Global Perspective') return true;
         if (index === 0) return true; // Hub is always visible
@@ -89,7 +89,7 @@ export function DomainsPage() {
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.05)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
                 {/* Trust Radius Overlay */}
-                <motion.div 
+                <motion.div
                     animate={{ width: trustRadius * 2, height: trustRadius * 2 }}
                     transition={{ type: "spring", stiffness: 100, damping: 20 }}
                     className="absolute z-0 rounded-full border-2 border-dashed border-[#FF0000]/30 bg-[#FF0000]/5 flex items-center justify-center pointer-events-none"
@@ -160,8 +160,8 @@ export function DomainsPage() {
                             {/* Node */}
                             <motion.div
                                 initial={{ opacity: 0, scale: 0 }}
-                                animate={{ 
-                                    opacity: 1, 
+                                animate={{
+                                    opacity: 1,
                                     scale: trusted ? 1 : 0.8,
                                     filter: trusted ? 'none' : 'grayscale(1) contrast(0.5)'
                                 }}

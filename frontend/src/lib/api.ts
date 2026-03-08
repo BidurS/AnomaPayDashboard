@@ -223,6 +223,52 @@ export function useStats(chainId: number) {
     return { stats: stats || null, loading: isLoading, refetch };
 }
 
+// Multi-chain aggregate stats for ARM Overview
+const ARM_CHAIN_IDS = [1, 8453, 10, 42161]; // Ethereum, Base, Optimism, Arbitrum
+
+export function useMultiChainStats() {
+    const { data, isLoading } = useQuery({
+        queryKey: ['multi-chain-stats'],
+        queryFn: async () => {
+            const results = await Promise.allSettled(
+                ARM_CHAIN_IDS.map(async (chainId) => {
+                    const res = await fetch(`${API_URL}/api/stats?chainId=${chainId}`);
+                    if (!res.ok) return null;
+                    return { chainId, stats: await res.json() as Stats };
+                })
+            );
+
+            const perChain: { chainId: number; stats: Stats }[] = [];
+            const aggregate: Stats = {
+                totalVolume: 0, volume24h: 0, volume7d: 0,
+                intentCount: 0, intentCount24h: 0,
+                uniqueSolvers: 0, totalGasUsed: 0, gasSavedUsd: 0
+            };
+
+            for (const r of results) {
+                if (r.status === 'fulfilled' && r.value) {
+                    perChain.push(r.value);
+                    const s = r.value.stats;
+                    aggregate.totalVolume += s.totalVolume || 0;
+                    aggregate.volume24h += s.volume24h || 0;
+                    aggregate.volume7d += s.volume7d || 0;
+                    aggregate.intentCount += s.intentCount || 0;
+                    aggregate.intentCount24h += s.intentCount24h || 0;
+                    aggregate.uniqueSolvers += s.uniqueSolvers || 0;
+                    aggregate.totalGasUsed += s.totalGasUsed || 0;
+                    aggregate.gasSavedUsd += (s.gasSavedUsd || 0);
+                }
+            }
+
+            return { perChain, aggregate, chainCount: perChain.length };
+        },
+        refetchInterval: 30000,
+        staleTime: 20000,
+    });
+
+    return { multiStats: data || null, loading: isLoading };
+}
+
 export function useTransactions(chainId: number, searchQuery?: string, page = 1, limit = 20) {
     const { data, isLoading, refetch } = useQuery({
         queryKey: ['transactions', chainId, searchQuery, page, limit],
@@ -442,4 +488,334 @@ export function usePrivacyStats(chainId: number) {
     });
 
     return { stats: stats || [], loading: isLoading };
+}
+
+// =============================================================
+//  V3 API — Intent Lifecycle & Analytics (Phase 1)
+// =============================================================
+
+export interface IntentRecord {
+    id: string
+    chainId: number
+    status: string
+    intentType: string
+    solver: string | null
+    inputValueUsd: number
+    outputValueUsd: number
+    gasCostUsd: number
+    gasUsed: number
+    isShielded: number
+    isMultiChain: number
+    payloadTypes: string
+    payloadCount: number
+    hasForwarderCalls: number
+    tagCount: number
+    createdAt: number
+    settledAt: number | null
+    txHash: string
+    blockNumber: number
+}
+
+export interface IntentDetail extends IntentRecord {
+    creator: string | null
+    consumedResources: string | null
+    createdResources: string | null
+    actionTreeRoot: string | null
+    solverProfitUsd: number
+    gasPriceWei: string
+    commitmentRoot: string | null
+    nullifierCount: number
+    correlationId: string | null
+    valueWei: string
+    rawDataJson: string | null
+    lifecycle: any[]
+    payloads: any[]
+    tokenTransfers: any[]
+    forwarderCalls: any[]
+}
+
+export interface IntentTypeDistribution {
+    intentType: string
+    count: number
+    totalVolumeUsd: number
+    avgGasCostUsd: number
+    shieldedCount: number
+}
+
+export interface LifecycleFunnel {
+    status: string
+    count: number
+    totalVolumeUsd: number
+}
+
+export interface DemandHeatmapCell {
+    dayOfWeek: number
+    hourOfDay: number
+    count: number
+    totalVolumeUsd: number
+}
+
+export interface SolverEconEntry {
+    solverAddress: string
+    totalIntentsSolved: number
+    totalRevenueUsd: number
+    totalGasCostUsd: number
+    netProfitUsd: number
+    avgSuccessRate: number
+    activeDays: number
+    rank: number
+    profitPerIntent: number
+    roi: number
+}
+
+export interface PlatformOverview {
+    allTime: {
+        totalIntents: number
+        totalVolumeUsd: number
+        uniqueSolvers: number
+        shieldedIntents: number
+        shieldedPercentage: string
+        avgGasCostUsd: number
+    }
+    last24h: { intentCount: number; volumeUsd: number; uniqueSolvers: number }
+    last7d: { intentCount: number; volumeUsd: number }
+}
+
+export function useIntents(chainId: number, filters?: { status?: string; type?: string; solver?: string; shielded?: string; page?: number; limit?: number }) {
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 25;
+    const { data, isLoading, refetch } = useQuery({
+        queryKey: ['v3-intents', chainId, filters],
+        queryFn: async () => {
+            const params = new URLSearchParams({ chainId: String(chainId), page: String(page), limit: String(limit) });
+            if (filters?.status) params.set('status', filters.status);
+            if (filters?.type) params.set('type', filters.type);
+            if (filters?.solver) params.set('solver', filters.solver);
+            if (filters?.shielded) params.set('shielded', filters.shielded);
+            const res = await fetch(`${API_URL}/api/v3/intents?${params}`);
+            return res.json() as Promise<{ data: IntentRecord[]; pagination: { page: number; limit: number; total: number; totalPages: number } }>;
+        },
+        placeholderData: keepPreviousData,
+        refetchInterval: 15000,
+        staleTime: 10000,
+    });
+    return {
+        intents: data?.data || [],
+        pagination: data?.pagination || { page, limit, total: 0, totalPages: 0 },
+        loading: isLoading,
+        refetch,
+    };
+}
+
+export function useIntentDetail(chainId: number, intentId: string | null) {
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['v3-intent-detail', chainId, intentId],
+        queryFn: async () => {
+            if (!intentId) return null;
+            const res = await fetch(`${API_URL}/api/v3/intents/${encodeURIComponent(intentId)}?chainId=${chainId}`);
+            if (!res.ok) throw new Error('Not found');
+            return res.json() as Promise<IntentDetail>;
+        },
+        enabled: !!intentId,
+        staleTime: 60000 * 5,
+    });
+    return { intent: data || null, loading: isLoading, error: error ? error.message : null };
+}
+
+export function useIntentTypes(chainId: number) {
+    const { data, isLoading } = useQuery({
+        queryKey: ['v3-intent-types', chainId],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/v3/analytics/intent-types?chainId=${chainId}`);
+            return res.json() as Promise<IntentTypeDistribution[]>;
+        },
+        refetchInterval: 120000,
+        staleTime: 60000,
+    });
+    return { types: data || [], loading: isLoading };
+}
+
+export function useLifecycleFunnel(chainId: number) {
+    const { data, isLoading } = useQuery({
+        queryKey: ['v3-lifecycle-funnel', chainId],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/v3/analytics/lifecycle-funnel?chainId=${chainId}`);
+            return res.json() as Promise<LifecycleFunnel[]>;
+        },
+        refetchInterval: 120000,
+        staleTime: 60000,
+    });
+    return { funnel: data || [], loading: isLoading };
+}
+
+export function useDemandHeatmap(chainId: number) {
+    const { data, isLoading } = useQuery({
+        queryKey: ['v3-demand-heatmap', chainId],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/v3/analytics/demand-heatmap?chainId=${chainId}`);
+            return res.json() as Promise<DemandHeatmapCell[]>;
+        },
+        refetchInterval: 300000,
+        staleTime: 120000,
+    });
+    return { heatmap: data || [], loading: isLoading };
+}
+
+export function useSolverEconomics(chainId: number, days = 30) {
+    const { data, isLoading } = useQuery({
+        queryKey: ['v3-solver-economics', chainId, days],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/v3/solvers/economics?chainId=${chainId}&days=${days}`);
+            return res.json() as Promise<SolverEconEntry[]>;
+        },
+        refetchInterval: 60000,
+        staleTime: 30000,
+    });
+    return { economics: data || [], loading: isLoading };
+}
+
+export interface SolverEconHistoryEntry {
+    period: string;
+    intentsSolved: number;
+    intentsFailed: number;
+    totalRevenueUsd: number;
+    totalGasCostUsd: number;
+    netProfitUsd: number;
+    avgSettlementTimeMs: number;
+    avgBatchSize: number;
+    successRate: number;
+    intentTypesJson: string | null;
+}
+
+export interface SolverEconHistoryResponse {
+    history: SolverEconHistoryEntry[];
+    intentBreakdown: { intentType: string; count: number; totalVolumeUsd: number }[];
+    totals: { totalDays: number; totalIntents: number; totalRevenue: number; totalGasCost: number; netProfit: number };
+}
+
+export function useSolverEconomicHistory(chainId: number, address: string | null) {
+    const { data, isLoading } = useQuery({
+        queryKey: ['v3-solver-econ-history', chainId, address],
+        queryFn: async () => {
+            if (!address) return null;
+            const res = await fetch(`${API_URL}/api/v3/solvers/${address}/economics?chainId=${chainId}`);
+            return res.json() as Promise<SolverEconHistoryResponse>;
+        },
+        enabled: !!address,
+        staleTime: 60000,
+        refetchInterval: 120000,
+    });
+    return { econHistory: data || null, loading: isLoading };
+}
+
+export function usePlatformOverview(chainId: number) {
+    const { data, isLoading } = useQuery({
+        queryKey: ['v3-overview', chainId],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/v3/overview?chainId=${chainId}`);
+            return res.json() as Promise<PlatformOverview>;
+        },
+        refetchInterval: 60000,
+        staleTime: 30000,
+    });
+    return { overview: data || null, loading: isLoading };
+}
+
+// ============================================================
+// Phase 2: Intelligence Layer API Hooks
+// ============================================================
+
+// Types
+export interface SimulationResult {
+    id: number;
+    intentId: string;
+    chainId: number;
+    routeType: string;
+    routeSteps: { stepIndex: number; action: string; protocol: string; inputToken: string; outputToken: string; estimatedGas: number; description: string }[];
+    predictedOutputUsd: number;
+    predictedGas: number;
+    predictedGasCostUsd: number;
+    predictedSlippage: number;
+    predictedProfitUsd: number;
+    riskScore: number;
+    confidence: number;
+    riskFactors: string[];
+    aiModel: string;
+    aiReasoning: string;
+    predictionAccuracy: number | null;
+    createdAt: number;
+    simulationDurationMs: number;
+}
+
+export interface IntentAnnotation {
+    id: number;
+    intentId: string;
+    chainId: number;
+    annotationType: string;
+    severity: string;
+    title: string;
+    description: string;
+    metadata: string | null;
+    aiConfidence: number;
+    createdAt: number;
+}
+
+export interface CrossChainFlow {
+    source: number;
+    target: number;
+    value: number;
+    count: number;
+}
+
+export interface AIInsightsData {
+    accuracy: {
+        totalSimulations: number;
+        avgAccuracy: number;
+        highConfidenceCount: number;
+        avgRiskScore: number;
+        avgSimDurationMs: number;
+    };
+    recentAnnotations: IntentAnnotation[];
+    annotationTypes: { type: string; count: number }[];
+    routeTypes: { routeType: string; count: number; avgConfidence: number; avgRiskScore: number }[];
+}
+
+// Hooks
+export function useIntentSimulation(intentId: string) {
+    const { data, isLoading } = useQuery({
+        queryKey: ['v3-intent-simulation', intentId],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/v3/intents/${intentId}/simulation`);
+            return res.json() as Promise<{ simulations: SimulationResult[]; annotations: IntentAnnotation[] }>;
+        },
+        enabled: !!intentId,
+        staleTime: 30000,
+    });
+    return { simulations: data?.simulations || [], annotations: data?.annotations || [], loading: isLoading };
+}
+
+export function useCrossChainFlows(days = 30) {
+    const { data, isLoading } = useQuery({
+        queryKey: ['v3-cross-chain-flows', days],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/v3/analytics/cross-chain-flows?days=${days}`);
+            return res.json() as Promise<{ flows: CrossChainFlow[]; chains: Record<string, string> }>;
+        },
+        refetchInterval: 300000,
+        staleTime: 120000,
+    });
+    return { flows: data?.flows || [], chains: data?.chains || {}, loading: isLoading };
+}
+
+export function useAIInsights(chainId: number) {
+    const { data, isLoading } = useQuery({
+        queryKey: ['v3-ai-insights', chainId],
+        queryFn: async () => {
+            const res = await fetch(`${API_URL}/api/v3/analytics/ai-insights?chainId=${chainId}`);
+            return res.json() as Promise<AIInsightsData>;
+        },
+        refetchInterval: 60000,
+        staleTime: 30000,
+    });
+    return { insights: data || null, loading: isLoading };
 }

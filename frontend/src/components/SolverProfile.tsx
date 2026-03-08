@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion'
-import { ArrowLeft, ExternalLink, Fuel, Clock, Wallet, TrendingUp, BarChart3 } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Fuel, Clock, Wallet, TrendingUp, BarChart3, DollarSign } from 'lucide-react'
 import { SEO } from './SEO'
-import { useSolverDetail } from '../lib/api'
+import { useSolverDetail, useSolverEconomicHistory } from '../lib/api'
 import { useChainContext } from '../context/ChainContext'
-import { shortenAddress, formatCurrency, formatNumber, timeAgo } from '../lib/utils'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { shortenAddress, formatCurrency, formatNumber, timeAgo, cn } from '../lib/utils'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, Line } from 'recharts'
 import { TransactionTable } from './TransactionTable'
 
 interface SolverProfileProps {
@@ -16,6 +16,7 @@ interface SolverProfileProps {
 export function SolverProfile({ address, onBack, onTxClick }: SolverProfileProps) {
     const { activeChain } = useChainContext()
     const { solver, loading, error } = useSolverDetail(activeChain?.id || 8453, address)
+    const { econHistory } = useSolverEconomicHistory(activeChain?.id || 8453, address)
 
     if (loading) {
         return (
@@ -85,7 +86,7 @@ export function SolverProfile({ address, onBack, onTxClick }: SolverProfileProps
                                     </div>
                                 </div>
                             </div>
-                            
+
                             {/* Strategy Badges */}
                             <div className="flex flex-wrap gap-2">
                                 {solver.badges?.map(badge => (
@@ -176,6 +177,70 @@ export function SolverProfile({ address, onBack, onTxClick }: SolverProfileProps
                                 </div>
                             </div>
                         )}
+
+                        {/* ─── Economics Panel ─── */}
+                        {econHistory && econHistory.totals && (
+                            <div className="swiss-card mb-8">
+                                <div className="swiss-card-accent bg-[#FF0000]" />
+                                <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 mb-6 pt-2 flex items-center gap-2">
+                                    <DollarSign className="w-4 h-4" /> Economic Performance
+                                </h3>
+
+                                {/* P&L Summary Cards */}
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                                    {[
+                                        { label: 'Total Revenue', value: formatCurrency(econHistory.totals.totalRevenue), color: 'text-green-500' },
+                                        { label: 'Gas Costs', value: `-${formatCurrency(econHistory.totals.totalGasCost)}`, color: 'text-red-500' },
+                                        { label: 'Net Profit', value: formatCurrency(econHistory.totals.netProfit), color: econHistory.totals.netProfit >= 0 ? 'text-green-500' : 'text-red-500' },
+                                        { label: 'Active Days', value: econHistory.totals.totalDays, color: 'text-[#0066CC]' },
+                                    ].map(stat => (
+                                        <div key={stat.label} className="bg-gray-50 dark:bg-white/5 p-4">
+                                            <div className="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-bold">{stat.label}</div>
+                                            <div className={cn('text-lg font-extrabold font-mono', stat.color)}>{stat.value}</div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Revenue vs Gas Chart */}
+                                {econHistory.history.length > 0 && (
+                                    <div className="h-52 mb-6">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <AreaChart data={econHistory.history.slice(-30)} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,128,0.15)" />
+                                                <XAxis dataKey="period" tick={{ fontSize: 9, fill: '#888' }} />
+                                                <YAxis tick={{ fontSize: 9, fill: '#888' }} tickFormatter={v => `$${formatNumber(v)}`} />
+                                                <Tooltip
+                                                    contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333', borderRadius: 0, fontSize: 11 }}
+                                                    formatter={(value: number | undefined) => [`$${formatNumber(value ?? 0)}`, '']}
+                                                />
+                                                <Area type="monotone" dataKey="totalRevenueUsd" stackId="1" stroke="#10B981" fill="#10B981" fillOpacity={0.3} name="Revenue" />
+                                                <Area type="monotone" dataKey="totalGasCostUsd" stackId="2" stroke="#EF4444" fill="#EF4444" fillOpacity={0.2} name="Gas Cost" />
+                                                <Line type="monotone" dataKey="netProfitUsd" stroke="#FFCC00" strokeWidth={2} dot={false} name="Net Profit" />
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                )}
+
+                                {/* Intent Type Breakdown */}
+                                {econHistory.intentBreakdown.length > 0 && (
+                                    <div>
+                                        <h4 className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-3">Intent Type Breakdown</h4>
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                            {econHistory.intentBreakdown.map(ib => (
+                                                <div key={ib.intentType} className="flex items-center justify-between bg-gray-50 dark:bg-white/5 px-3 py-2">
+                                                    <span className="text-xs font-bold uppercase text-black dark:text-zinc-200">{ib.intentType}</span>
+                                                    <div className="text-right">
+                                                        <span className="font-mono text-xs text-gray-500">{formatNumber(ib.count)}</span>
+                                                        <span className="font-mono text-[10px] text-gray-400 ml-2">{formatCurrency(ib.totalVolumeUsd)}</span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
 
                         {/* Recent Transactions */}
                         <div className="swiss-card">

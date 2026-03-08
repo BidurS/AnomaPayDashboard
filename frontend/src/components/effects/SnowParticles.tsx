@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import type { EffectIntensity } from '../../context/PreferencesContext';
 
 interface SnowParticle {
     x: number;
@@ -8,7 +9,11 @@ interface SnowParticle {
     wind: number;
 }
 
-export function SnowParticles() {
+interface SnowParticlesProps {
+    intensity?: EffectIntensity;
+}
+
+export function SnowParticles({ intensity = 'full' }: SnowParticlesProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
@@ -21,6 +26,10 @@ export function SnowParticles() {
         let animationFrameId: number;
         let particles: SnowParticle[] = [];
 
+        // Intensity multipliers
+        const countMultiplier = intensity === 'subtle' ? 0.3 : 1;
+        const speedMultiplier = intensity === 'subtle' ? 0.5 : 1;
+
         const resizeCanvas = () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -28,15 +37,15 @@ export function SnowParticles() {
         };
 
         const initParticles = () => {
-            const particleCount = Math.floor(window.innerWidth / 10); // Responsive count
+            const particleCount = Math.floor((window.innerWidth / 10) * countMultiplier);
             particles = [];
             for (let i = 0; i < particleCount; i++) {
                 particles.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
                     radius: Math.random() * 2 + 1,
-                    speed: Math.random() * 1 + 0.5,
-                    wind: Math.random() * 0.5 - 0.25,
+                    speed: (Math.random() * 1 + 0.5) * speedMultiplier,
+                    wind: (Math.random() * 0.5 - 0.25) * speedMultiplier,
                 });
             }
         };
@@ -80,7 +89,7 @@ export function SnowParticles() {
             window.removeEventListener('resize', resizeCanvas);
             cancelAnimationFrame(animationFrameId);
         };
-    }, []);
+    }, [intensity]);
 
     return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full pointer-events-none z-[-1]" />;
 }

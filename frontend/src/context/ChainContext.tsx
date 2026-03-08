@@ -14,7 +14,7 @@ const ChainContext = createContext<ChainContextType | undefined>(undefined)
 
 export function ChainProvider({ children }: { children: ReactNode }) {
     const { chains, loading } = useChains()
-    const [activeChainId, setActiveChainId] = useState<number>(8453) // Default Base
+    const [activeChainId, setActiveChainId] = useState<number>(1) // Default Ethereum (ARM PA)
 
     const activeChain = chains.find(c => c.id === activeChainId) || chains[0] || null
 

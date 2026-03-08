@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Share2, Shield, Timer, ArrowRight, User, Cpu, Activity, EyeOff } from 'lucide-react'
 import { cn } from '../lib/utils'
-import { useWebSocket } from '../context/WebSocketContext'
+import { useWebSocket } from '../context/EventStreamContext'
 import { useTrust } from '../context/TrustContext'
 
 interface Intent {

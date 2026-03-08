@@ -1,3 +1,4 @@
+import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Trophy, Zap, ArrowRight, Users, DollarSign } from 'lucide-react'
 import { useSolvers } from '../lib/api'
@@ -35,6 +36,7 @@ const generateSparklineData = (seed: string) => {
 
 export function SolverLeaderboard() {
     const { activeChain } = useChainContext()
+    const navigate = useNavigate()
     const { solvers, loading } = useSolvers(activeChain?.id || 8453)
 
     // Calculate Intent Mastery (USD Volume Weight + Activity)
@@ -44,7 +46,7 @@ export function SolverLeaderboard() {
         const txWeight = s.tx_count * 5
         // Economic value (USD) is the primary driver of mastery score
         const masteryScore = (usdVolume / 10) + (ethVolume * 250) + txWeight
-        
+
         return {
             ...s,
             masteryScore,
@@ -98,9 +100,9 @@ export function SolverLeaderboard() {
                                         </div>
                                         <div className="w-full bg-white dark:bg-zinc-900 border border-black dark:border-white/10 p-6 relative top-0 group-hover:-top-2 transition-all duration-300">
                                             <div className="h-1 w-full bg-gray-200 absolute top-0 left-0" />
-                                            <a href={`#/solver/${topThree[1].address}`} className="font-mono font-bold text-lg text-black dark:text-zinc-100 hover:text-[#FF0000] hover:underline mb-1 block truncate text-center">
+                                            <Link to={`/solver/${topThree[1].address}`} className="font-mono font-bold text-lg text-black dark:text-zinc-100 hover:text-[#FF0000] hover:underline mb-1 block truncate text-center">
                                                 {shortenAddress(topThree[1].address)}
-                                            </a>
+                                            </Link>
                                             <div className="text-center text-xs uppercase text-gray-500 font-bold tracking-wider mb-4">Silver Tier</div>
 
                                             <div className="grid grid-cols-2 gap-2 text-center border-t border-gray-100 dark:border-white/10 pt-4">
@@ -128,9 +130,9 @@ export function SolverLeaderboard() {
                                         </div>
                                         <div className="w-full bg-black dark:bg-white text-white dark:text-black p-8 relative top-0 group-hover:-top-2 transition-all duration-300 shadow-xl shadow-black/20">
                                             <div className="h-1.5 w-full bg-[#FFCC00] absolute top-0 left-0" />
-                                            <a href={`#/solver/${topThree[0].address}`} className="font-mono font-bold text-xl hover:underline mb-1 block truncate text-center">
+                                            <Link to={`/solver/${topThree[0].address}`} className="font-mono font-bold text-xl hover:underline mb-1 block truncate text-center">
                                                 {shortenAddress(topThree[0].address)}
-                                            </a>
+                                            </Link>
                                             <div className="text-center text-xs uppercase text-gray-400 dark:text-gray-600 font-bold tracking-wider mb-6">Top Performer</div>
 
                                             <div className="grid grid-cols-2 gap-4 text-center border-t border-gray-800 dark:border-gray-200 pt-6">
@@ -155,9 +157,9 @@ export function SolverLeaderboard() {
                                         </div>
                                         <div className="w-full bg-white dark:bg-zinc-900 border border-black dark:border-white/10 p-6 relative top-0 group-hover:-top-2 transition-all duration-300">
                                             <div className="h-1 w-full bg-orange-300 absolute top-0 left-0" />
-                                            <a href={`#/solver/${topThree[2].address}`} className="font-mono font-bold text-lg text-black dark:text-zinc-100 hover:text-[#FF0000] hover:underline mb-1 block truncate text-center">
+                                            <Link to={`/solver/${topThree[2].address}`} className="font-mono font-bold text-lg text-black dark:text-zinc-100 hover:text-[#FF0000] hover:underline mb-1 block truncate text-center">
                                                 {shortenAddress(topThree[2].address)}
-                                            </a>
+                                            </Link>
                                             <div className="text-center text-xs uppercase text-gray-500 font-bold tracking-wider mb-4">Bronze Tier</div>
 
                                             <div className="grid grid-cols-2 gap-2 text-center border-t border-gray-100 dark:border-white/10 pt-4">
@@ -175,14 +177,14 @@ export function SolverLeaderboard() {
                                 )}
                             </div>
 
-                            {/* Main List */}
-                            <div className="swiss-border bg-white dark:bg-zinc-950 overflow-hidden relative transition-colors duration-300">
+                            {/* Main List - Desktop */}
+                            <div className="swiss-border bg-white dark:bg-zinc-950 overflow-hidden relative transition-colors duration-300 hidden sm:block">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
                                         <tr className="border-b-2 border-black dark:border-white/10 text-[10px] uppercase tracking-[0.2em] text-gray-500 bg-gray-50 dark:bg-white/5">
                                             <th className="p-4 w-16 text-center">#</th>
                                             <th className="p-4">Solver</th>
-                                            <th className="p-4 w-32 hidden sm:table-cell">Trend</th>
+                                            <th className="p-4 w-32 hidden md:table-cell">Trend</th>
                                             <th className="p-4 text-right">Txs</th>
                                             <th className="p-4 text-right hidden md:table-cell">
                                                 Value Saved
@@ -212,9 +214,9 @@ export function SolverLeaderboard() {
                                                     <div className="flex flex-col gap-1">
                                                         <div className="flex items-center gap-3">
                                                             <SwissIdenticon address={solver.address} size={28} />
-                                                            <a href={`#/solver/${solver.address}`} className="font-mono-swiss text-sm font-bold text-black dark:text-zinc-200 hover:text-[#0066CC] dark:hover:text-[#0066CC] transition-colors">
+                                                            <Link to={`/solver/${solver.address}`} className="font-mono-swiss text-sm font-bold text-black dark:text-zinc-200 hover:text-[#0066CC] dark:hover:text-[#0066CC] transition-colors">
                                                                 {shortenAddress(solver.address)}
-                                                            </a>
+                                                            </Link>
                                                             {i < 3 && <Zap className="w-3 h-3 text-[#FFCC00] fill-current hidden sm:block" />}
                                                         </div>
                                                         <div className="flex flex-wrap gap-1 mt-1">
@@ -224,7 +226,7 @@ export function SolverLeaderboard() {
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="p-4 hidden sm:table-cell">
+                                                <td className="p-4 hidden md:table-cell">
                                                     <div className="h-8 w-24 opacity-50 group-hover:opacity-100 transition-opacity">
                                                         <ResponsiveContainer width="100%" height="100%">
                                                             <LineChart data={solver.sparklineData}>
@@ -266,6 +268,59 @@ export function SolverLeaderboard() {
                                         ))}
                                     </tbody>
                                 </table>
+                            </div>
+
+                            {/* Main List - Mobile Cards */}
+                            <div className="sm:hidden space-y-2 px-2">
+                                {solversWithMastery.map((solver, i) => (
+                                    <motion.div
+                                        key={solver.address}
+                                        onClick={() => navigate(`/solver/${solver.address}`)}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.05 + i * 0.03 }}
+                                        className="block swiss-border bg-white dark:bg-zinc-950 p-4 active:bg-gray-50 dark:active:bg-white/5 transition-colors cursor-pointer"
+                                    >
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <span className={cn(
+                                                "w-7 h-7 flex items-center justify-center font-bold text-sm shrink-0",
+                                                i === 0 && "bg-[#FFCC00] text-black",
+                                                i === 1 && "bg-gray-200 text-black",
+                                                i === 2 && "bg-orange-300 text-black",
+                                                i > 2 && "bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-500"
+                                            )}>
+                                                {i + 1}
+                                            </span>
+                                            <SwissIdenticon address={solver.address} size={32} />
+                                            <div className="flex-1 min-w-0">
+                                                <span className="font-mono-swiss text-sm font-bold text-black dark:text-zinc-200 block truncate">
+                                                    {shortenAddress(solver.address)}
+                                                </span>
+                                                <span className="px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[8px] font-black uppercase tracking-tighter">
+                                                    PVA Leader
+                                                </span>
+                                            </div>
+                                            <ArrowRight className="w-4 h-4 text-[#FF0000] shrink-0" />
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-2 text-center border-t border-gray-100 dark:border-white/5 pt-3">
+                                            <div>
+                                                <div className="text-[9px] uppercase text-gray-400 tracking-wider">Mastery</div>
+                                                <div className={cn(
+                                                    "font-bold text-sm",
+                                                    i < 3 ? "text-[#FF0000]" : "text-black dark:text-zinc-300"
+                                                )}>{formatNumber(solver.masteryScore)}</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-[9px] uppercase text-gray-400 tracking-wider">Txs</div>
+                                                <div className="font-bold text-sm text-black dark:text-zinc-300">{formatNumber(solver.tx_count || 0)}</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-[9px] uppercase text-gray-400 tracking-wider">Volume</div>
+                                                <div className="font-bold text-sm text-black dark:text-zinc-300">{formatCurrency(solver.total_volume_usd || 0)}</div>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ))}
                             </div>
                         </>
                     ) : (

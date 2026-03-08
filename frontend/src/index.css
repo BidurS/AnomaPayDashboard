@@ -179,3 +179,17 @@ body {
 .dark .glass-panel {
   background: rgba(0, 0, 0, 0.85);
 }
+
+/* Compact Mode — Reduced spacing for power users */
+.compact-mode .swiss-card {
+  @apply p-4 md:p-5;
+}
+
+.compact-mode table td,
+.compact-mode table th {
+  @apply py-2 px-3;
+}
+
+.compact-mode main {
+  @apply gap-3;
+}

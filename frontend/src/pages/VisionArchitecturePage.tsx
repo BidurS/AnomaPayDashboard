@@ -185,16 +185,16 @@ export function VisionArchitecturePage() {
                             </p>
                         </div>
                         <div className="bg-black text-green-400 font-mono text-xs p-6 border-l-4 border-[#FF0000] leading-relaxed">
-                            <div className="text-gray-500 mb-3">// Resource definition (pseudocode)</div>
+                            <div className="text-gray-500 dark:text-zinc-500 mb-3">// Resource definition (pseudocode)</div>
                             <div><span className="text-[#FF0000]">record</span> Resource α :=</div>
-                            <div className="pl-4">label       : α,          <span className="text-gray-600">-- type tag</span></div>
-                            <div className="pl-4">quantity    : Nat,        <span className="text-gray-600">-- amount</span></div>
-                            <div className="pl-4">commitment  : Hash,       <span className="text-gray-600">-- hides owner</span></div>
-                            <div className="pl-4">nullifier   : Hash,       <span className="text-gray-600">-- proves consumption</span></div>
-                            <div className="pl-4">logic       : Predicate,  <span className="text-gray-600">-- validity rule</span></div>
-                            <div className="pl-4">ephemeral   : Bool;       <span className="text-gray-600">-- created & consumed same tx</span></div>
+                            <div className="pl-4">label       : α,          <span className="text-gray-600 dark:text-zinc-500">-- type tag</span></div>
+                            <div className="pl-4">quantity    : Nat,        <span className="text-gray-600 dark:text-zinc-500">-- amount</span></div>
+                            <div className="pl-4">commitment  : Hash,       <span className="text-gray-600 dark:text-zinc-500">-- hides owner</span></div>
+                            <div className="pl-4">nullifier   : Hash,       <span className="text-gray-600 dark:text-zinc-500">-- proves consumption</span></div>
+                            <div className="pl-4">logic       : Predicate,  <span className="text-gray-600 dark:text-zinc-500">-- validity rule</span></div>
+                            <div className="pl-4">ephemeral   : Bool;       <span className="text-gray-600 dark:text-zinc-500">-- created & consumed same tx</span></div>
                             <br />
-                            <div className="text-gray-500">-- Invariant the ARM enforces:</div>
+                            <div className="text-gray-500 dark:text-zinc-500">-- Invariant the ARM enforces:</div>
                             <div><span className="text-[#FF0000]">axiom</span> conservation :</div>
                             <div className="pl-4">Σ(created) - Σ(consumed) = 0</div>
                         </div>
@@ -380,8 +380,8 @@ export function VisionArchitecturePage() {
                             <motion.div key={activeCode} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}
                                 className="bg-[#111] border border-white/10 relative">
                                 <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10">
-                                    <FileJson className="w-4 h-4 text-gray-500" />
-                                    <span className="text-[10px] font-mono text-gray-500">{activeCode === 'swap' ? 'ShieldedSwap.juvix' : 'PrivateVote.juvix'}</span>
+                                    <FileJson className="w-4 h-4 text-gray-500 dark:text-zinc-500" />
+                                    <span className="text-[10px] font-mono text-gray-500 dark:text-zinc-500">{activeCode === 'swap' ? 'ShieldedSwap.juvix' : 'PrivateVote.juvix'}</span>
                                 </div>
                                 <pre className="font-mono text-xs text-green-400 overflow-x-auto p-6 leading-relaxed whitespace-pre">
                                     {activeCode === 'swap' ? JUVIX_SWAP : JUVIX_VOTE}
@@ -397,7 +397,7 @@ export function VisionArchitecturePage() {
                             <motion.div key={layer.layer} custom={i} initial={{ opacity: 0 }} animate={controls}
                                 className="grid grid-cols-1 md:grid-cols-3 gap-0 border border-white/10 hover:border-[#FF0000]/50 transition-colors group">
                                 <div className="p-5 border-b md:border-b-0 md:border-r border-white/10 flex flex-col gap-1">
-                                    <div className="text-[9px] font-black uppercase tracking-widest text-gray-600">Layer {i + 1}</div>
+                                    <div className="text-[9px] font-black uppercase tracking-widest text-gray-600 dark:text-zinc-400">Layer {i + 1}</div>
                                     <div className="text-sm font-black uppercase tracking-tighter group-hover:text-[#FF0000] transition-colors">{layer.layer}</div>
                                 </div>
                                 <div className="p-5 border-b md:border-b-0 md:border-r border-white/10">

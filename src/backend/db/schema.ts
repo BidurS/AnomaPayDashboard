@@ -171,3 +171,264 @@ export const tokenTransfers = sqliteTable('token_transfers', {
     idxToken: index('idx_token_transfers_token').on(table.chainId, table.tokenAddress),
     idxTx: index('idx_token_transfers_tx').on(table.chainId, table.txHash),
 }));
+
+// ══════════════════════════════════════════════════════════════
+//  Phase 1: Intent Lifecycle Engine Tables
+// ══════════════════════════════════════════════════════════════
+
+// Intent Lifecycle — full lifecycle tracking for every intent
+export const intentLifecycle = sqliteTable('intent_lifecycle', {
+    id: text('id').primaryKey(),                           // chainId:txHash:logIndex
+    chainId: integer('chain_id').notNull(),
+    status: text('status').notNull().default('settled'),    // pending/matched/settling/settled/failed/expired
+    intentType: text('intent_type').notNull().default('unknown'), // swap/transfer/bridge/resource/discovery/external/application
+    creator: text('creator'),
+    solver: text('solver'),
+
+    // ARM Resource Model
+    consumedResources: text('consumed_resources'),          // JSON array
+    createdResources: text('created_resources'),            // JSON array
+    actionTreeRoot: text('action_tree_root'),
+    tagCount: integer('tag_count').default(0),
+
+    // Financial
+    inputValueUsd: real('input_value_usd').default(0),
+    outputValueUsd: real('output_value_usd').default(0),
+    solverProfitUsd: real('solver_profit_usd').default(0),
+    gasCostUsd: real('gas_cost_usd').default(0),
+    gasUsed: integer('gas_used').default(0),
+    gasPriceWei: text('gas_price_wei').default('0'),
+
+    // Privacy
+    isShielded: integer('is_shielded').default(0),
+    commitmentRoot: text('commitment_root'),
+    nullifierCount: integer('nullifier_count').default(0),
+
+    // Cross-chain
+    isMultiChain: integer('is_multi_chain').default(0),
+    correlationId: text('correlation_id'),
+
+    // Payloads
+    payloadTypes: text('payload_types'),                    // JSON array: ["Resource", "Discovery"]
+    payloadCount: integer('payload_count').default(0),
+    hasForwarderCalls: integer('has_forwarder_calls').default(0),
+
+    // Timing
+    createdAt: integer('created_at').notNull(),
+    matchedAt: integer('matched_at'),
+    settledAt: integer('settled_at'),
+    expiresAt: integer('expires_at'),
+    settlementTimeMs: integer('settlement_time_ms'),
+
+    // Raw data
+    txHash: text('tx_hash').notNull(),
+    blockNumber: integer('block_number').notNull(),
+    valueWei: text('value_wei').default('0'),
+    rawDataJson: text('raw_data_json'),
+}, (table) => ({
+    idxStatus: index('idx_lifecycle_status').on(table.status, table.createdAt),
+    idxSolver: index('idx_lifecycle_solver').on(table.solver, table.settledAt),
+    idxType: index('idx_lifecycle_type').on(table.intentType, table.chainId),
+    idxChainTime: index('idx_lifecycle_chain_time').on(table.chainId, table.createdAt),
+    idxCorrelation: index('idx_lifecycle_correlation').on(table.correlationId),
+    idxTx: index('idx_lifecycle_tx').on(table.chainId, table.txHash),
+}));
+
+// Lifecycle Events — state transition audit log
+export const lifecycleEvents = sqliteTable('lifecycle_events', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    intentId: text('intent_id').notNull(),
+    fromStatus: text('from_status').notNull(),
+    toStatus: text('to_status').notNull(),
+    triggeredBy: text('triggered_by'),
+    metadata: text('metadata'),
+    timestamp: integer('timestamp').notNull(),
+}, (table) => ({
+    idxIntent: index('idx_lifecycle_events_intent').on(table.intentId, table.timestamp),
+}));
+
+// Solver Economics — daily P&L per solver
+export const solverEconomics = sqliteTable('solver_economics', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    solverAddress: text('solver_address').notNull(),
+    chainId: integer('chain_id').notNull(),
+    period: text('period').notNull(),                      // YYYY-MM-DD
+    intentsSolved: integer('intents_solved').default(0),
+    intentsFailed: integer('intents_failed').default(0),
+    totalRevenueUsd: real('total_revenue_usd').default(0),
+    totalGasCostUsd: real('total_gas_cost_usd').default(0),
+    netProfitUsd: real('net_profit_usd').default(0),
+    avgSettlementTimeMs: integer('avg_settlement_time_ms').default(0),
+    avgBatchSize: real('avg_batch_size').default(1),
+    successRate: real('success_rate').default(1.0),
+    intentTypesJson: text('intent_types_json'),            // JSON: {"swap": 5, "bridge": 2}
+}, (table) => ({
+    uniqSolverPeriod: unique('uniq_solver_chain_period').on(table.solverAddress, table.chainId, table.period),
+    idxAddress: index('idx_solver_econ_address').on(table.solverAddress, table.period),
+    idxChain: index('idx_solver_econ_chain').on(table.chainId, table.period),
+}));
+
+// Cross-chain Correlations
+export const crossChainCorrelations = sqliteTable('cross_chain_correlations', {
+    correlationId: text('correlation_id').primaryKey(),
+    intentIds: text('intent_ids').notNull(),                // JSON array
+    correlationType: text('correlation_type').notNull(),    // bridge/atomic_swap/chimera
+    confidence: real('confidence').default(0),
+    totalValueUsd: real('total_value_usd').default(0),
+    chains: text('chains').notNull(),                      // JSON array of chain IDs
+    status: text('status').default('in_progress'),
+    startedAt: integer('started_at').notNull(),
+    completedAt: integer('completed_at'),
+});
+
+// API Keys for developer access
+export const apiKeys = sqliteTable('api_keys', {
+    keyHash: text('key_hash').primaryKey(),
+    userId: text('user_id').notNull(),
+    name: text('name').notNull(),
+    tier: text('tier').default('free'),
+    rateLimit: integer('rate_limit').default(100),
+    dailyLimit: integer('daily_limit').default(10000),
+    createdAt: integer('created_at').notNull(),
+    lastUsed: integer('last_used'),
+    isActive: integer('is_active').default(1),
+});
+
+// API Usage tracking
+export const apiUsage = sqliteTable('api_usage', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    keyHash: text('key_hash').notNull(),
+    endpoint: text('endpoint').notNull(),
+    responseTimeMs: integer('response_time_ms'),
+    timestamp: integer('timestamp').notNull(),
+}, (table) => ({
+    idxKey: index('idx_api_usage_key').on(table.keyHash, table.timestamp),
+}));
+
+// ============================================================
+// Phase 2: Intelligence Layer
+// ============================================================
+
+// AI Simulation results for intents
+export const simulationResults = sqliteTable('simulation_results', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    intentId: text('intent_id').notNull(),
+    chainId: integer('chain_id').notNull(),
+
+    // Route
+    routeJson: text('route_json').notNull(),
+    routeType: text('route_type').default('direct'),
+    routeSteps: integer('route_steps').default(1),
+
+    // Predictions
+    predictedOutputUsd: real('predicted_output_usd').default(0),
+    predictedGas: integer('predicted_gas').default(0),
+    predictedGasCostUsd: real('predicted_gas_cost_usd').default(0),
+    predictedSlippage: real('predicted_slippage').default(0),
+    predictedProfitUsd: real('predicted_profit_usd').default(0),
+    riskScore: integer('risk_score').default(50),
+    confidence: real('confidence').default(0.5),
+
+    // Risk
+    riskFactors: text('risk_factors'),
+
+    // AI
+    aiModel: text('ai_model').default('gemini-2.0-flash'),
+    aiReasoning: text('ai_reasoning'),
+    aiTokensUsed: integer('ai_tokens_used').default(0),
+
+    // Post-settlement accuracy
+    actualOutputUsd: real('actual_output_usd'),
+    actualGas: integer('actual_gas'),
+    actualGasCostUsd: real('actual_gas_cost_usd'),
+    predictionAccuracy: real('prediction_accuracy'),
+    accuracyComputedAt: integer('accuracy_computed_at'),
+
+    // Timing
+    createdAt: integer('created_at').notNull(),
+    simulationDurationMs: integer('simulation_duration_ms').default(0),
+}, (table) => ({
+    idxIntent: index('idx_sim_intent').on(table.intentId),
+    idxChain: index('idx_sim_chain').on(table.chainId, table.createdAt),
+    idxAccuracy: index('idx_sim_accuracy').on(table.predictionAccuracy),
+}));
+
+// AI-generated annotations and insights per intent
+export const intentAnnotations = sqliteTable('intent_annotations', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    intentId: text('intent_id').notNull(),
+    chainId: integer('chain_id').notNull(),
+    annotationType: text('annotation_type').notNull(),
+    severity: text('severity').default('info'),
+    title: text('title').notNull(),
+    description: text('description').notNull(),
+    metadata: text('metadata'),
+    aiConfidence: real('ai_confidence').default(0.5),
+    createdAt: integer('created_at').notNull(),
+}, (table) => ({
+    idxIntent: index('idx_annot_intent').on(table.intentId),
+    idxType: index('idx_annot_type').on(table.annotationType, table.createdAt),
+    idxSeverity: index('idx_annot_severity').on(table.severity, table.createdAt),
+}));
+
+// ══════════════════════════════════════════════════════════════
+//  Admin Panel v2: Solver Labels & Identity
+// ══════════════════════════════════════════════════════════════
+
+export const solverLabels = sqliteTable('solver_labels', {
+    address: text('address').primaryKey(),           // Wallet address (lowercase)
+    label: text('label').notNull(),                  // Human name: "BarterSwap"
+    category: text('category').default('solver'),    // solver/relayer/protocol/user/deployer
+    logoUrl: text('logo_url'),
+    website: text('website'),
+    notes: text('notes'),
+    createdAt: integer('created_at').default(sql`(strftime('%s', 'now'))`),
+    updatedAt: integer('updated_at').default(sql`(strftime('%s', 'now'))`),
+}, (table) => ({
+    idxCategory: index('idx_solver_labels_category').on(table.category),
+    idxLabel: index('idx_solver_labels_label').on(table.label),
+}));
+
+// ══════════════════════════════════════════════════════════════
+//  Agent Autonomy: Autonomous Solver Agents
+// ══════════════════════════════════════════════════════════════
+
+export const agents = sqliteTable('agents', {
+    id: text('id').primaryKey(),                     // UUID
+    name: text('name').notNull(),
+    strategy: text('strategy').notNull(),             // arbitrage, market_maker, liquidator, mev, custom
+    walletAddress: text('wallet_address'),
+    status: text('status').default('active'),         // active, paused, disabled
+    apiKeyHash: text('api_key_hash'),                 // Links to API key owner
+    maxGasPerTx: integer('max_gas_per_tx').default(500000),
+    maxDailySpend: integer('max_daily_spend').default(100),  // USD
+    allowedChains: text('allowed_chains'),            // JSON array string
+    allowedIntentTypes: text('allowed_intent_types'), // JSON array string
+    totalExecutions: integer('total_executions').default(0),
+    successfulExecutions: integer('successful_executions').default(0),
+    totalGasSpent: integer('total_gas_spent').default(0),
+    createdAt: integer('created_at').default(sql`(strftime('%s', 'now'))`),
+    lastActive: integer('last_active').default(sql`(strftime('%s', 'now'))`),
+}, (table) => ({
+    idxStatus: index('idx_agents_status').on(table.status),
+    idxStrategy: index('idx_agents_strategy').on(table.strategy),
+    idxApiKey: index('idx_agents_api_key').on(table.apiKeyHash),
+}));
+
+export const agentExecutions = sqliteTable('agent_executions', {
+    id: text('id').primaryKey(),                     // UUID
+    agentId: text('agent_id').notNull(),
+    chainId: integer('chain_id').notNull(),
+    intentType: text('intent_type').notNull(),
+    params: text('params'),                           // JSON string
+    status: text('status').notNull(),                 // simulated, submitted, confirmed, failed
+    txHash: text('tx_hash'),
+    gasUsed: integer('gas_used'),
+    result: text('result'),                           // JSON string
+    errorMessage: text('error_message'),
+    createdAt: integer('created_at').default(sql`(strftime('%s', 'now'))`),
+}, (table) => ({
+    idxAgent: index('idx_agent_exec_agent').on(table.agentId, table.createdAt),
+    idxStatus: index('idx_agent_exec_status').on(table.status),
+    idxChain: index('idx_agent_exec_chain').on(table.chainId),
+}));
