@@ -270,9 +270,10 @@ app.get('/api/latest-transactions', (c) => {
 });
 
 app.get('/api/solvers', (c) => {
-  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId') || null);
-  if (!cid.success) return cid.response;
-  return withCache(c.req.raw, 60, () => solverController.handleGetSolvers(createDb(c.env.DB), cid.data, corsHeaders));
+  const rawChainId = c.req.query('chainId');
+  const chainId = rawChainId ? parseInt(rawChainId, 10) : 0; // 0 = all chains
+  if (isNaN(chainId) || chainId < 0) return new Response(JSON.stringify({ error: 'Invalid chainId' }), { status: 400, headers: corsHeaders });
+  return withCache(c.req.raw, 60, () => solverController.handleGetSolvers(createDb(c.env.DB), chainId, corsHeaders));
 });
 
 app.get('/api/daily-stats', (c) => {

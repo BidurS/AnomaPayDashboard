@@ -51,7 +51,8 @@ export default function SolversPage() {
     const [days, setDays] = useState(30)
     const [search, setSearch] = useState('')
 
-    const { solvers, loading: solversLoading } = useSolvers(chainId)
+    // Fetch ALL solvers across chains (chainId=0), economics scoped to active chain
+    const { solvers, loading: solversLoading } = useSolvers(0)
     const { economics, loading: econLoading } = useSolverEconomics(chainId, days)
     const { types: intentTypes, loading: typesLoading } = useIntentTypes(chainId)
 

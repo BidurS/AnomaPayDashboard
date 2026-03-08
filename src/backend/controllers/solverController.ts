@@ -3,8 +3,14 @@ import * as schema from '../db/schema';
 import { eq, desc, sql, and } from 'drizzle-orm';
 
 export async function handleGetSolvers(db: DB, chainId: number, headers: any) {
+    // chainId=0 means "all chains"
+    const allChains = chainId === 0;
+    const chainFilter = allChains ? sql`1=1` : eq(schema.solvers.chainId, chainId);
+    const subqueryChainFilter = allChains ? sql`1=1` : sql`e.chain_id = ${chainId}`;
+
     const results = await db.select({
         address: schema.solvers.address,
+        chain_id: schema.solvers.chainId,
         tx_count: schema.solvers.txCount,
         total_gas_spent: schema.solvers.totalGasSpent,
         total_value_processed: schema.solvers.totalValueProcessed,
@@ -14,18 +20,18 @@ export async function handleGetSolvers(db: DB, chainId: number, headers: any) {
             SELECT SUM(t.amount_usd)
             FROM ${schema.tokenTransfers} t
             INNER JOIN ${schema.events} e ON t.tx_hash = e.tx_hash AND t.chain_id = e.chain_id
-            WHERE e.solver_address = ${schema.solvers.address} AND e.chain_id = ${chainId}
+            WHERE e.solver_address = ${schema.solvers.address} AND ${subqueryChainFilter}
         ), 0)`,
         forwarder_calls: sql<number>`COALESCE((
             SELECT COUNT(*)
             FROM ${schema.forwarderCalls} fc
             INNER JOIN ${schema.events} e ON fc.tx_hash = e.tx_hash AND fc.chain_id = e.chain_id
-            WHERE e.solver_address = ${schema.solvers.address} AND e.chain_id = ${chainId}
+            WHERE e.solver_address = ${schema.solvers.address} AND ${subqueryChainFilter}
         ), 0)`
     }).from(schema.solvers)
-        .where(eq(schema.solvers.chainId, chainId))
+        .where(chainFilter)
         .orderBy(desc(schema.solvers.txCount))
-        .limit(20);
+        .limit(50);
 
     // Map badges in-memory for performance
     const enrichedResults = results.map(s => {
