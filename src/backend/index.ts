@@ -337,12 +337,12 @@ app.get('/api/tx/:hash', (c) => {
 });
 
 app.get('/api/solver/:address', (c) => {
-  const cid = parseQueryParam(chainIdSchema, c.req.query('chainId') || null);
-  if (!cid.success) return cid.response;
+  const rawChainId = c.req.query('chainId');
+  const chainId = rawChainId ? parseInt(rawChainId, 10) : 0; // 0 = all chains by default
+  if (isNaN(chainId) || chainId < 0) return new Response(JSON.stringify({ error: 'Invalid chainId' }), { status: 400, headers: corsHeaders });
   const a = parseQueryParam(addressSchema, c.req.param('address') || null);
   if (!a.success) return a.response;
-  // Cache solver details for 60 seconds
-  return withCache(c.req.raw, 60, () => solverController.handleGetSolverDetail(createDb(c.env.DB), cid.data, a.data, corsHeaders));
+  return withCache(c.req.raw, 60, () => solverController.handleGetSolverDetail(createDb(c.env.DB), chainId, a.data, corsHeaders));
 });
 
 // ═══════════════════════════════════════════════════════════

@@ -109,6 +109,10 @@ export interface SolverDetail extends Solver {
     forwarderCallsCount?: number
     recentTransactions: Transaction[]
     dailyActivity: { date: string; count: number }[]
+    chainBreakdown?: { chainId: number; chainName: string; txCount: number; gasSpent: string }[]
+    reputationScore?: number
+    reputationTier?: string
+    reputationBreakdown?: { volume: number; activity: number; consistency: number; chainDiversity: number; longevity: number }
 }
 
 export interface DailyStat {
@@ -418,19 +422,21 @@ export function useTxDetail(chainId: number, txHash: string | null) {
     return { tx: tx || null, loading: isLoading, error: error ? error.message : null };
 }
 
-export function useSolverDetail(chainId: number, address: string | null) {
+export function useSolverDetail(_chainId: number, address: string | null) {
+    // Use chainId=0 for cross-chain aggregated profile
+    const queryChainId = 0;
     const { data: solver, isLoading, error } = useQuery({
-        queryKey: ['solverDetail', chainId, address],
+        queryKey: ['solverDetail', queryChainId, address],
         queryFn: async () => {
             if (!address) return null;
-            const res = await fetch(`${API_URL}/api/solver/${address}?chainId=${chainId}`);
+            const res = await fetch(`${API_URL}/api/solver/${address}?chainId=${queryChainId}`);
             if (!res.ok) throw new Error('Not found');
             return res.json() as Promise<SolverDetail>;
         },
         enabled: !!address,
         retry: 1,
         staleTime: 30000,
-        refetchInterval: 60000, // Poll every 60s
+        refetchInterval: 60000,
     });
 
     return { solver: solver || null, loading: isLoading, error: error ? error.message : null };
