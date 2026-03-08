@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { createDb } from './db';
-import { runBlockscoutIndexer } from './services/blockscoutIndexer';
+import { runBlockscoutIndexer, runDeepBackfill } from './services/blockscoutIndexer';
 import { runIndexer, syncBlockRange } from './services/indexer';
 import { processLifecycleForNewEvents, computeSolverEconomics } from './services/lifecycleEngine';
 import { processSimulationsForNewIntents, backfillAccuracy } from './services/simulationEngine';
@@ -83,6 +83,18 @@ app.delete('/api/admin/chains/:id', async (c) => {
 app.post('/api/admin/backfill', async (c) => {
   const body = await c.req.json() as { chainId?: number; fromBlock?: number; toBlock?: number };
   return adminController.handleHistoricalBackfill(createDb(c.env.DB), body.chainId || 8453, body.fromBlock, body.toBlock, corsHeaders);
+});
+
+// Deep backfill via Blockscout pagination (up to 50 pages / 2,500 txs)
+app.post('/api/admin/deep-backfill', async (c) => {
+  const body = await c.req.json() as { chainId?: number; pages?: number };
+  const chainId = body.chainId || 8453;
+  const pages = Math.min(body.pages || 50, 100);
+  const chains = await createDb(c.env.DB).select().from(schema.chains).where(eq(schema.chains.id, chainId)).all();
+  if (chains.length === 0) return new Response(JSON.stringify({ error: 'Chain not found' }), { status: 404, headers: corsHeaders });
+  const chain = chains[0];
+  const result = await runDeepBackfill(createDb(c.env.DB), { id: chain.id, rpcUrl: chain.rpcUrl, contractAddress: chain.contractAddress }, pages);
+  return new Response(JSON.stringify({ success: true, ...result }), { status: 200, headers: corsHeaders });
 });
 
 app.post('/api/admin/import', async (c) => {

@@ -201,8 +201,8 @@ async function fetchNewTransactions(db: DB, chain: ChainConfig, apiUrl: string, 
     let nextPageParams: any = null;
     let foundExisting = false;
 
-    // Fetch up to 3 pages (150 txs) of recent transactions
-    for (let page = 0; page < 3 && !foundExisting; page++) {
+    // Fetch up to 10 pages (500 txs) of recent transactions
+    for (let page = 0; page < 10 && !foundExisting; page++) {
         let url = `${apiUrl}/addresses/${chain.contractAddress}/transactions?filter=to`;
         if (nextPageParams) {
             url += `&${new URLSearchParams(nextPageParams).toString()}`;
@@ -698,4 +698,90 @@ async function insertData(
     if (batch.length > 0) {
         await db.batch(batch as [any, ...any[]]);
     }
+}
+
+/**
+ * Deep backfill: fetches up to `maxPages` pages of historical transactions
+ * from Blockscout, skipping any that already exist in the DB.
+ * Unlike the cron indexer, this does NOT stop when it finds an existing tx.
+ */
+export async function runDeepBackfill(
+    db: DB, chain: ChainConfig, maxPages: number = 50
+): Promise<IndexerResult> {
+    const result: IndexerResult = {
+        chainId: chain.id,
+        newTransactions: 0, newPayloads: 0, newPrivacyRoots: 0,
+        newTokenTransfers: 0, newForwarderCalls: 0, errors: [], pages: 0,
+    };
+
+    const apiUrl = getBlockscoutApiUrl(chain.id);
+    const allNewTxs: TxRecord[] = [];
+    let nextPageParams: any = null;
+
+    for (let page = 0; page < maxPages; page++) {
+        let url = `${apiUrl}/addresses/${chain.contractAddress}/transactions?filter=to`;
+        if (nextPageParams) {
+            url += `&${new URLSearchParams(nextPageParams).toString()}`;
+        }
+
+        try {
+            const res = await fetchWithRetry(url);
+            if (!res.ok) throw new Error(`Blockscout HTTP ${res.status}`);
+            const data: any = await res.json();
+
+            if (!data.items || data.items.length === 0) break;
+            result.pages++;
+
+            // Check all tx hashes in a batch
+            const hashes = data.items.map((tx: any) => tx.hash?.toLowerCase()).filter(Boolean);
+            const existing = hashes.length > 0
+                ? await db.select({ txHash: schema.events.txHash })
+                    .from(schema.events)
+                    .where(inArray(schema.events.txHash, hashes))
+                    .all()
+                : [];
+            const existingSet = new Set(existing.map(e => e.txHash.toLowerCase()));
+
+            for (const tx of data.items) {
+                const txHash = tx.hash?.toLowerCase();
+                if (!txHash || existingSet.has(txHash)) continue;
+
+                allNewTxs.push({
+                    txHash: tx.hash,
+                    blockNumber: tx.block_number || 0,
+                    solverAddress: tx.from?.hash || '0x0',
+                    valueWei: tx.value || '0',
+                    gasUsed: parseInt(tx.gas_used || '0'),
+                    gasPriceWei: tx.gas_price || '0',
+                    dataJson: JSON.stringify(tx.decoded_input || {}),
+                    decodedInput: tx.decoded_input ? JSON.stringify(tx.decoded_input) : null,
+                    timestamp: Math.floor(new Date(tx.timestamp).getTime() / 1000),
+                });
+            }
+
+            nextPageParams = data.next_page_params;
+            if (!nextPageParams) break;
+        } catch (e: any) {
+            result.errors.push(`backfill page ${page}: ${e.message}`);
+            break;
+        }
+    }
+
+    result.newTransactions = allNewTxs.length;
+
+    // Process in batches of 20 to avoid overwhelming the DB
+    const BATCH_SIZE = 20;
+    for (let i = 0; i < allNewTxs.length; i += BATCH_SIZE) {
+        const batch = allNewTxs.slice(i, i + BATCH_SIZE);
+        try {
+            const { payloads, privacyStats, forwarderCalls } = await fetchAndProcessLogs(db, chain, apiUrl, batch, result);
+            const tokenTransfers = await fetchTokenTransfersForTxs(chain, apiUrl, batch, result);
+            const maxBlock = Math.max(...batch.map(t => t.blockNumber), 0);
+            await insertData(db, chain.id, batch, payloads, privacyStats, tokenTransfers, forwarderCalls, result, maxBlock);
+        } catch (e: any) {
+            result.errors.push(`backfill insert batch ${i}: ${e.message}`);
+        }
+    }
+
+    return result;
 }
