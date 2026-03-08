@@ -432,3 +432,13 @@ export const agentExecutions = sqliteTable('agent_executions', {
     idxStatus: index('idx_agent_exec_status').on(table.status),
     idxChain: index('idx_agent_exec_chain').on(table.chainId),
 }));
+
+// Price Cache — live prices from CoinGecko with TTL
+export const priceCache = sqliteTable('price_cache', {
+    id: text('id').primaryKey(), // coingecko token id, e.g. "ethereum"
+    symbol: text('symbol').notNull(),
+    priceUsd: real('price_usd').notNull(),
+    change24h: real('change_24h').default(0),
+    marketCap: real('market_cap').default(0),
+    updatedAt: integer('updated_at').default(sql`(strftime('%s', 'now'))`),
+});

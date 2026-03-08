@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { createDb } from './db';
 import { runBlockscoutIndexer, runDeepBackfill } from './services/blockscoutIndexer';
+import { refreshPrices, getAllCachedPrices } from './services/priceFeed';
 import { runIndexer, syncBlockRange } from './services/indexer';
 import { processLifecycleForNewEvents, computeSolverEconomics } from './services/lifecycleEngine';
 import { processSimulationsForNewIntents, backfillAccuracy } from './services/simulationEngine';
@@ -267,6 +268,14 @@ app.get('/api/health', (c) => {
   const cid = parseQueryParam(chainIdSchema, c.req.query('chainId') || null);
   if (!cid.success) return cid.response;
   return statsController.handleGetHealth(createDb(c.env.DB), cid.data, corsHeaders);
+});
+
+// Live token prices (cached from CoinGecko)
+app.get('/api/prices', (c) => {
+  return withCache(c.req.raw, 120, async () => {
+    const prices = await getAllCachedPrices(createDb(c.env.DB));
+    return new Response(JSON.stringify(prices), { headers: corsHeaders });
+  });
 });
 
 app.get('/api/stats', (c) => {
@@ -594,6 +603,15 @@ export default {
           await backfillAccuracy(db);
         } catch (e: any) {
           errors.push(`SimEngine: ${e.message}`);
+        }
+
+        // Refresh live prices from CoinGecko (every 5 minutes)
+        try {
+          const priceResult = await refreshPrices(db);
+          if (priceResult.errors.length > 0) errors.push(`Prices: ${priceResult.errors.join(', ')}`);
+          else console.log(`[Cron] Refreshed ${priceResult.updated} token prices`);
+        } catch (e: any) {
+          errors.push(`PriceFeed: ${e.message}`);
         }
       }
 
