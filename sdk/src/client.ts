@@ -30,6 +30,7 @@ import type {
     SolverEconomicsParams,
     AnalyticsParams,
     SimulateIntentParams,
+    TokenPrice,
 } from './types';
 
 const DEFAULT_BASE_URL = 'https://anomapay-explorer.bidurandblog.workers.dev/api/v3';
@@ -50,6 +51,7 @@ export class AnomaScanClient {
     public developer: DeveloperAPI;
     public stream: StreamAPI;
     public agents: AgentAPI;
+    public prices: PricesAPI;
 
     constructor(options: AnomaScanClientOptions = {}) {
         this.baseUrl = (options.baseUrl || DEFAULT_BASE_URL).replace(/\/$/, '');
@@ -64,6 +66,7 @@ export class AnomaScanClient {
         this.developer = new DeveloperAPI(this);
         this.stream = new StreamAPI(this);
         this.agents = new AgentAPI(this);
+        this.prices = new PricesAPI(this);
     }
 
     /* ── HTTP Core ── */
@@ -390,4 +393,25 @@ function toQueryString(params: Record<string, any>): string {
     const entries = Object.entries(params).filter(([_, v]) => v !== undefined && v !== null);
     if (entries.length === 0) return '';
     return '?' + entries.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+}
+
+/* ═══════════════════ Prices Module ═══════════════════ */
+class PricesAPI {
+    constructor(private client: AnomaScanClient) { }
+
+    /** Get all cached token prices */
+    async getAll(): Promise<ApiResponse<Record<string, TokenPrice>>> {
+        return this.client.request<Record<string, TokenPrice>>('/prices', {
+            // Prices endpoint is at the root API level, not /v3
+        });
+    }
+
+    /** Get price for a specific token symbol */
+    async get(symbol: string): Promise<TokenPrice | null> {
+        const result = await this.getAll();
+        if (result.success && result.data) {
+            return result.data[symbol.toUpperCase()] || null;
+        }
+        return null;
+    }
 }

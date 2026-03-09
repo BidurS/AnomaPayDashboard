@@ -77,6 +77,23 @@ export interface Solver {
     rank: number;
     firstSeen: number;
     lastActive: number;
+    /** Reputation data (available when fetching with chainId=0) */
+    reputationScore?: number;
+    reputationTier?: 'Bronze' | 'Silver' | 'Gold' | 'Diamond';
+    reputationBreakdown?: {
+        volume: number;
+        activity: number;
+        consistency: number;
+        chainDiversity: number;
+        longevity: number;
+    };
+    chainBreakdown?: Array<{
+        chainId: number;
+        chainName: string;
+        txCount: number;
+        gasSpent: number;
+    }>;
+    badges?: string[];
 }
 
 export interface SolverEconomics {
@@ -203,6 +220,14 @@ export interface StreamEvent {
     chainId: number;
     payload: Record<string, any>;
     createdAt: number;
+}
+
+/* ── Prices ── */
+export interface TokenPrice {
+    symbol: string;
+    priceUsd: number;
+    change24h: number;
+    marketCap: number;
 }
 
 /* ── API Key ── */

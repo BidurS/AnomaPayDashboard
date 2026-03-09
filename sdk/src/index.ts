@@ -37,6 +37,8 @@ export type {
     AnalyticsParams,
     // Streaming
     StreamEvent,
+    // Prices
+    TokenPrice,
     // Developer
     ApiKeyInfo,
     // Agent Autonomy

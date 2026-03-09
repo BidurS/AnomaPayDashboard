@@ -66,6 +66,23 @@ interface Solver {
     rank: number;
     firstSeen: number;
     lastActive: number;
+    /** Reputation data (available when fetching with chainId=0) */
+    reputationScore?: number;
+    reputationTier?: 'Bronze' | 'Silver' | 'Gold' | 'Diamond';
+    reputationBreakdown?: {
+        volume: number;
+        activity: number;
+        consistency: number;
+        chainDiversity: number;
+        longevity: number;
+    };
+    chainBreakdown?: Array<{
+        chainId: number;
+        chainName: string;
+        txCount: number;
+        gasSpent: number;
+    }>;
+    badges?: string[];
 }
 interface SolverEconomics {
     address: string;
@@ -176,6 +193,12 @@ interface StreamEvent {
     chainId: number;
     payload: Record<string, any>;
     createdAt: number;
+}
+interface TokenPrice {
+    symbol: string;
+    priceUsd: number;
+    change24h: number;
+    marketCap: number;
 }
 interface ApiKeyInfo {
     keyHash: string;
@@ -299,6 +322,7 @@ declare class AnomaScanClient {
     developer: DeveloperAPI;
     stream: StreamAPI;
     agents: AgentAPI;
+    prices: PricesAPI;
     constructor(options?: AnomaScanClientOptions);
     request<T>(path: string, options?: RequestInit): Promise<ApiResponse<T>>;
     private sleep;
@@ -399,5 +423,13 @@ declare class AgentAPI {
     /** Resume a paused agent */
     resume(agentId: string): Promise<ApiResponse<Agent>>;
 }
+declare class PricesAPI {
+    private client;
+    constructor(client: AnomaScanClient);
+    /** Get all cached token prices */
+    getAll(): Promise<ApiResponse<Record<string, TokenPrice>>>;
+    /** Get price for a specific token symbol */
+    get(symbol: string): Promise<TokenPrice | null>;
+}
 
-export { type AIInsight, type Agent, type AgentConfig, type AgentExecParams, type AgentExecResult, type AgentHistory, type AnalyticsParams, AnomaScanClient, type AnomaScanClientOptions, type ApiKeyInfo, type ApiResponse, type CrossChainCorrelation, type CrossChainFlow, type DemandHeatmap, type Intent, type IntentBreakdownEntry, type IntentDetail, type IntentPayload, type IntentTypeDistribution, type LifecycleEvent, type LifecycleFunnel, type ListIntentsParams, type ListSolversParams, type Pagination, type SimulateIntentParams, type SimulationResult, type Solver, type SolverEconHistory, type SolverEconHistoryEntry, type SolverEconTotals, type SolverEconomics, type SolverEconomicsParams, type StreamEvent, type TokenTransfer, type VolumeAnalytics };
+export { type AIInsight, type Agent, type AgentConfig, type AgentExecParams, type AgentExecResult, type AgentHistory, type AnalyticsParams, AnomaScanClient, type AnomaScanClientOptions, type ApiKeyInfo, type ApiResponse, type CrossChainCorrelation, type CrossChainFlow, type DemandHeatmap, type Intent, type IntentBreakdownEntry, type IntentDetail, type IntentPayload, type IntentTypeDistribution, type LifecycleEvent, type LifecycleFunnel, type ListIntentsParams, type ListSolversParams, type Pagination, type SimulateIntentParams, type SimulationResult, type Solver, type SolverEconHistory, type SolverEconHistoryEntry, type SolverEconTotals, type SolverEconomics, type SolverEconomicsParams, type StreamEvent, type TokenPrice, type TokenTransfer, type VolumeAnalytics };

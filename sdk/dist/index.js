@@ -41,6 +41,7 @@ var AnomaScanClient = class {
     this.developer = new DeveloperAPI(this);
     this.stream = new StreamAPI(this);
     this.agents = new AgentAPI(this);
+    this.prices = new PricesAPI(this);
   }
   /* ── HTTP Core ── */
   async request(path, options = {}) {
@@ -319,6 +320,25 @@ function toQueryString(params) {
   if (entries.length === 0) return "";
   return "?" + entries.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join("&");
 }
+var PricesAPI = class {
+  constructor(client) {
+    this.client = client;
+  }
+  /** Get all cached token prices */
+  async getAll() {
+    return this.client.request("/prices", {
+      // Prices endpoint is at the root API level, not /v3
+    });
+  }
+  /** Get price for a specific token symbol */
+  async get(symbol) {
+    const result = await this.getAll();
+    if (result.success && result.data) {
+      return result.data[symbol.toUpperCase()] || null;
+    }
+    return null;
+  }
+};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AnomaScanClient
